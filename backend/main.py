@@ -10,6 +10,8 @@ BACKEND_DIR = Path(__file__).resolve().parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
+from core.database import Base, engine
+
 # Import models so SQLAlchemy metadata is registered.
 import models  # noqa: F401
 
@@ -32,3 +34,7 @@ def root():
 def health():
     return {"status": "healthy"}
 
+
+@app.on_event("startup")
+def startup_event():
+    Base.metadata.create_all(bind=engine)
