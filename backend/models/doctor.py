@@ -1,0 +1,2 @@
+"""SQLAlchemy doctor model."""
+

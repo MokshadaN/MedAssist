@@ -1,0 +1,2 @@
+"""SQLAlchemy AI summary model."""
+
