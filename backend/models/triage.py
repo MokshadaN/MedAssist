@@ -1,0 +1,2 @@
+"""SQLAlchemy triage model."""
+

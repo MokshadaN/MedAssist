@@ -1,0 +1,2 @@
+"""SQLAlchemy user model."""
+

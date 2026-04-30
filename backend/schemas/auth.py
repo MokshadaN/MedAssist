@@ -1,0 +1,2 @@
+"""Pydantic auth schemas."""
+
