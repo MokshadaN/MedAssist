@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from schemas.session import SessionCreate, SessionOut
 from services.session_service import create_session
 from core.dependencies import get_db
+from models.session import ChatSession
+from services.message_service import get_messages
 
 router = APIRouter()
 
@@ -26,8 +28,26 @@ def get_chat(
     session_id: str,
     db: Session = Depends(get_db)
 ):
-    # placeholder for now
+    # 🔹 Check session exists
+    session = db.query(ChatSession).filter(
+        ChatSession.id == session_id
+    ).first()
+
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    # 🔹 Fetch messages
+    messages = get_messages(db, session_id)
+
     return {
-        "session_id": session_id,
-        "messages": []
-    }
+    "session_id": session_id,
+    "messages": [
+        {
+            "id": msg.id,
+            "sender": msg.sender,
+            "message": msg.message,
+            "timestamp": msg.timestamp
+        }
+        for msg in messages
+    ]
+}
