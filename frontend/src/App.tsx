@@ -190,6 +190,54 @@ function App() {
   const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
   const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
 
+  const clearUserData = () => {
+    setPatientProfile(null);
+    setDoctorProfile(null);
+    setFlash('');
+    setBusy('');
+    setShowNotifications(false);
+    
+    // Clear patient state
+    setDoctors([]);
+    setSelectedDoctorId('');
+    setPatientVisits([]);
+    setPatientReports([]);
+    setPatientPrescriptions([]);
+    setNotifications([]);
+    setPatientReminders([]);
+    setReportFile(null);
+    setIntakeStatus('');
+    setProfileStatus('');
+    setReportStatus('');
+    setPrescriptionStatus('');
+    setMedicationStatus('');
+    setNotificationStatus('');
+    
+    // Clear intake/chat state
+    setIntakeOpen(false);
+    setActiveSessionId('');
+    setIntakeText('');
+    setIntakeMessages([]);
+    setStructuredData(null);
+    setLastSummary(null);
+    setEmergencyHospitals([]);
+    setEmergencyMessage('');
+    setIsSendingIntake(false);
+
+    // Clear doctor state
+    setPatients([]);
+    setSelectedPatientId('');
+    setDoctorHistory([]);
+    setDoctorReports([]);
+    setDoctorReminders([]);
+    setDoctorReminderStatus('');
+    setSelectedVisit(null);
+    setSessionSnapshot(null);
+    setDoctorSummary(null);
+    setCurrentPrescriptionItems([]);
+    setPrescriptionDraftStatus('');
+  };
+
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.patient_id === selectedPatientId) || null,
     [patients, selectedPatientId],
@@ -407,54 +455,6 @@ function App() {
     } finally {
       setBusy('');
     }
-  };
-
-  const clearUserData = () => {
-    setPatientProfile(null);
-    setDoctorProfile(null);
-    setFlash('');
-    setBusy('');
-    setShowNotifications(false);
-    
-    // Clear patient state
-    setDoctors([]);
-    setSelectedDoctorId('');
-    setPatientVisits([]);
-    setPatientReports([]);
-    setPatientPrescriptions([]);
-    setNotifications([]);
-    setPatientReminders([]);
-    setReportFile(null);
-    setIntakeStatus('');
-    setProfileStatus('');
-    setReportStatus('');
-    setPrescriptionStatus('');
-    setMedicationStatus('');
-    setNotificationStatus('');
-    
-    // Clear intake/chat state
-    setIntakeOpen(false);
-    setActiveSessionId('');
-    setIntakeText('');
-    setIntakeMessages([]);
-    setStructuredData(null);
-    setLastSummary(null);
-    setEmergencyHospitals([]);
-    setEmergencyMessage('');
-    setIsSendingIntake(false);
-
-    // Clear doctor state
-    setPatients([]);
-    setSelectedPatientId('');
-    setDoctorHistory([]);
-    setDoctorReports([]);
-    setDoctorReminders([]);
-    setDoctorReminderStatus('');
-    setSelectedVisit(null);
-    setSessionSnapshot(null);
-    setDoctorSummary(null);
-    setCurrentPrescriptionItems([]);
-    setPrescriptionDraftStatus('');
   };
 
   const signOut = () => {
