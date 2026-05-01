@@ -15,9 +15,10 @@ import { api, MedicalMetric } from '../api';
 interface HealthMetricsChartProps {
   patientId: string;
   token: string;
+  refreshTrigger?: any;
 }
 
-const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({ patientId, token }) => {
+const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({ patientId, token, refreshTrigger }) => {
   const [metrics, setMetrics] = useState<MedicalMetric[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +50,7 @@ const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({ patientId, toke
     if (patientId && token) {
       fetchMetrics();
     }
-  }, [patientId, token]);
+  }, [patientId, token, refreshTrigger]);
 
   const chartData = metrics
     .filter(m => m.parameter === selectedParam && m.value !== null)
@@ -111,47 +112,57 @@ const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({ patientId, toke
         </select>
       </div>
 
-      <div className="h-[300px] w-full mt-4">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-            <XAxis 
-              dataKey="date" 
-              stroke="#94a3b8" 
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis 
-              stroke="#94a3b8" 
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) => `${value}`}
-            />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#1e293b', 
-                border: '1px solid #334155',
-                borderRadius: '8px',
-                color: '#fff'
-              }}
-              itemStyle={{ color: '#60a5fa' }}
-            />
-            <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="value" 
-              name={selectedParam}
-              stroke="#3b82f6" 
-              strokeWidth={3}
-              dot={{ r: 6, fill: '#3b82f6', strokeWidth: 2, stroke: '#1e293b' }}
-              activeDot={{ r: 8, strokeWidth: 0 }}
-              animationDuration={1500}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      {chartData.length === 1 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '200px', backgroundColor: 'rgba(59, 130, 246, 0.05)', borderRadius: '1rem', border: '1px dashed rgba(59, 130, 246, 0.2)' }}>
+          <Activity className="text-blue-400/50 mb-2" size={32} />
+          <p className="text-blue-200/70 font-medium">Single Reading: {chartData[0].value} {chartData[0].units}</p>
+          <p className="text-slate-500 text-xs mt-1 text-center px-8">
+            Upload another report from a different date to see your health progress visualized as a trend line.
+          </p>
+        </div>
+      ) : (
+        <div style={{ height: '300px', width: '100%', marginTop: '1rem' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+              <XAxis 
+                dataKey="date" 
+                stroke="#94a3b8" 
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis 
+                stroke="#94a3b8" 
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `${value}`}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#1e293b', 
+                  border: '1px solid #334155',
+                  borderRadius: '8px',
+                  color: '#fff'
+                }}
+                itemStyle={{ color: '#60a5fa' }}
+              />
+              <Legend />
+              <Line 
+                type="monotone" 
+                dataKey="value" 
+                name={selectedParam}
+                stroke="#3b82f6" 
+                strokeWidth={3}
+                dot={{ r: 6, fill: '#3b82f6', strokeWidth: 2, stroke: '#1e293b' }}
+                activeDot={{ r: 8, strokeWidth: 0 }}
+                animationDuration={1500}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-start gap-3">
         <AlertCircle className="text-blue-400 mt-0.5" size={18} />
