@@ -12,6 +12,7 @@ import {
   Prescription,
   Reminder,
   SessionState,
+  API_BASE,
 } from './api';
 
 type AuthMode = 'login' | 'register-doctor' | 'register-patient';
@@ -77,6 +78,12 @@ function App() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [patientReminders, setPatientReminders] = useState<Reminder[]>([]);
   const [reportFile, setReportFile] = useState<File | null>(null);
+  const [intakeStatus, setIntakeStatus] = useState('');
+  const [profileStatus, setProfileStatus] = useState('');
+  const [reportStatus, setReportStatus] = useState('');
+  const [prescriptionStatus, setPrescriptionStatus] = useState('');
+  const [medicationStatus, setMedicationStatus] = useState('');
+  const [notificationStatus, setNotificationStatus] = useState('');
 
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState('');
@@ -99,6 +106,9 @@ function App() {
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
   const [doctorHistory, setDoctorHistory] = useState<DoctorVisit[]>([]);
+  const [doctorReports, setDoctorReports] = useState<Array<{ id: string; file_url: string }>>([]);
+  const [doctorReminders, setDoctorReminders] = useState<Reminder[]>([]);
+  const [doctorReminderStatus, setDoctorReminderStatus] = useState('');
   const [selectedVisit, setSelectedVisit] = useState<DoctorVisit | null>(null);
   const [sessionSnapshot, setSessionSnapshot] = useState<SessionState | null>(null);
   const [doctorSummary, setDoctorSummary] = useState<AISummary | null>(null);
@@ -174,7 +184,7 @@ function App() {
     try {
       setNotifications(await api.listNotifications(authToken));
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not load notifications');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not load notifications');
     }
   };
 
@@ -198,7 +208,7 @@ function App() {
       setPatientReminders(reminders);
       setNotifications(notes);
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not load patient dashboard');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not load patient dashboard');
     } finally {
       setBusy('');
     }
@@ -216,7 +226,7 @@ function App() {
       setNotifications(notes);
       setSelectedPatientId((current) => current || loadedPatients[0]?.patient_id || '');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not load doctor dashboard');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not load doctor dashboard');
     } finally {
       setBusy('');
     }
@@ -229,10 +239,17 @@ function App() {
 
   useEffect(() => {
     if (!authToken || !selectedPatientId || user?.role !== 'doctor') return;
+    setDoctorReminderStatus('');
     setBusy('Loading patient timeline');
-    api.getPatientHistory(selectedPatientId, authToken)
-      .then((history) => {
+    Promise.all([
+      api.getPatientHistory(selectedPatientId, authToken),
+      api.listPatientReports(selectedPatientId, authToken),
+      api.listReminders(selectedPatientId),
+    ])
+      .then(([history, reports, reminders]) => {
         setDoctorHistory(history);
+        setDoctorReports(reports);
+        setDoctorReminders(reminders);
         setSelectedVisit(history[0] || null);
       })
       .catch((error) => setFlash(error instanceof Error ? error.message : 'Could not load patient history'))
@@ -329,6 +346,13 @@ function App() {
     setUser(null);
     setPatientProfile(null);
     setFlash('');
+    setIntakeStatus('');
+    setProfileStatus('');
+    setReportStatus('');
+    setPrescriptionStatus('');
+    setMedicationStatus('');
+    setNotificationStatus('');
+    setDoctorReminderStatus('');
   };
 
   const startPatientVisit = async () => {
@@ -341,8 +365,9 @@ function App() {
       setStructuredData(null);
       setLastSummary(null);
       setIntakeOpen(true);
+      setIntakeStatus('Intake started');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not start visit');
+      setIntakeStatus(error instanceof Error ? error.message : 'Could not start visit');
     } finally {
       setBusy('');
     }
@@ -376,11 +401,12 @@ function App() {
         const summary = await api.getSummary(response.session_id, authToken);
         setLastSummary(summary);
         setPatientVisits((current) => [visit, ...current.filter((item) => item.visit_id !== visit.visit_id)]);
-        setFlash(`Visit sent to ${selectedDoctor?.name || 'doctor'}`);
+        setPatientReminders((current) => current);
+        setIntakeStatus(`Visit sent to ${selectedDoctor?.name || 'doctor'}`);
         await refreshPatientData();
       }
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not save intake answer');
+      setIntakeStatus(error instanceof Error ? error.message : 'Could not save intake answer');
     } finally {
       setBusy('');
       setIsSendingIntake(false);
@@ -405,9 +431,9 @@ function App() {
         authToken,
       );
       setAuthContext(context);
-      setFlash('Profile updated');
+      setProfileStatus('Profile updated');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not update profile');
+      setProfileStatus(error instanceof Error ? error.message : 'Could not update profile');
     } finally {
       setBusy('');
     }
@@ -420,11 +446,66 @@ function App() {
       await api.uploadReport(user.id, reportFile, authToken);
       setPatientReports(await api.listReports(user.id, authToken));
       setReportFile(null);
-      setFlash('Report uploaded');
+      setReportStatus('Report uploaded');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Upload failed');
+      setReportStatus(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setBusy('');
+    }
+  };
+
+  const getReportUrl = (fileUrl: string) => {
+    if (fileUrl.startsWith('http')) return fileUrl;
+    if (fileUrl.startsWith('/')) return fileUrl;
+    return `${API_BASE}/${fileUrl}`;
+  };
+
+  const openReport = async (fileUrl: string) => {
+    if (!authToken) return;
+    try {
+      const response = await fetch(getReportUrl(fileUrl), {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text() || 'Could not open report');
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank', 'noopener,noreferrer');
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+    } catch (error) {
+      setFlash(error instanceof Error ? error.message : 'Could not open report');
+    }
+  };
+
+  const downloadReport = async (fileUrl: string) => {
+    if (!authToken) return;
+    try {
+      const response = await fetch(getReportUrl(fileUrl), {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text() || 'Could not download report');
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = blobUrl;
+      anchor.download = fileUrl.split('/').pop() || 'report';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+    } catch (error) {
+      setFlash(error instanceof Error ? error.message : 'Could not download report');
     }
   };
 
@@ -436,7 +517,7 @@ function App() {
       const reminder = await api.createMyReminder({ message, time: time.toISOString() }, authToken);
       setPatientReminders((current) => [reminder, ...current]);
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not create reminder');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not create reminder');
     }
   };
 
@@ -446,7 +527,7 @@ function App() {
       const updated = await api.markNotificationRead(notification.id, authToken);
       setNotifications((current) => current.map((item) => (item.id === updated.id ? updated : item)));
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not mark notification read');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not mark notification read');
     }
   };
 
@@ -456,9 +537,9 @@ function App() {
     try {
       const prescription = await api.createPrescription(selectedVisit.visit_id, prescriptionNotes, authToken);
       setPrescriptionId(prescription.id);
-      setFlash('Prescription created');
+      setPrescriptionStatus('Prescription created');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not create prescription');
+      setPrescriptionStatus(error instanceof Error ? error.message : 'Could not create prescription');
     } finally {
       setBusy('');
     }
@@ -477,9 +558,9 @@ function App() {
       setDosage('');
       setDuration('');
       setFrequency('');
-      setFlash('Medication added');
+      setMedicationStatus('Medication added');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not add medication');
+      setMedicationStatus(error instanceof Error ? error.message : 'Could not add medication');
     } finally {
       setBusy('');
     }
@@ -488,14 +569,15 @@ function App() {
   const scheduleFollowUp = async () => {
     if (!selectedPatientId || !doctorReminderMessage || !doctorReminderTime) return;
     try {
-      await api.createReminder({
+      const reminder = await api.createReminder({
         user_id: selectedPatientId,
         message: doctorReminderMessage,
         time: new Date(doctorReminderTime).toISOString(),
       });
-      setFlash('Follow-up reminder scheduled');
+      setDoctorReminders((current) => [reminder, ...current.filter((item) => item.id !== reminder.id)]);
+      setDoctorReminderStatus('Follow-up already scheduled for this patient; the existing reminder was updated.');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not schedule follow-up');
+      setDoctorReminderStatus(error instanceof Error ? error.message : 'Could not schedule follow-up');
     }
   };
 
@@ -578,8 +660,8 @@ function App() {
         </div>
       </header>
 
-      {flash && <div className="flash">{flash}</div>}
       {busy && <div className="flash subtle">{busy}...</div>}
+      {notificationStatus && <div className="flash subtle">{notificationStatus}</div>}
 
       {showNotifications && (
         <section className="panel notification-panel">
@@ -646,6 +728,7 @@ function App() {
                     <textarea rows={2} value={profileForm.chronic_conditions} onChange={(e) => setProfileForm({ ...profileForm, chronic_conditions: e.target.value })} placeholder="Example: Diabetes" />
                   </label>
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
+                  {profileStatus && <div className="flash subtle">{profileStatus}</div>}
                 </form>
               </div>
             </div>
@@ -708,6 +791,7 @@ function App() {
                         {isSendingIntake ? 'Thinking...' : 'Send'}
                       </button>
                     </form>
+                    {intakeStatus && <div className="flash subtle" style={{ marginTop: '0.25rem' }}>{intakeStatus}</div>}
                   </div>
                   <div className="summary-card">
                     <div className="eyebrow" style={{ marginBottom: '1rem' }}>Live SOAP Generation</div>
@@ -762,6 +846,7 @@ function App() {
                     </div>
                   ))}
                   {!patientPrescriptions.length && <div className="empty">No active prescriptions.</div>}
+                  {prescriptionStatus && <div className="flash subtle">{prescriptionStatus}</div>}
                 </div>
               </section>
             </div>
@@ -773,17 +858,19 @@ function App() {
                   <h2>Lab Reports</h2>
                 </div>
               </div>
-              <div className="stack compact">
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} style={{ flex: 1 }} />
-                  <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload</button>
-                </div>
-                <div className="reports-list" style={{ marginTop: '0.5rem' }}>
+                <div className="stack compact">
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} style={{ flex: 1 }} />
+                    <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload</button>
+                  </div>
+                  {reportStatus && <div className="flash subtle">{reportStatus}</div>}
+                  <div className="reports-list" style={{ marginTop: '0.5rem' }}>
                   {patientReports.map((report) => (
-                    <a className="link-row" key={report.id} href={report.file_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd"></path></svg>
-                      {report.file_url.split('/').pop()}
-                    </a>
+                    <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                      <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                      <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
+                      <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
+                    </div>
                   ))}
                   {!patientReports.length && <div className="empty">No reports uploaded.</div>}
                 </div>
@@ -936,6 +1023,25 @@ function App() {
             <section className="panel wide">
               <div className="panel-head">
                 <div>
+                  <div className="eyebrow">Documents</div>
+                  <h2>Patient Reports</h2>
+                </div>
+              </div>
+              <div className="stack compact">
+                {doctorReports.map((report) => (
+                  <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                    <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                    <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
+                    <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
+                  </div>
+                ))}
+                {!doctorReports.length && <div className="empty">No reports uploaded for this patient.</div>}
+              </div>
+            </section>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
                   <div className="eyebrow">Analysis</div>
                   <h2>SOAP Summary</h2>
                 </div>
@@ -955,6 +1061,22 @@ function App() {
                   <input type="datetime-local" value={doctorReminderTime} onChange={(e) => setDoctorReminderTime(e.target.value)} />
                   <textarea rows={3} value={doctorReminderMessage} onChange={(e) => setDoctorReminderMessage(e.target.value)} placeholder="Message for patient..." />
                   <button className="primary" onClick={() => void scheduleFollowUp()} disabled={!selectedPatientId}>Set Reminder</button>
+                  {doctorReminderStatus && <div className="flash subtle" style={{ marginTop: '0.25rem' }}>{doctorReminderStatus}</div>}
+                  <div className="stack compact" style={{ marginTop: '0.75rem' }}>
+                    {doctorReminders[0] ? (
+                      <div className={`reminder-row ${doctorReminders[0].is_completed ? 'done' : ''}`}>
+                        <div>
+                          <span className="badge" style={{ marginBottom: '0.25rem' }}>
+                            {doctorReminders[0].is_completed ? 'Follow-up completed' : 'Follow-up already scheduled'}
+                          </span>
+                          <strong style={{ display: 'block', color: '#fff' }}>{doctorReminders[0].message}</strong>
+                          <span style={{ fontSize: '0.85rem' }}>{formatDate(doctorReminders[0].time)}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="empty">No follow-ups scheduled for this patient.</div>
+                    )}
+                  </div>
                 </div>
               </section>
 
@@ -994,6 +1116,7 @@ function App() {
                     </button>
                   </div>
                 </div>
+                {prescriptionStatus && <div className="flash subtle">{prescriptionStatus}</div>}
                 
                 {prescriptionId && (
                   <div className="panel animate-in" style={{ background: 'var(--surface-soft)', padding: '1rem', border: '1px dashed var(--border)' }}>
@@ -1005,6 +1128,7 @@ function App() {
                       <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Duration (e.g. 5 days)" />
                     </div>
                     <button className="primary" style={{ marginTop: '1rem', width: '100%' }} onClick={() => void addMedication()}>Add Item</button>
+                    {medicationStatus && <div className="flash subtle" style={{ marginTop: '0.75rem' }}>{medicationStatus}</div>}
                   </div>
                 )}
               </div>
