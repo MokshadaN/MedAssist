@@ -29,3 +29,14 @@ def delete_report(db: Session, report: Report) -> None:
     """
     db.delete(report)
     db.commit()
+
+
+def update_report_analysis(db: Session, report: Report, parsed_data: str | None) -> Report:
+    """
+    Update the stored analysis for a report.
+    """
+    report.parsed_data = parsed_data
+    db.add(report)
+    db.commit()
+    db.refresh(report)
+    return report

@@ -17,6 +17,7 @@ from schemas.places import Hospital, HospitalDetails
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_DIR / ".env")
 
+
 OVERPASS_API_URL = "https://overpass-api.de/api/interpreter"
 NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/search"
 REQUEST_HEADERS = {

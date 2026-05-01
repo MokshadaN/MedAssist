@@ -48,19 +48,12 @@ def upload_report(
 
         file_url = f"/api/v1/reports/download/{safe_name}"
 
-        parsed_data = None
-        if file.content_type and file.content_type.lower().startswith("image/"):
-            analysis = analyze_report_image(disk_path)
-            parsed_data = serialize_report_analysis(analysis)
-        else:
-            parsed_data = "Uploaded file is not an image; report analysis skipped."
-
         # Save report record in database via service
         report = report_service.save_report(
             db, 
             patient_id=patient_id, 
             file_url=file_url,
-            parsed_data=parsed_data
+            parsed_data=None
         )
         return report
     except HTTPException:
@@ -132,3 +125,30 @@ def delete_report(
 
     report_service.delete_report(db, report)
     return {"status": "deleted", "report_id": report_id}
+
+
+@router.post("/{report_id}/analyze", response_model=ReportOut)
+def analyze_report(
+    report_id: str,
+    current_user=Depends(require_roles("patient", "doctor")),
+    db: Session = Depends(get_db),
+):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    if current_user.role == "patient" and report.patient_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only analyze your own reports")
+
+    if current_user.role not in {"patient", "doctor"}:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    disk_name = Path(report.file_url).name
+    disk_path = UPLOAD_DIR / disk_name
+    if not disk_path.exists():
+        raise HTTPException(status_code=404, detail="Report file not found on server")
+
+    analysis = analyze_report_image(disk_path)
+    parsed_data = serialize_report_analysis(analysis)
+    updated = report_service.update_report_analysis(db, report, parsed_data)
+    return updated
