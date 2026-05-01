@@ -323,6 +323,7 @@ function App() {
     const data = new FormData(event.currentTarget);
     setBusy('Signing in');
     try {
+      clearUserData();
       const result = await api.login(String(data.get('email') || ''), String(data.get('password') || ''));
       localStorage.setItem('medassist_token', result.access_token);
       setAuthToken(result.access_token);
@@ -365,6 +366,7 @@ function App() {
         });
       }
 
+      clearUserData();
       const result = await api.login(String(data.get('email') || ''), String(data.get('password') || ''));
       localStorage.setItem('medassist_token', result.access_token);
       setAuthToken(result.access_token);
@@ -377,20 +379,59 @@ function App() {
     }
   };
 
-  const signOut = () => {
-    localStorage.removeItem('medassist_token');
-    setAuthToken('');
-    setUser(null);
+  const clearUserData = () => {
     setPatientProfile(null);
+    setDoctorProfile(null);
     setFlash('');
+    setBusy('');
+    setShowNotifications(false);
+    
+    // Clear patient state
+    setDoctors([]);
+    setSelectedDoctorId('');
+    setPatientVisits([]);
+    setPatientReports([]);
+    setPatientPrescriptions([]);
+    setNotifications([]);
+    setPatientReminders([]);
+    setReportFile(null);
     setIntakeStatus('');
     setProfileStatus('');
     setReportStatus('');
     setPrescriptionStatus('');
     setMedicationStatus('');
     setNotificationStatus('');
+    
+    // Clear intake/chat state
+    setIntakeOpen(false);
+    setActiveSessionId('');
+    setIntakeText('');
+    setIntakeMessages([]);
+    setStructuredData(null);
+    setLastSummary(null);
+    setEmergencyHospitals([]);
+    setEmergencyMessage('');
+    setIsSendingIntake(false);
+
+    // Clear doctor state
+    setPatients([]);
+    setSelectedPatientId('');
+    setDoctorHistory([]);
+    setDoctorReports([]);
+    setDoctorReminders([]);
     setDoctorReminderStatus('');
+    setSelectedVisit(null);
+    setSessionSnapshot(null);
+    setDoctorSummary(null);
+    setCurrentPrescriptionItems([]);
     setPrescriptionDraftStatus('');
+  };
+
+  const signOut = () => {
+    localStorage.removeItem('medassist_token');
+    setAuthToken('');
+    setUser(null);
+    clearUserData();
   };
 
   const startPatientVisit = async () => {
