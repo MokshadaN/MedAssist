@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.class
+
+# Database
+backend/medassist.db
+
+# Environments
+.venv/
+venv/
+ENV/
+newvenv/
+
+# IDEs
+.vscode/
+.idea/
