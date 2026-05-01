@@ -46,7 +46,9 @@ export type ProfileUpdate = {
   chronic_conditions?: string;
   address?: string;
   specialization?: string;
-
+  license_number?: string;
+  experience_years?: number;
+  hospital_affiliation?: string;
 };
 
 export type DoctorDirectoryItem = {
@@ -195,6 +197,21 @@ export type Reminder = {
   updated_at: string;
 };
 
+export type PublicProfile = {
+  name: string;
+  age?: number | null;
+  gender?: string | null;
+  allergies?: string | null;
+  chronic_conditions?: string | null;
+  medications: Array<{
+    medicine_name: string;
+    dosage: string;
+    duration: string;
+    frequency: string;
+    prescribed_on: string;
+  }>;
+};
+
 type RequestOptions = RequestInit & {
   token?: string | null;
 };
@@ -326,7 +343,7 @@ export const api = {
     });
   },
   analyzeTriage(transcript: string, token?: string | null) {
-    return request<{ severity?: string; flags?: string[]; [key: string]: unknown }>(`/triage/analyze`, {
+    return request<{ severity?: string; flags?: string[];[key: string]: unknown }>(`/triage/analyze`, {
       method: 'POST',
       token,
       body: JSON.stringify({ transcript }),
@@ -457,8 +474,8 @@ export const api = {
       method: 'DELETE',
     });
   },
-  getPublicProfile(profileId: string) {
-    return request<PatientPublicProfile>(`/patient/public/${profileId}`);
+  getPublicProfile(patientId: string) {
+    return request<PublicProfile>(`/patient/public-profile/${patientId}`);
   },
 };
 
