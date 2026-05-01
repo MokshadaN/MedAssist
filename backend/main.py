@@ -8,6 +8,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from core.database import Base, engine
 
 # Import models so SQLAlchemy metadata is registered.
@@ -19,6 +20,14 @@ from schemas import ai, auth, feedback, message, prescription, reminder, report,
 from api.v1.router import api_router
 
 app = FastAPI(title="MedAssist API", version="0.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(api_router, prefix="/api/v1")
 
