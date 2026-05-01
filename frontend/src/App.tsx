@@ -68,6 +68,7 @@ function App() {
   const [busy, setBusy] = useState('');
   const [flash, setFlash] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const [doctors, setDoctors] = useState<DoctorDirectoryItem[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
@@ -546,7 +547,7 @@ function App() {
   return (
     <div className="app-shell">
       <header className="app-topbar">
-        <div className="brand">
+        <div className="brand" onClick={() => setShowProfile(!showProfile)} style={{ cursor: 'pointer' }}>
           <div className="brand-badge">M</div>
           <div>
             <div className="eyebrow">{user.role === 'patient' ? 'Patient portal' : 'Doctor dashboard'}</div>
@@ -587,6 +588,28 @@ function App() {
             ))}
             {!notifications.length && <div className="empty">No notifications yet.</div>}
           </div>
+        </section>
+      )}
+
+      {showProfile && user.role === 'patient' && (
+        <section className="panel notification-panel" style={{ right: 'auto', left: '22px' }}>
+          <div className="panel-head">
+            <div>
+              <div className="eyebrow">Profile</div>
+              <h2>Lookup and edit details</h2>
+            </div>
+            <span className="pill">{patientProfile?.allergies ? 'Allergies recorded' : 'No allergy details'}</span>
+          </div>
+          <form className="profile-grid" onSubmit={(e) => { saveProfile(e); setShowProfile(false); }}>
+            <input value={profileForm.name} onChange={(event) => setProfileForm({ ...profileForm, name: event.target.value })} placeholder="Name" />
+            <input value={profileForm.email} onChange={(event) => setProfileForm({ ...profileForm, email: event.target.value })} placeholder="Email" />
+            <input value={profileForm.phone} onChange={(event) => setProfileForm({ ...profileForm, phone: event.target.value })} placeholder="Phone" />
+            <input value={profileForm.age} onChange={(event) => setProfileForm({ ...profileForm, age: event.target.value })} placeholder="Age" />
+            <input value={profileForm.gender} onChange={(event) => setProfileForm({ ...profileForm, gender: event.target.value })} placeholder="Gender" />
+            <textarea rows={3} value={profileForm.allergies} onChange={(event) => setProfileForm({ ...profileForm, allergies: event.target.value })} placeholder="Allergies" />
+            <textarea rows={3} value={profileForm.chronic_conditions} onChange={(event) => setProfileForm({ ...profileForm, chronic_conditions: event.target.value })} placeholder="Chronic conditions" />
+            <button className="primary" type="submit">Save profile</button>
+          </form>
         </section>
       )}
 
@@ -716,25 +739,6 @@ function App() {
             </div>
           </section>
 
-          <section className="panel wide">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Profile</div>
-                <h2>Lookup and edit details</h2>
-              </div>
-              <span className="pill">{patientProfile?.allergies ? 'Allergies recorded' : 'No allergy details'}</span>
-            </div>
-            <form className="profile-grid" onSubmit={saveProfile}>
-              <input value={profileForm.name} onChange={(event) => setProfileForm({ ...profileForm, name: event.target.value })} placeholder="Name" />
-              <input value={profileForm.email} onChange={(event) => setProfileForm({ ...profileForm, email: event.target.value })} placeholder="Email" />
-              <input value={profileForm.phone} onChange={(event) => setProfileForm({ ...profileForm, phone: event.target.value })} placeholder="Phone" />
-              <input value={profileForm.age} onChange={(event) => setProfileForm({ ...profileForm, age: event.target.value })} placeholder="Age" />
-              <input value={profileForm.gender} onChange={(event) => setProfileForm({ ...profileForm, gender: event.target.value })} placeholder="Gender" />
-              <textarea rows={3} value={profileForm.allergies} onChange={(event) => setProfileForm({ ...profileForm, allergies: event.target.value })} placeholder="Allergies" />
-              <textarea rows={3} value={profileForm.chronic_conditions} onChange={(event) => setProfileForm({ ...profileForm, chronic_conditions: event.target.value })} placeholder="Chronic conditions" />
-              <button className="primary" type="submit">Save profile</button>
-            </form>
-          </section>
         </main>
       ) : (
         <main className="grid doctor-grid">
