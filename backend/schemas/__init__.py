@@ -1,1 +1,1 @@
-from . import ai, auth, feedback, message, prescription, reminder, report, session, triage, visit
+from . import ai, auth, doctor, feedback, message, prescription, reminder, report, session, triage, visit
