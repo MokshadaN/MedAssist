@@ -43,6 +43,7 @@ export type ProfileUpdate = {
   gender?: string;
   allergies?: string;
   chronic_conditions?: string;
+  specialization?: string;
 };
 
 export type DoctorDirectoryItem = {

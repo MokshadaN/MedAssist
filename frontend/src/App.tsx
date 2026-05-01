@@ -64,6 +64,7 @@ function App() {
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
+  const [doctorProfile, setDoctorProfile] = useState<DoctorProfile | null>(null);
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [authReady, setAuthReady] = useState(!localStorage.getItem('medassist_token'));
   const [busy, setBusy] = useState('');
@@ -101,6 +102,7 @@ function App() {
     gender: '',
     allergies: '',
     chronic_conditions: '',
+    specialization: '',
   });
 
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
@@ -141,6 +143,7 @@ function App() {
   const setAuthContext = (context: AuthContext) => {
     setUser(context.user);
     setPatientProfile(context.patient_profile || null);
+    setDoctorProfile(context.doctor_profile || null);
     setProfileForm({
       name: context.user.name || '',
       email: context.user.email || '',
@@ -149,6 +152,7 @@ function App() {
       gender: context.patient_profile?.gender || '',
       allergies: context.patient_profile?.allergies || '',
       chronic_conditions: context.patient_profile?.chronic_conditions || '',
+      specialization: context.doctor_profile?.specialization || '',
     });
   };
 
@@ -427,6 +431,7 @@ function App() {
           gender: profileForm.gender,
           allergies: profileForm.allergies,
           chronic_conditions: profileForm.chronic_conditions,
+          specialization: profileForm.specialization,
         },
         authToken,
       );
@@ -941,16 +946,18 @@ function App() {
 
               <div className="profile-details-form">
                 <div className="eyebrow" style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Professional Profile</div>
-                <div className="stack compact">
-                  <div className="record-card">
-                    <div className="eyebrow">Email</div>
-                    <p style={{ margin: 0, fontSize: '0.9rem' }}>{user.email}</p>
-                  </div>
-                  <div className="record-card">
-                    <div className="eyebrow">Contact</div>
-                    <p style={{ margin: 0, fontSize: '0.9rem' }}>{user.phone || 'Not provided'}</p>
-                  </div>
-                </div>
+                <form className="stack compact" onSubmit={saveProfile}>
+                  <label className="field">
+                    <span>Phone Number</span>
+                    <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Enter phone number" />
+                  </label>
+                  <label className="field">
+                    <span>Specialization</span>
+                    <input value={profileForm.specialization} onChange={(e) => setProfileForm({ ...profileForm, specialization: e.target.value })} placeholder="Example: Cardiology" />
+                  </label>
+                  <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
+                  {profileStatus && <div className="flash subtle">{profileStatus}</div>}
+                </form>
               </div>
             </div>
           </aside>
