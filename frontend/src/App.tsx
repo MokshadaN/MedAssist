@@ -205,7 +205,7 @@ function App() {
     if (isPublicRoute && routeProfileId) {
       api.getPublicProfile(routeProfileId)
         .then(setPublicProfile)
-        .catch((err) => setFlash(err.message))
+        .catch((err: Error) => setFlash(err.message))
         .finally(() => setPublicLoading(false));
     }
   }, [isPublicRoute, routeProfileId]);
@@ -407,7 +407,7 @@ function App() {
       setPublicProfileId(profileId);
       api.getPublicProfile(profileId)
         .then(setPublicProfile)
-        .catch((err) => setFlash(`Error loading profile: ${err.message}`));
+        .catch((err: Error) => setFlash(`Error loading profile: ${err.message}`));
     }
   }, []);
 
@@ -987,7 +987,7 @@ function App() {
               <div className="stack">
                 <div className="eyebrow">Current Medications</div>
                 <div className="medication-list-public">
-                  {publicProfile.medications.map((med, i) => (
+                  {publicProfile.medications.map((med: any, i: number) => (
                     <div key={i} className="record-card" style={{ marginBottom: '0.75rem' }}>
                       <strong style={{ color: '#fff' }}>{med.medicine_name}</strong>
                       <div className="pill-group" style={{ marginTop: '0.25rem' }}>

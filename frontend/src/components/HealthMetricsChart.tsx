@@ -33,8 +33,8 @@ const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({ patientId, toke
         const data = await api.getPatientMetrics(patientId, null, token);
         setMetrics(data);
         
-        const params = Array.from(new Set(data.map(m => m.parameter)));
-        setAvailableParams(params);
+        const params = Array.from(new Set(data.map((m: any) => m.parameter)));
+        setAvailableParams(params as string[]);
         
         if (params.length > 0 && !selectedParam) {
           setSelectedParam(params[0]);
@@ -137,7 +137,7 @@ const HealthMetricsChart: React.FC<HealthMetricsChartProps> = ({ patientId, toke
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(value) => `${value}`}
+                tickFormatter={(value: any) => `${value}`}
               />
               <Tooltip 
                 contentStyle={{ 

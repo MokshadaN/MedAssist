@@ -197,6 +197,35 @@ export type Reminder = {
   updated_at: string;
 };
 
+export type PublicProfile = {
+  name: string;
+  age?: number | null;
+  gender?: string | null;
+  allergies?: string | null;
+  chronic_conditions?: string | null;
+  medications: Array<{
+    medicine_name: string;
+    dosage: string;
+    duration: string;
+    frequency: string;
+    prescribed_on: string;
+  }>;
+};
+
+export type MedicalMetric = {
+  id: string;
+  patient_id: string;
+  report_id: string;
+  parameter: string;
+  value: number | null;
+  raw_value: string;
+  units?: string | null;
+  interpretation?: string | null;
+  severity?: string | null;
+  measured_at: string;
+  created_at: string;
+};
+
 type RequestOptions = RequestInit & {
   token?: string | null;
 };
@@ -458,6 +487,15 @@ export const api = {
     return request<{ status: string }>(`/reminders/${encodeURIComponent(reminderId)}`, {
       method: 'DELETE',
     });
+  },
+  getPublicProfile(patientId: string) {
+    return request<PublicProfile>(`/patient/public-profile/${patientId}`);
+  },
+  getPatientMetrics(patientId: string, parameter: string | null, token: string) {
+    const path = parameter 
+      ? `/reports/${encodeURIComponent(patientId)}/metrics?parameter=${encodeURIComponent(parameter)}`
+      : `/reports/${encodeURIComponent(patientId)}/metrics`;
+    return request<MedicalMetric[]>(path, { token });
   },
 };
 
