@@ -407,7 +407,7 @@ function App() {
     const recognition = new SpeechRecognition();
     recognitionRef.current = recognition;
     recordingBaseTextRef.current = intakeText.trim();
-    
+
     recognition.lang = 'en-US';
     recognition.interimResults = true;
     recognition.continuous = true;
@@ -422,13 +422,13 @@ function App() {
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         currentTranscript += event.results[i][0].transcript;
       }
-      
+
       // We use a functional update to avoid issues with stale intakeText
       // but we use the ref for the base text captured at start.
       const fullTranscript = Array.from(event.results)
         .map((res: any) => res[0].transcript)
         .join('');
-        
+
       setIntakeText(recordingBaseTextRef.current + (recordingBaseTextRef.current ? ' ' : '') + fullTranscript);
       setIsVoiceInput(true);
     };
@@ -974,13 +974,13 @@ function App() {
                   <h2>Lab Reports</h2>
                 </div>
               </div>
-                <div className="stack compact">
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} style={{ flex: 1 }} />
-                    <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload</button>
-                  </div>
-                  {reportStatus && <div className="flash subtle">{reportStatus}</div>}
-                  <div className="reports-list" style={{ marginTop: '0.5rem' }}>
+              <div className="stack compact">
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} style={{ flex: 1 }} />
+                  <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload</button>
+                </div>
+                {reportStatus && <div className="flash subtle">{reportStatus}</div>}
+                <div className="reports-list" style={{ marginTop: '0.5rem' }}>
                   {patientReports.map((report) => (
                     <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto', alignItems: 'center', gap: '0.75rem' }}>
                       <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
@@ -1208,8 +1208,8 @@ function App() {
                 <div className={`alert-card ${sessionSnapshot?.status === 'urgent' ? 'urgent' : ''}`} style={{ height: '100%' }}>
                   <strong style={{ color: '#fff' }}>{sessionSnapshot?.status?.toUpperCase() || 'NORMAL'}</strong>
                   <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
-                    {sessionSnapshot?.status === 'urgent' 
-                      ? 'Immediate medical evaluation recommended based on AI triage.' 
+                    {sessionSnapshot?.status === 'urgent'
+                      ? 'Immediate medical evaluation recommended based on AI triage.'
                       : 'No urgent indicators detected in current session.'}
                   </p>
                 </div>
@@ -1235,7 +1235,7 @@ function App() {
                   </div>
                 </div>
                 {prescriptionStatus && <div className="flash subtle">{prescriptionStatus}</div>}
-                
+
                 {prescriptionId && (
                   <div className="panel animate-in" style={{ background: 'var(--surface-soft)', padding: '1rem', border: '1px dashed var(--border)' }}>
                     {currentPrescriptionItems.length > 0 && (
