@@ -1,18 +1,26 @@
 """Triage endpoints."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-router = APIRouter()
+from core.dependencies import get_current_user, get_db
+from services.triage_service import detect_urgent_red_flags
+
+router = APIRouter(tags=["triage"])
 
 from pydantic import BaseModel
-from services.triage_service import detect_urgent_red_flags
 
 class TriageRequest(BaseModel):
     transcript: str
 
 @router.post("/analyze")
-def analyze(req: TriageRequest):
-    return detect_urgent_red_flags(req.transcript)
+def analyze(
+    req: TriageRequest,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Analyze transcript for medical emergencies and provide hospital information if urgent."""
+    return detect_urgent_red_flags(req.transcript, current_user.id, db)
 
 @router.get("/{session_id}")
 def get_triage(session_id: str):

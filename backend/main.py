@@ -9,13 +9,15 @@ if str(BACKEND_DIR) not in sys.path:
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import inspect, text
+
 from core.database import Base, engine
 
 # Import models so SQLAlchemy metadata is registered.
 import models  # noqa: F401
 
 # Import schemas so the package modules load cleanly.
-from schemas import ai, auth, feedback, message, prescription, reminder, report, risk, session, triage, visit  # noqa: F401
+from schemas import ai, auth, feedback, message, patient, prescription, reminder, report, risk, session, triage, visit  # noqa: F401
 
 from api.v1.router import api_router
 
@@ -45,3 +47,9 @@ def health():
 @app.on_event("startup")
 def startup_event():
     Base.metadata.create_all(bind=engine)
+    inspector = inspect(engine)
+    if "patient_profiles" in inspector.get_table_names():
+        columns = {column["name"] for column in inspector.get_columns("patient_profiles")}
+        if "address" not in columns:
+            with engine.begin() as connection:
+                connection.execute(text("ALTER TABLE patient_profiles ADD COLUMN address VARCHAR"))

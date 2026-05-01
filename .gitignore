@@ -5,3 +5,6 @@ __pycache__/
 *.pyd
 *.db
 medassist.db
+frontend/dist/
+frontend/node_modules/
+uploads/
