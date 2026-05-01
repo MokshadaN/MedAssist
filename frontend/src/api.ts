@@ -16,6 +16,7 @@ export type PatientProfile = {
   gender?: string | null;
   allergies?: string | null;
   chronic_conditions?: string | null;
+  address?: string | null;
 };
 
 export type DoctorProfile = {
@@ -43,6 +44,7 @@ export type ProfileUpdate = {
   gender?: string;
   allergies?: string;
   chronic_conditions?: string;
+  address?: string;
 };
 
 export type DoctorDirectoryItem = {
@@ -84,6 +86,15 @@ export type IntakeStart = {
   initial_question?: string | null;
 };
 
+export type EmergencyHospital = {
+  name: string;
+  phone?: string | null;
+  address?: string | null;
+  distance_meters?: number | null;
+  opening_hours?: string | null;
+  is_open?: boolean | null;
+};
+
 export type IntakeResponse = {
   session_id: string;
   status: string;
@@ -96,6 +107,8 @@ export type IntakeResponse = {
   comparison?: Record<string, unknown> | null;
   summary_id?: string | null;
   matched_terms?: string[];
+  nearest_hospitals?: EmergencyHospital[];
+  emergency_message?: string | null;
 };
 
 export type AISummary = {
@@ -255,6 +268,7 @@ export const api = {
     gender?: string;
     allergies?: string;
     chronic_conditions?: string;
+    address?: string;
   }) {
     return request<AuthContext>(`/auth/register/patient`, {
       method: 'POST',

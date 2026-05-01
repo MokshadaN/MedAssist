@@ -137,7 +137,7 @@ def process_intake_answer(
     transcript = build_transcript(messages)
     patient_answer_count = _patient_answer_count(messages)
 
-    triage_result = detect_urgent_red_flags(transcript)
+    triage_result = detect_urgent_red_flags(transcript, session.patient_id, db)
     if triage_result["urgent"]:
         session.status = "urgent"
         db.commit()
@@ -149,6 +149,8 @@ def process_intake_answer(
             "message": reply,
             "input_mode": input_mode,
             "matched_terms": triage_result["matched_terms"],
+            "nearest_hospitals": triage_result.get("nearest_hospitals", []),
+            "emergency_message": triage_result.get("emergency_message"),
         }
 
     if patient_answer_count < len(INTAKE_QUESTIONS):

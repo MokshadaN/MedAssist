@@ -35,6 +35,7 @@ class PatientRegister(BaseRegister):
     gender: Optional[str] = Field(default=None, max_length=30)
     allergies: Optional[str] = Field(default=None, max_length=255)
     chronic_conditions: Optional[str] = Field(default=None, max_length=255)
+    address: Optional[str] = Field(default=None, max_length=255)
 
 
 class UserLogin(BaseModel):
@@ -78,6 +79,7 @@ class PatientProfileOut(BaseModel):
     gender: Optional[str] = None
     allergies: Optional[str] = None
     chronic_conditions: Optional[str] = None
+    address: Optional[str] = None
 
     model_config = {"from_attributes": True}
 
@@ -90,6 +92,7 @@ class ProfileUpdate(BaseModel):
     gender: Optional[str] = Field(default=None, max_length=30)
     allergies: Optional[str] = Field(default=None, max_length=255)
     chronic_conditions: Optional[str] = Field(default=None, max_length=255)
+    address: Optional[str] = Field(default=None, max_length=255)
 
 
 class RegisterResponse(BaseModel):

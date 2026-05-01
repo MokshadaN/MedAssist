@@ -7,6 +7,7 @@ import {
   DoctorDirectoryItem,
   DoctorPatient,
   DoctorVisit,
+  EmergencyHospital,
   Notification,
   PatientProfile,
   Prescription,
@@ -24,6 +25,7 @@ const emptyProfile: PatientProfile = {
   gender: '',
   allergies: '',
   chronic_conditions: '',
+  address: '',
 };
 
 function formatDate(value?: string | null) {
@@ -59,6 +61,18 @@ function isUrgent(reminder: Reminder) {
   return text.includes('urgent') || reminderLabel(reminder) === 'Overdue' || reminderLabel(reminder) === 'Due today';
 }
 
+function formatDistance(meters?: number | null) {
+  if (!meters && meters !== 0) return 'Distance unavailable';
+  if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km away`;
+  return `${Math.round(meters)} m away`;
+}
+
+function openStatus(hospital: EmergencyHospital) {
+  if (hospital.is_open === true) return 'Open now';
+  if (hospital.is_open === false) return 'May be closed';
+  return hospital.opening_hours ? `Hours: ${hospital.opening_hours}` : 'Open status not listed';
+}
+
 function App() {
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -84,6 +98,8 @@ function App() {
   const [intakeMessages, setIntakeMessages] = useState<ChatMessage[]>([]);
   const [structuredData, setStructuredData] = useState<Record<string, unknown> | null>(null);
   const [lastSummary, setLastSummary] = useState<AISummary | null>(null);
+  const [emergencyHospitals, setEmergencyHospitals] = useState<EmergencyHospital[]>([]);
+  const [emergencyMessage, setEmergencyMessage] = useState('');
 
   const [profileForm, setProfileForm] = useState({
     name: '',
@@ -93,6 +109,7 @@ function App() {
     gender: '',
     allergies: '',
     chronic_conditions: '',
+    address: '',
   });
 
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
@@ -135,6 +152,7 @@ function App() {
       gender: context.patient_profile?.gender || '',
       allergies: context.patient_profile?.allergies || '',
       chronic_conditions: context.patient_profile?.chronic_conditions || '',
+      address: context.patient_profile?.address || '',
     });
   };
 
@@ -294,6 +312,7 @@ function App() {
           gender: String(data.get('gender') || ''),
           allergies: String(data.get('allergies') || ''),
           chronic_conditions: String(data.get('chronic_conditions') || ''),
+          address: String(data.get('address') || ''),
         });
       }
 
@@ -326,6 +345,8 @@ function App() {
       setIntakeMessages(started.initial_question ? [{ role: 'assistant', text: started.initial_question }] : []);
       setStructuredData(null);
       setLastSummary(null);
+      setEmergencyHospitals([]);
+      setEmergencyMessage('');
       setIntakeOpen(true);
     } catch (error) {
       setFlash(error instanceof Error ? error.message : 'Could not start visit');
@@ -355,6 +376,10 @@ function App() {
       ]);
       setIntakeText('');
       if (response.structured_data) setStructuredData(response.structured_data);
+      if (response.status === 'urgent') {
+        setEmergencyHospitals(response.nearest_hospitals || []);
+        setEmergencyMessage(response.emergency_message || response.message);
+      }
 
       if (response.status === 'complete') {
         const visit = await api.createPatientVisit(selectedDoctorId, response.session_id, authToken);
@@ -385,6 +410,7 @@ function App() {
           gender: profileForm.gender,
           allergies: profileForm.allergies,
           chronic_conditions: profileForm.chronic_conditions,
+          address: profileForm.address,
         },
         authToken,
       );
@@ -520,6 +546,7 @@ function App() {
             {authMode !== 'login' && <input name="phone" placeholder="Phone number" />}
             {authMode === 'register-patient' && (
               <>
+                <input name="address" placeholder="Address" required />
                 <input name="age" type="number" placeholder="Age" />
                 <input name="gender" placeholder="Gender" />
                 <input name="allergies" placeholder="Allergies" />
@@ -612,6 +639,7 @@ function App() {
                   <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Phone Number" />
                   <input value={profileForm.age} onChange={(e) => setProfileForm({ ...profileForm, age: e.target.value })} placeholder="Age" type="number" />
                   <input value={profileForm.gender} onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })} placeholder="Gender" />
+                  <textarea rows={2} value={profileForm.address} onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })} placeholder="Address" />
                   <textarea rows={2} value={profileForm.allergies} onChange={(e) => setProfileForm({ ...profileForm, allergies: e.target.value })} placeholder="Allergies (e.g., Penicillin)" />
                   <textarea rows={2} value={profileForm.chronic_conditions} onChange={(e) => setProfileForm({ ...profileForm, chronic_conditions: e.target.value })} placeholder="Chronic Conditions" />
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
@@ -669,6 +697,38 @@ function App() {
                     <pre className="code-block">{formatSummary(lastSummary)}</pre>
                   </div>
                 </div>
+                {emergencyMessage && (
+                  <div className="emergency-panel">
+                    <div>
+                      <div className="eyebrow">Emergency detected</div>
+                      <h2>{emergencyMessage}</h2>
+                    </div>
+                    <div className="stack compact">
+                      {emergencyHospitals.map((hospital, index) => (
+                        <div className="hospital-card" key={`${hospital.name}-${index}`}>
+                          <div>
+                            <strong>{hospital.name}</strong>
+                            <span>{hospital.address || 'Address unavailable'}</span>
+                            <span>{formatDistance(hospital.distance_meters)} - {openStatus(hospital)}</span>
+                          </div>
+                          {hospital.phone ? (
+                            <a className="dial-button" href={`tel:${hospital.phone.replace(/[^\d+]/g, '')}`}>
+                              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                              </svg>
+                              <span>{hospital.phone}</span>
+                            </a>
+                          ) : (
+                            <span className="phone-missing">Phone unavailable</span>
+                          )}
+                        </div>
+                      ))}
+                      {!emergencyHospitals.length && (
+                        <div className="empty">No nearby hospital phone number returned. Call local emergency services immediately.</div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </section>
             )}
 

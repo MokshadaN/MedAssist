@@ -99,6 +99,7 @@ def register_patient(db: Session, patient_data: PatientRegister):
             gender=_normalize_text(patient_data.gender),
             allergies=_normalize_text(patient_data.allergies),
             chronic_conditions=_normalize_text(patient_data.chronic_conditions),
+            address=_normalize_text(patient_data.address),
         )
         db.add(profile)
         db.commit()
@@ -162,7 +163,7 @@ def update_user_context(db: Session, user: User, data: ProfileUpdate):
             profile = PatientProfile(user_id=user.id)
             db.add(profile)
 
-        for field in ("age", "gender", "allergies", "chronic_conditions"):
+        for field in ("age", "gender", "allergies", "chronic_conditions", "address"):
             if field not in update_data:
                 continue
             value = update_data[field]

@@ -13,3 +13,4 @@ class PatientProfile(Base):
     gender = Column(String)
     allergies = Column(String)
     chronic_conditions = Column(String)
+    address = Column(String)
