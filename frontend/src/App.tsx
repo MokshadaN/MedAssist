@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
 import {
   api,
   AISummary,
@@ -66,6 +66,7 @@ function App() {
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
+  const [doctorProfile, setDoctorProfile] = useState<DoctorProfile | null>(null);
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [authReady, setAuthReady] = useState(!localStorage.getItem('medassist_token'));
   const [busy, setBusy] = useState('');
@@ -91,6 +92,10 @@ function App() {
   const [activeSessionId, setActiveSessionId] = useState('');
   const [intakeText, setIntakeText] = useState('');
   const [intakeMessages, setIntakeMessages] = useState<ChatMessage[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isVoiceInput, setIsVoiceInput] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const recordingBaseTextRef = useRef('');
   const [structuredData, setStructuredData] = useState<Record<string, unknown> | null>(null);
   const [lastSummary, setLastSummary] = useState<AISummary | null>(null);
   const [isSendingIntake, setIsSendingIntake] = useState(false);
@@ -103,6 +108,7 @@ function App() {
     gender: '',
     allergies: '',
     chronic_conditions: '',
+    specialization: '',
   });
 
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
@@ -148,6 +154,7 @@ function App() {
   const setAuthContext = (context: AuthContext) => {
     setUser(context.user);
     setPatientProfile(context.patient_profile || null);
+    setDoctorProfile(context.doctor_profile || null);
     setProfileForm({
       name: context.user.name || '',
       email: context.user.email || '',
@@ -156,6 +163,7 @@ function App() {
       gender: context.patient_profile?.gender || '',
       allergies: context.patient_profile?.allergies || '',
       chronic_conditions: context.patient_profile?.chronic_conditions || '',
+      specialization: context.doctor_profile?.specialization || '',
     });
   };
 
@@ -381,6 +389,73 @@ function App() {
     }
   };
 
+  const toggleRecording = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setFlash('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    if (isRecording) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsRecording(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    recordingBaseTextRef.current = intakeText.trim();
+    
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      let currentTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        currentTranscript += event.results[i][0].transcript;
+      }
+      
+      // We use a functional update to avoid issues with stale intakeText
+      // but we use the ref for the base text captured at start.
+      const fullTranscript = Array.from(event.results)
+        .map((res: any) => res[0].transcript)
+        .join('');
+        
+      setIntakeText(recordingBaseTextRef.current + (recordingBaseTextRef.current ? ' ' : '') + fullTranscript);
+      setIsVoiceInput(true);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error', event.error);
+      setIsRecording(false);
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
+        setFlash(`Speech recognition error: ${event.error}`);
+      }
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+      recognitionRef.current = null;
+    };
+
+    setIsRecording(true);
+    try {
+      recognition.start();
+    } catch (error) {
+      setIsRecording(false);
+      console.error('Failed to start recognition', error);
+      setFlash('Failed to start voice input.');
+    }
+  };
+
   const sendIntakeAnswer = async () => {
     if (!authToken || !activeSessionId || !intakeText.trim() || isSendingIntake) return;
     const answer = intakeText.trim();
@@ -391,7 +466,7 @@ function App() {
         activeSessionId,
         {
           message: answer,
-          input_mode: 'text',
+          input_mode: isVoiceInput ? 'voice' : 'text',
           previous_structured: structuredData,
         },
         authToken,
@@ -402,6 +477,7 @@ function App() {
         { role: 'assistant', text: response.next_question || response.clinical_summary || response.message },
       ]);
       setIntakeText('');
+      setIsVoiceInput(false);
       if (response.structured_data) setStructuredData(response.structured_data);
 
       if (response.status === 'complete') {
@@ -435,6 +511,7 @@ function App() {
           gender: profileForm.gender,
           allergies: profileForm.allergies,
           chronic_conditions: profileForm.chronic_conditions,
+          specialization: profileForm.specialization,
         },
         authToken,
       );
@@ -807,10 +884,25 @@ function App() {
                       <textarea
                         rows={2}
                         value={intakeText}
-                        onChange={(event) => setIntakeText(event.target.value)}
+                        onChange={(event) => {
+                          setIntakeText(event.target.value);
+                          setIsVoiceInput(false);
+                        }}
                         placeholder="Type your response..."
                         disabled={isSendingIntake}
                       />
+                      <button
+                        type="button"
+                        className={`voice-btn ${isRecording ? 'recording' : ''}`}
+                        onClick={toggleRecording}
+                        title={isRecording ? 'Stop recording' : 'Start voice input'}
+                      >
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" />
+                          <path d="M16 10a1 1 0 10-2 0 4 4 0 01-8 0 1 1 0 00-2 0 6 6 0 1012 0z" />
+                          <path d="M10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z" />
+                        </svg>
+                      </button>
                       <button className="primary" type="submit" disabled={isSendingIntake || !intakeText.trim()}>
                         {isSendingIntake ? 'Thinking...' : 'Send'}
                       </button>
@@ -965,16 +1057,18 @@ function App() {
 
               <div className="profile-details-form">
                 <div className="eyebrow" style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Professional Profile</div>
-                <div className="stack compact">
-                  <div className="record-card">
-                    <div className="eyebrow">Email</div>
-                    <p style={{ margin: 0, fontSize: '0.9rem' }}>{user.email}</p>
-                  </div>
-                  <div className="record-card">
-                    <div className="eyebrow">Contact</div>
-                    <p style={{ margin: 0, fontSize: '0.9rem' }}>{user.phone || 'Not provided'}</p>
-                  </div>
-                </div>
+                <form className="stack compact" onSubmit={saveProfile}>
+                  <label className="field">
+                    <span>Phone Number</span>
+                    <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Enter phone number" />
+                  </label>
+                  <label className="field">
+                    <span>Specialization</span>
+                    <input value={profileForm.specialization} onChange={(e) => setProfileForm({ ...profileForm, specialization: e.target.value })} placeholder="Example: Cardiology" />
+                  </label>
+                  <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
+                  {profileStatus && <div className="flash subtle">{profileStatus}</div>}
+                </form>
               </div>
             </div>
           </aside>
