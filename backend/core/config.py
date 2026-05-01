@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
 
     database_url: str = f"sqlite:///{(BASE_DIR / 'medassist.db').as_posix()}"
+    hf_token: str = ""
+
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

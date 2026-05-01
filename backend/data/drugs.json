@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Metformin",
+    "side_effects": ["nausea", "diarrhea", "dizziness", "stomach pain", "loss of appetite"]
+  },
+  {
+    "name": "Warfarin",
+    "side_effects": ["bleeding", "bruising", "hair loss", "stomach pain", "vomiting blood"]
+  },
+  {
+    "name": "Amoxicillin",
+    "side_effects": ["rash", "nausea", "diarrhea", "vomiting", "headache"]
+  },
+  {
+    "name": "Lisinopril",
+    "side_effects": ["dry cough", "dizziness", "headache", "fatigue", "high potassium"]
+  },
+  {
+    "name": "Atorvastatin",
+    "side_effects": ["muscle pain", "diarrhea", "joint pain", "sore throat", "urinary tract infection"]
+  },
+  {
+    "name": "Amlodipine",
+    "side_effects": ["swelling", "dizziness", "palpitations", "fatigue", "nausea"]
+  },
+  {
+    "name": "Levothyroxine",
+    "side_effects": ["weight loss", "tremor", "headache", "nausea", "vomiting"]
+  },
+  {
+    "name": "Omeprazole",
+    "side_effects": ["headache", "abdominal pain", "nausea", "diarrhea", "flatulence"]
+  }
+]
