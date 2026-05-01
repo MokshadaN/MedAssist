@@ -100,7 +100,7 @@ def detect_urgent_red_flags(text: str) -> dict:
     client = _get_groq_client()
     
     if not client:
-        print("⚠ GROQ_API_KEY missing. Using regex fallback for triage.")
+        print("WARNING: GROQ_API_KEY missing. Using regex fallback for triage.")
         return _detect_urgent_red_flags_regex(text)
 
     try:
@@ -129,6 +129,6 @@ def detect_urgent_red_flags(text: str) -> dict:
         }
         
     except Exception as e:
-        print(f"⚠ Groq Triage API Error: {e}")
+        print(f"ERROR: Groq Triage API Error: {e}")
         # Fallback to regex if Groq API fails
         return _detect_urgent_red_flags_regex(text)

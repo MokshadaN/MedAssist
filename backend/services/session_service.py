@@ -83,22 +83,35 @@ def _parse_soap_summary(summary: str) -> dict[str, str]:
         "plan": "",
     }
     section_markers = {
-        "S": "subjective",
-        "O": "objective",
-        "A": "assessment",
-        "P": "plan",
+        "SUBJECTIVE": "subjective",
+        "OBJECTIVE": "objective",
+        "ASSESSMENT": "assessment",
+        "PLAN": "plan",
     }
 
     active_key: str | None = None
     for raw_line in summary.splitlines():
         line = raw_line.strip()
-        marker = line[:1].upper()
-        if marker in section_markers and (
-            line[1:2] in {":", ")", "."} or line.upper().startswith(f"{marker} (")
-        ):
-            active_key = section_markers[marker]
-            separator = ":" if ":" in line else line[1:2]
-            sections[active_key] = line.split(separator, 1)[1].strip()
+        upper_line = line.upper()
+        matched_header = False
+        for marker, key in section_markers.items():
+            if upper_line.startswith(marker):
+                remainder = line[len(marker):].lstrip(" :).-")
+                active_key = key
+                sections[active_key] = remainder.strip()
+                matched_header = True
+                break
+        else:
+            if line[:1].upper() in {"S", "O", "A", "P"} and line[1:2] in {":", ")", "."}:
+                active_key = {
+                    "S": "subjective",
+                    "O": "objective",
+                    "A": "assessment",
+                    "P": "plan",
+                }[line[:1].upper()]
+                sections[active_key] = line[2:].lstrip(" :).-").strip()
+                matched_header = True
+        if matched_header:
             continue
 
         if active_key and line:
