@@ -123,24 +123,33 @@ S (Subjective):
 - Triggers
 - Relievers
 - Impact
+- Write as short bullet points or compact phrases only
+- Do not include Objective, Assessment, or Plan content here
 
 O (Objective):
 - Only include explicitly stated observable/measurable data
 - If none: write 'No objective data available from intake.'
+- If none is present, do not invent exam findings
 
 A (Assessment):
 - Clinical impression based strictly on reported symptoms
 - No definitive diagnosis
 - No prescriptions
+- Keep this to 1 to 2 concise sentences
 
 P (Plan):
 - Suggested next evaluation steps
 - No medications
+- Keep this to 1 to 2 concise sentences
+- Mention urgent evaluation only if clearly supported by the transcript
 
 STRICT RULES:
 - No diagnosis
 - No hallucination
 - Only use transcript information
+- Use the exact section labels `Subjective:`, `Objective:`, `Assessment:`, and `Plan:` on separate lines
+- Do not merge sections into one paragraph
+- Do not add any preamble or closing remarks
 
 Transcript:
 {transcript}

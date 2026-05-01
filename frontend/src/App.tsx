@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
 import {
   api,
   AISummary,
@@ -13,6 +13,7 @@ import {
   Prescription,
   Reminder,
   SessionState,
+  API_BASE,
 } from './api';
 
 type AuthMode = 'login' | 'register-doctor' | 'register-patient';
@@ -77,6 +78,7 @@ function App() {
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
+  const [doctorProfile, setDoctorProfile] = useState<DoctorProfile | null>(null);
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [authReady, setAuthReady] = useState(!localStorage.getItem('medassist_token'));
   const [busy, setBusy] = useState('');
@@ -91,15 +93,27 @@ function App() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [patientReminders, setPatientReminders] = useState<Reminder[]>([]);
   const [reportFile, setReportFile] = useState<File | null>(null);
+  const [intakeStatus, setIntakeStatus] = useState('');
+  const [profileStatus, setProfileStatus] = useState('');
+  const [reportStatus, setReportStatus] = useState('');
+  const [prescriptionStatus, setPrescriptionStatus] = useState('');
+  const [medicationStatus, setMedicationStatus] = useState('');
+  const [notificationStatus, setNotificationStatus] = useState('');
 
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState('');
   const [intakeText, setIntakeText] = useState('');
   const [intakeMessages, setIntakeMessages] = useState<ChatMessage[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isVoiceInput, setIsVoiceInput] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const recordingBaseTextRef = useRef('');
   const [structuredData, setStructuredData] = useState<Record<string, unknown> | null>(null);
   const [lastSummary, setLastSummary] = useState<AISummary | null>(null);
   const [emergencyHospitals, setEmergencyHospitals] = useState<EmergencyHospital[]>([]);
   const [emergencyMessage, setEmergencyMessage] = useState('');
+  const [isSendingIntake, setIsSendingIntake] = useState(false);
+
 
   const [profileForm, setProfileForm] = useState({
     name: '',
@@ -110,11 +124,16 @@ function App() {
     allergies: '',
     chronic_conditions: '',
     address: '',
+    specialization: '',
+
   });
 
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
   const [doctorHistory, setDoctorHistory] = useState<DoctorVisit[]>([]);
+  const [doctorReports, setDoctorReports] = useState<Array<{ id: string; file_url: string }>>([]);
+  const [doctorReminders, setDoctorReminders] = useState<Reminder[]>([]);
+  const [doctorReminderStatus, setDoctorReminderStatus] = useState('');
   const [selectedVisit, setSelectedVisit] = useState<DoctorVisit | null>(null);
   const [sessionSnapshot, setSessionSnapshot] = useState<SessionState | null>(null);
   const [doctorSummary, setDoctorSummary] = useState<AISummary | null>(null);
@@ -131,6 +150,9 @@ function App() {
   });
   const [doctorReminderMessage, setDoctorReminderMessage] = useState('Doctor visit in 2 days');
 
+  const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
+  const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
+
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.patient_id === selectedPatientId) || null,
     [patients, selectedPatientId],
@@ -144,6 +166,7 @@ function App() {
   const setAuthContext = (context: AuthContext) => {
     setUser(context.user);
     setPatientProfile(context.patient_profile || null);
+    setDoctorProfile(context.doctor_profile || null);
     setProfileForm({
       name: context.user.name || '',
       email: context.user.email || '',
@@ -153,6 +176,8 @@ function App() {
       allergies: context.patient_profile?.allergies || '',
       chronic_conditions: context.patient_profile?.chronic_conditions || '',
       address: context.patient_profile?.address || '',
+      specialization: context.doctor_profile?.specialization || '',
+
     });
   };
 
@@ -188,7 +213,7 @@ function App() {
     try {
       setNotifications(await api.listNotifications(authToken));
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not load notifications');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not load notifications');
     }
   };
 
@@ -212,7 +237,7 @@ function App() {
       setPatientReminders(reminders);
       setNotifications(notes);
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not load patient dashboard');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not load patient dashboard');
     } finally {
       setBusy('');
     }
@@ -230,7 +255,7 @@ function App() {
       setNotifications(notes);
       setSelectedPatientId((current) => current || loadedPatients[0]?.patient_id || '');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not load doctor dashboard');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not load doctor dashboard');
     } finally {
       setBusy('');
     }
@@ -243,10 +268,17 @@ function App() {
 
   useEffect(() => {
     if (!authToken || !selectedPatientId || user?.role !== 'doctor') return;
+    setDoctorReminderStatus('');
     setBusy('Loading patient timeline');
-    api.getPatientHistory(selectedPatientId, authToken)
-      .then((history) => {
+    Promise.all([
+      api.getPatientHistory(selectedPatientId, authToken),
+      api.listPatientReports(selectedPatientId, authToken),
+      api.listReminders(selectedPatientId),
+    ])
+      .then(([history, reports, reminders]) => {
         setDoctorHistory(history);
+        setDoctorReports(reports);
+        setDoctorReminders(reminders);
         setSelectedVisit(history[0] || null);
       })
       .catch((error) => setFlash(error instanceof Error ? error.message : 'Could not load patient history'))
@@ -269,6 +301,16 @@ function App() {
     });
   }, [authToken, selectedVisit?.session_id]);
 
+  useEffect(() => {
+    if (!authToken || !selectedTimelineVisit?.session_id) {
+      setTimelineSummary(null);
+      return;
+    }
+    api.getSummary(selectedTimelineVisit.session_id, authToken)
+      .then(setTimelineSummary)
+      .catch(() => setTimelineSummary(null));
+  }, [authToken, selectedTimelineVisit?.session_id]);
+
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -278,7 +320,7 @@ function App() {
       localStorage.setItem('medassist_token', result.access_token);
       setAuthToken(result.access_token);
       setAuthContext(result);
-      setFlash(`Signed in as ${result.user.name}`);
+      // setFlash(`Signed in as ${result.user.name}`);
     } catch (error) {
       setFlash(error instanceof Error ? error.message : 'Login failed');
     } finally {
@@ -334,6 +376,13 @@ function App() {
     setUser(null);
     setPatientProfile(null);
     setFlash('');
+    setIntakeStatus('');
+    setProfileStatus('');
+    setReportStatus('');
+    setPrescriptionStatus('');
+    setMedicationStatus('');
+    setNotificationStatus('');
+    setDoctorReminderStatus('');
   };
 
   const startPatientVisit = async () => {
@@ -348,23 +397,92 @@ function App() {
       setEmergencyHospitals([]);
       setEmergencyMessage('');
       setIntakeOpen(true);
+      setIntakeStatus('Intake started');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not start visit');
+      setIntakeStatus(error instanceof Error ? error.message : 'Could not start visit');
     } finally {
       setBusy('');
     }
   };
 
+  const toggleRecording = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setFlash('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    if (isRecording) {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+      setIsRecording(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    recordingBaseTextRef.current = intakeText.trim();
+
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setIsRecording(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      let currentTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        currentTranscript += event.results[i][0].transcript;
+      }
+
+      // We use a functional update to avoid issues with stale intakeText
+      // but we use the ref for the base text captured at start.
+      const fullTranscript = Array.from(event.results)
+        .map((res: any) => res[0].transcript)
+        .join('');
+
+      setIntakeText(recordingBaseTextRef.current + (recordingBaseTextRef.current ? ' ' : '') + fullTranscript);
+      setIsVoiceInput(true);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error', event.error);
+      setIsRecording(false);
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
+        setFlash(`Speech recognition error: ${event.error}`);
+      }
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+      recognitionRef.current = null;
+    };
+
+    setIsRecording(true);
+    try {
+      recognition.start();
+    } catch (error) {
+      setIsRecording(false);
+      console.error('Failed to start recognition', error);
+      setFlash('Failed to start voice input.');
+    }
+  };
+
   const sendIntakeAnswer = async () => {
-    if (!authToken || !activeSessionId || !intakeText.trim()) return;
+    if (!authToken || !activeSessionId || !intakeText.trim() || isSendingIntake) return;
     const answer = intakeText.trim();
+    setIsSendingIntake(true);
     setBusy('Saving answer');
     try {
       const response = await api.answerIntake(
         activeSessionId,
         {
           message: answer,
-          input_mode: 'text',
+          input_mode: isVoiceInput ? 'voice' : 'text',
           previous_structured: structuredData,
         },
         authToken,
@@ -375,6 +493,7 @@ function App() {
         { role: 'assistant', text: response.next_question || response.clinical_summary || response.message },
       ]);
       setIntakeText('');
+      setIsVoiceInput(false);
       if (response.structured_data) setStructuredData(response.structured_data);
       if (response.status === 'urgent') {
         setEmergencyHospitals(response.nearest_hospitals || []);
@@ -386,13 +505,15 @@ function App() {
         const summary = await api.getSummary(response.session_id, authToken);
         setLastSummary(summary);
         setPatientVisits((current) => [visit, ...current.filter((item) => item.visit_id !== visit.visit_id)]);
-        setFlash(`Visit sent to ${selectedDoctor?.name || 'doctor'}`);
+        setPatientReminders((current) => current);
+        setIntakeStatus(`Visit sent to ${selectedDoctor?.name || 'doctor'}`);
         await refreshPatientData();
       }
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not save intake answer');
+      setIntakeStatus(error instanceof Error ? error.message : 'Could not save intake answer');
     } finally {
       setBusy('');
+      setIsSendingIntake(false);
     }
   };
 
@@ -411,13 +532,15 @@ function App() {
           allergies: profileForm.allergies,
           chronic_conditions: profileForm.chronic_conditions,
           address: profileForm.address,
+          specialization: profileForm.specialization,
+
         },
         authToken,
       );
       setAuthContext(context);
-      setFlash('Profile updated');
+      setProfileStatus('Profile updated');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not update profile');
+      setProfileStatus(error instanceof Error ? error.message : 'Could not update profile');
     } finally {
       setBusy('');
     }
@@ -430,11 +553,66 @@ function App() {
       await api.uploadReport(user.id, reportFile, authToken);
       setPatientReports(await api.listReports(user.id, authToken));
       setReportFile(null);
-      setFlash('Report uploaded');
+      setReportStatus('Report uploaded');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Upload failed');
+      setReportStatus(error instanceof Error ? error.message : 'Upload failed');
     } finally {
       setBusy('');
+    }
+  };
+
+  const getReportUrl = (fileUrl: string) => {
+    if (fileUrl.startsWith('http')) return fileUrl;
+    if (fileUrl.startsWith('/')) return fileUrl;
+    return `${API_BASE}/${fileUrl}`;
+  };
+
+  const openReport = async (fileUrl: string) => {
+    if (!authToken) return;
+    try {
+      const response = await fetch(getReportUrl(fileUrl), {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text() || 'Could not open report');
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank', 'noopener,noreferrer');
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+    } catch (error) {
+      setFlash(error instanceof Error ? error.message : 'Could not open report');
+    }
+  };
+
+  const downloadReport = async (fileUrl: string) => {
+    if (!authToken) return;
+    try {
+      const response = await fetch(getReportUrl(fileUrl), {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text() || 'Could not download report');
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = blobUrl;
+      anchor.download = fileUrl.split('/').pop() || 'report';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000);
+    } catch (error) {
+      setFlash(error instanceof Error ? error.message : 'Could not download report');
     }
   };
 
@@ -446,7 +624,7 @@ function App() {
       const reminder = await api.createMyReminder({ message, time: time.toISOString() }, authToken);
       setPatientReminders((current) => [reminder, ...current]);
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not create reminder');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not create reminder');
     }
   };
 
@@ -456,7 +634,7 @@ function App() {
       const updated = await api.markNotificationRead(notification.id, authToken);
       setNotifications((current) => current.map((item) => (item.id === updated.id ? updated : item)));
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not mark notification read');
+      setNotificationStatus(error instanceof Error ? error.message : 'Could not mark notification read');
     }
   };
 
@@ -466,9 +644,9 @@ function App() {
     try {
       const prescription = await api.createPrescription(selectedVisit.visit_id, prescriptionNotes, authToken);
       setPrescriptionId(prescription.id);
-      setFlash('Prescription created');
+      setPrescriptionStatus('Prescription created');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not create prescription');
+      setPrescriptionStatus(error instanceof Error ? error.message : 'Could not create prescription');
     } finally {
       setBusy('');
     }
@@ -487,9 +665,9 @@ function App() {
       setDosage('');
       setDuration('');
       setFrequency('');
-      setFlash('Medication added');
+      setMedicationStatus('Medication added');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not add medication');
+      setMedicationStatus(error instanceof Error ? error.message : 'Could not add medication');
     } finally {
       setBusy('');
     }
@@ -498,14 +676,15 @@ function App() {
   const scheduleFollowUp = async () => {
     if (!selectedPatientId || !doctorReminderMessage || !doctorReminderTime) return;
     try {
-      await api.createReminder({
+      const reminder = await api.createReminder({
         user_id: selectedPatientId,
         message: doctorReminderMessage,
         time: new Date(doctorReminderTime).toISOString(),
       });
-      setFlash('Follow-up reminder scheduled');
+      setDoctorReminders((current) => [reminder, ...current.filter((item) => item.id !== reminder.id)]);
+      setDoctorReminderStatus('Follow-up already scheduled for this patient; the existing reminder was updated.');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not schedule follow-up');
+      setDoctorReminderStatus(error instanceof Error ? error.message : 'Could not schedule follow-up');
     }
   };
 
@@ -589,8 +768,8 @@ function App() {
         </div>
       </header>
 
-      {flash && <div className="flash">{flash}</div>}
       {busy && <div className="flash subtle">{busy}...</div>}
+      {notificationStatus && <div className="flash subtle">{notificationStatus}</div>}
 
       {showNotifications && (
         <section className="panel notification-panel">
@@ -632,17 +811,37 @@ function App() {
                 <div className="stat-mini"><span>Gender</span><strong>{patientProfile?.gender || '--'}</strong></div>
                 <div className="stat-mini"><span>Visits</span><strong>{patientVisits.length}</strong></div>
               </div>
-              
+
               <div className="profile-details-form">
                 <div className="eyebrow" style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Medical Profile</div>
                 <form className="stack compact" onSubmit={saveProfile}>
-                  <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Phone Number" />
-                  <input value={profileForm.age} onChange={(e) => setProfileForm({ ...profileForm, age: e.target.value })} placeholder="Age" type="number" />
-                  <input value={profileForm.gender} onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })} placeholder="Gender" />
-                  <textarea rows={2} value={profileForm.address} onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })} placeholder="Address" />
-                  <textarea rows={2} value={profileForm.allergies} onChange={(e) => setProfileForm({ ...profileForm, allergies: e.target.value })} placeholder="Allergies (e.g., Penicillin)" />
-                  <textarea rows={2} value={profileForm.chronic_conditions} onChange={(e) => setProfileForm({ ...profileForm, chronic_conditions: e.target.value })} placeholder="Chronic Conditions" />
+                  <label className="field">
+                    <span>Phone Number</span>
+                    <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Enter phone number" />
+                  </label>
+                  <label className="field">
+                    <span>Age</span>
+                    <input value={profileForm.age} onChange={(e) => setProfileForm({ ...profileForm, age: e.target.value })} placeholder="Enter age" type="number" />
+                  </label>
+                  <label className="field">
+                    <span>Gender</span>
+                    <input value={profileForm.gender} onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })} placeholder="Enter gender" />
+                  </label>
+                  <label className="field">
+                    <span>Address</span>
+                    <textarea rows={2} value={profileForm.address} onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })} placeholder="Enter your full address" />
+                  </label>
+                  <label className="field">
+                    <span>Allergies</span>
+                    <textarea rows={2} value={profileForm.allergies} onChange={(e) => setProfileForm({ ...profileForm, allergies: e.target.value })} placeholder="Example: Penicillin" />
+                  </label>
+                  <label className="field">
+                    <span>Chronic Conditions</span>
+                    <textarea rows={2} value={profileForm.chronic_conditions} onChange={(e) => setProfileForm({ ...profileForm, chronic_conditions: e.target.value })} placeholder="Example: Diabetes" />
+                  </label>
+
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
+                  {profileStatus && <div className="flash subtle">{profileStatus}</div>}
                 </form>
               </div>
             </div>
@@ -687,10 +886,40 @@ function App() {
                         <div key={`${message.role}-${index}`} className={`bubble ${message.role}`}>{message.text}</div>
                       ))}
                     </div>
-                    <div className="chat-compose">
-                      <textarea rows={2} value={intakeText} onChange={(event) => setIntakeText(event.target.value)} placeholder="Type your response..." />
-                      <button className="primary" onClick={() => void sendIntakeAnswer()}>Send</button>
-                    </div>
+                    <form
+                      className="chat-compose"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        void sendIntakeAnswer();
+                      }}
+                    >
+                      <textarea
+                        rows={2}
+                        value={intakeText}
+                        onChange={(event) => {
+                          setIntakeText(event.target.value);
+                          setIsVoiceInput(false);
+                        }}
+                        placeholder="Type your response..."
+                        disabled={isSendingIntake}
+                      />
+                      <button
+                        type="button"
+                        className={`voice-btn ${isRecording ? 'recording' : ''}`}
+                        onClick={toggleRecording}
+                        title={isRecording ? 'Stop recording' : 'Start voice input'}
+                      >
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" />
+                          <path d="M16 10a1 1 0 10-2 0 4 4 0 01-8 0 1 1 0 00-2 0 6 6 0 1012 0z" />
+                          <path d="M10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z" />
+                        </svg>
+                      </button>
+                      <button className="primary" type="submit" disabled={isSendingIntake || !intakeText.trim()}>
+                        {isSendingIntake ? 'Thinking...' : 'Send'}
+                      </button>
+                    </form>
+                    {intakeStatus && <div className="flash subtle" style={{ marginTop: '0.25rem' }}>{intakeStatus}</div>}
                   </div>
                   <div className="summary-card">
                     <div className="eyebrow" style={{ marginBottom: '1rem' }}>Live SOAP Generation</div>
@@ -777,6 +1006,156 @@ function App() {
                     </div>
                   ))}
                   {!patientPrescriptions.length && <div className="empty">No active prescriptions.</div>}
+                  {prescriptionStatus && <div className="flash subtle">{prescriptionStatus}</div>}
+                </div>
+              </section>
+            </div>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
+                  <div className="eyebrow">Documents</div>
+                  <h2>Lab Reports</h2>
+                </div>
+              </div>
+              <div className="stack compact">
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} style={{ flex: 1 }} />
+                  <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload</button>
+                </div>
+                {reportStatus && <div className="flash subtle">{reportStatus}</div>}
+                <div className="reports-list" style={{ marginTop: '0.5rem' }}>
+                  {patientReports.map((report) => (
+                    <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                      <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                      <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
+                      <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
+                    </div>
+                  ))}
+                  {!patientReports.length && <div className="empty">No reports uploaded.</div>}
+                </div>
+              </div>
+            </section>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
+                  <div className="eyebrow">History</div>
+                  <h2>Visit Timeline</h2>
+                </div>
+              </div>
+              <div className="horizontal-timeline">
+                <div className="timeline-line"></div>
+                <div className="timeline-dot-wrapper">
+                  {patientVisits.map((visit) => (
+                    <div key={visit.visit_id} className="timeline-item-node" onClick={() => setSelectedTimelineVisit(visit)}>
+                      <div className="timeline-label-above">Dr. {visit.doctor_name.split(' ').pop()}</div>
+                      <div className="timeline-dot-row">
+                        <div
+                          className={`timeline-dot ${selectedTimelineVisit?.visit_id === visit.visit_id ? 'active' : ''}`}
+                          title="Click to view details"
+                        ></div>
+                      </div>
+                      <div className="timeline-label-below">{new Date(visit.created_at).toLocaleDateString()}</div>
+                    </div>
+                  ))}
+                  {!patientVisits.length && <div className="empty" style={{ width: '100%', textAlign: 'center' }}>No visits yet.</div>}
+                </div>
+              </div>
+
+              {selectedTimelineVisit && (
+                <div className="panel visit-details-box animate-in">
+                  <div className="panel-head">
+                    <div>
+                      <div className="eyebrow">Visit Details</div>
+                      <h2>Dr. {selectedTimelineVisit.doctor_name}</h2>
+                      <p>{formatDate(selectedTimelineVisit.created_at)} • {selectedTimelineVisit.status.toUpperCase()}</p>
+                    </div>
+                    <button className="ghost" onClick={() => setSelectedTimelineVisit(null)}>Close</button>
+                  </div>
+                  <div className="stack">
+                    <div className="summary-card">
+                      <div className="eyebrow">Clinical Summary (SOAP)</div>
+                      <pre className="code-block">{formatSummary(timelineSummary)}</pre>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+          </div>
+        </main>
+      ) : (
+        <main className="dashboard-layout">
+          {/* LEFT SIDEBAR: Doctor Profile */}
+          <aside className="profile-sidebar">
+            <div className="panel profile-card">
+              <div className="profile-header">
+                <div className="profile-avatar">{user.name.charAt(0)}</div>
+                <h2>{user.name}</h2>
+                <span className="pill" style={{ marginTop: '0.5rem' }}>Medical Professional</span>
+              </div>
+              <div className="profile-stats">
+                <div className="stat-mini"><span>Patients</span><strong>{patients.length}</strong></div>
+                <div className="stat-mini"><span>Role</span><strong>Doctor</strong></div>
+              </div>
+
+              <div className="profile-details-form">
+                <div className="eyebrow" style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Professional Profile</div>
+                <form className="stack compact" onSubmit={saveProfile}>
+                  <label className="field">
+                    <span>Phone Number</span>
+                    <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Enter phone number" />
+                  </label>
+                  <label className="field">
+                    <span>Specialization</span>
+                    <input value={profileForm.specialization} onChange={(e) => setProfileForm({ ...profileForm, specialization: e.target.value })} placeholder="Example: Cardiology" />
+                  </label>
+                  <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
+                  {profileStatus && <div className="flash subtle">{profileStatus}</div>}
+                </form>
+              </div>
+            </div>
+          </aside>
+
+          {/* MAIN CONTENT AREA */}
+          <div className="dashboard-content stack">
+            <section className="hero-card">
+              <div className="hero-head">
+                <div>
+                  <div className="eyebrow">Current Case</div>
+                  <h2>{selectedPatient?.patient_name || 'No patient selected'}</h2>
+                  <p>{selectedPatient ? `${selectedPatient.patient_email} - ${selectedPatient.visit_count} visits` : 'Select a patient to view history and generate SOAP summaries.'}</p>
+                </div>
+                <span className="pill">{selectedVisit?.status || 'Select Visit'}</span>
+              </div>
+              <div className="stats" style={{ marginTop: '1.5rem' }}>
+                <div className="stat"><span>Total Visits</span><strong>{doctorHistory.length}</strong></div>
+                <div className="stat"><span>Session Status</span><strong>{sessionSnapshot?.status || 'N/A'}</strong></div>
+                <div className="stat"><span>Messages</span><strong>{sessionSnapshot?.messages.length || 0}</strong></div>
+              </div>
+            </section>
+
+            <div className="grid grid-2">
+              <section className="panel">
+                <div className="panel-head">
+                  <div>
+                    <div className="eyebrow">Directory</div>
+                    <h2>Patient List</h2>
+                  </div>
+                </div>
+                <div className="table-list" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {patients.map((patient) => (
+                    <button
+                      key={patient.patient_id}
+                      className={`list-row ${selectedPatientId === patient.patient_id ? 'active' : ''}`}
+                      onClick={() => setSelectedPatientId(patient.patient_id)}
+                    >
+                      <strong>{patient.patient_name}</strong>
+                      <span style={{ fontSize: '0.8rem' }}>{patient.patient_email}</span>
+                      <span className="pill" style={{ fontSize: '0.7rem' }}>{patient.visit_count} visits</span>
+                    </button>
+                  ))}
+                  {!patients.length && <div className="empty">No patients found.</div>}
                 </div>
               </section>
 
@@ -787,175 +1166,136 @@ function App() {
                     <h2>Visit Timeline</h2>
                   </div>
                 </div>
-                <div className="stack compact">
-                  {patientVisits.map((visit) => (
-                    <button key={visit.visit_id} className="timeline-item">
-                      <strong style={{ color: '#fff' }}>Dr. {visit.doctor_name}</strong>
+                <div className="stack compact" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {doctorHistory.map((visit) => (
+                    <button
+                      key={visit.visit_id}
+                      className={`timeline-item ${selectedVisit?.visit_id === visit.visit_id ? 'active' : ''}`}
+                      onClick={() => setSelectedVisit(visit)}
+                    >
+                      <strong style={{ color: '#fff' }}>Visit on {new Date(visit.created_at).toLocaleDateString()}</strong>
                       <span>{visit.status.toUpperCase()} • {formatDate(visit.created_at)}</span>
                     </button>
                   ))}
-                  {!patientVisits.length && <div className="empty">Your previous visits will appear here.</div>}
+                  {!doctorHistory.length && <div className="empty">No history for this patient.</div>}
+                </div>
+              </section>
+            </div>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
+                  <div className="eyebrow">Documents</div>
+                  <h2>Patient Reports</h2>
+                </div>
+              </div>
+              <div className="stack compact">
+                {doctorReports.map((report) => (
+                  <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                    <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                    <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
+                    <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
+                  </div>
+                ))}
+                {!doctorReports.length && <div className="empty">No reports uploaded for this patient.</div>}
+              </div>
+            </section>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
+                  <div className="eyebrow">Analysis</div>
+                  <h2>SOAP Summary</h2>
+                </div>
+              </div>
+              <pre className="code-block">{formatSummary(doctorSummary)}</pre>
+            </section>
+
+            <div className="grid grid-2">
+              <section className="panel">
+                <div className="panel-head">
+                  <div>
+                    <div className="eyebrow">Follow-up</div>
+                    <h2>Schedule Reminder</h2>
+                  </div>
+                </div>
+                <div className="stack compact">
+                  <input type="datetime-local" value={doctorReminderTime} onChange={(e) => setDoctorReminderTime(e.target.value)} />
+                  <textarea rows={3} value={doctorReminderMessage} onChange={(e) => setDoctorReminderMessage(e.target.value)} placeholder="Message for patient..." />
+                  <button className="primary" onClick={() => void scheduleFollowUp()} disabled={!selectedPatientId}>Set Reminder</button>
+                  {doctorReminderStatus && <div className="flash subtle" style={{ marginTop: '0.25rem' }}>{doctorReminderStatus}</div>}
+                  <div className="stack compact" style={{ marginTop: '0.75rem' }}>
+                    {doctorReminders[0] ? (
+                      <div className={`reminder-row ${doctorReminders[0].is_completed ? 'done' : ''}`}>
+                        <div>
+                          <span className="badge" style={{ marginBottom: '0.25rem' }}>
+                            {doctorReminders[0].is_completed ? 'Follow-up completed' : 'Follow-up already scheduled'}
+                          </span>
+                          <strong style={{ display: 'block', color: '#fff' }}>{doctorReminders[0].message}</strong>
+                          <span style={{ fontSize: '0.85rem' }}>{formatDate(doctorReminders[0].time)}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="empty">No follow-ups scheduled for this patient.</div>
+                    )}
+                  </div>
                 </div>
               </section>
 
               <section className="panel">
                 <div className="panel-head">
                   <div>
-                    <div className="eyebrow">Documents</div>
-                    <h2>Lab Reports</h2>
+                    <div className="eyebrow">Triage</div>
+                    <h2>Status Check</h2>
                   </div>
                 </div>
-                <div className="stack compact">
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} style={{ flex: 1 }} />
-                    <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload</button>
-                  </div>
-                  <div className="reports-list" style={{ marginTop: '0.5rem' }}>
-                    {patientReports.map((report) => (
-                      <a className="link-row" key={report.id} href={report.file_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd"></path></svg>
-                        {report.file_url.split('/').pop()}
-                      </a>
-                    ))}
-                    {!patientReports.length && <div className="empty">No reports uploaded.</div>}
-                  </div>
+                <div className={`alert-card ${sessionSnapshot?.status === 'urgent' ? 'urgent' : ''}`} style={{ height: '100%' }}>
+                  <strong style={{ color: '#fff' }}>{sessionSnapshot?.status?.toUpperCase() || 'NORMAL'}</strong>
+                  <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                    {sessionSnapshot?.status === 'urgent'
+                      ? 'Immediate medical evaluation recommended based on AI triage.'
+                      : 'No urgent indicators detected in current session.'}
+                  </p>
                 </div>
               </section>
             </div>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
+                  <div className="eyebrow">Care Plan</div>
+                  <h2>Prescription Studio</h2>
+                </div>
+              </div>
+              <div className="stack compact">
+                <div className="row" style={{ gap: '1rem' }}>
+                  <div style={{ flex: 2 }}>
+                    <textarea rows={2} value={prescriptionNotes} onChange={(e) => setPrescriptionNotes(e.target.value)} placeholder="Overall prescription notes..." />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <button className="secondary" style={{ height: '100%', width: '100%' }} onClick={() => void createPrescription()} disabled={!selectedVisit}>
+                      Create ID
+                    </button>
+                  </div>
+                </div>
+                {prescriptionStatus && <div className="flash subtle">{prescriptionStatus}</div>}
+
+                {prescriptionId && (
+                  <div className="panel animate-in" style={{ background: 'var(--surface-soft)', padding: '1rem', border: '1px dashed var(--border)' }}>
+                    <div className="eyebrow">Add Medication</div>
+                    <div className="grid grid-2" style={{ marginTop: '0.5rem' }}>
+                      <input value={medicationName} onChange={(e) => setMedicationName(e.target.value)} placeholder="Medicine name" />
+                      <input value={dosage} onChange={(e) => setDosage(e.target.value)} placeholder="Dosage (e.g. 500mg)" />
+                      <input value={frequency} onChange={(e) => setFrequency(e.target.value)} placeholder="Frequency (e.g. 1-0-1)" />
+                      <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Duration (e.g. 5 days)" />
+                    </div>
+                    <button className="primary" style={{ marginTop: '1rem', width: '100%' }} onClick={() => void addMedication()}>Add Item</button>
+                    {medicationStatus && <div className="flash subtle" style={{ marginTop: '0.75rem' }}>{medicationStatus}</div>}
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
-        </main>
-      ) : (
-        <main className="grid doctor-grid">
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Patients</div>
-                <h2>Select patient</h2>
-              </div>
-            </div>
-            <div className="table-list">
-              {patients.map((patient) => (
-                <button
-                  key={patient.patient_id}
-                  className={`list-row ${selectedPatientId === patient.patient_id ? 'active' : ''}`}
-                  onClick={() => setSelectedPatientId(patient.patient_id)}
-                >
-                  <strong>{patient.patient_name}</strong>
-                  <span>{patient.patient_email}</span>
-                  <span>{patient.visit_count} visits</span>
-                </button>
-              ))}
-              {!patients.length && <div className="empty">No patients yet. Completed patient visits will appear here.</div>}
-            </div>
-          </section>
-
-          <section className="hero-card">
-            <div className="hero-head">
-              <div>
-                <div className="eyebrow">Selected patient</div>
-                <h2>{selectedPatient?.patient_name || 'No patient selected'}</h2>
-                <p>{selectedPatient ? `${selectedPatient.patient_email} - ${selectedPatient.visit_count} visits` : 'Choose a patient to load timeline and SOAP summaries.'}</p>
-              </div>
-              <span className="pill">{selectedVisit?.status || 'No visit'}</span>
-            </div>
-            <div className="stats">
-              <div className="stat"><span>Visits</span><strong>{doctorHistory.length}</strong></div>
-              <div className="stat"><span>Red flags</span><strong>{sessionSnapshot?.status === 'urgent' ? 1 : 0}</strong></div>
-              <div className="stat"><span>Messages</span><strong>{sessionSnapshot?.messages.length || 0}</strong></div>
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Timeline</div>
-                <h2>Visit timeline</h2>
-              </div>
-            </div>
-            <div className="stack compact">
-              {doctorHistory.map((visit) => (
-                <button
-                  key={visit.visit_id}
-                  className={`timeline-item ${selectedVisit?.visit_id === visit.visit_id ? 'active' : ''}`}
-                  onClick={() => setSelectedVisit(visit)}
-                >
-                  <strong>{visit.doctor_name}</strong>
-                  <span>{visit.status} - {formatDate(visit.created_at)}</span>
-                </button>
-              ))}
-              {!doctorHistory.length && <div className="empty">No visit history for this patient.</div>}
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Urgent red flags</div>
-                <h2>Triage state</h2>
-              </div>
-            </div>
-            <div className={`alert-card ${sessionSnapshot?.status === 'urgent' ? 'urgent' : ''}`}>
-              <strong>{sessionSnapshot?.status || 'No session loaded'}</strong>
-              <span>{sessionSnapshot?.status === 'urgent' ? 'Immediate medical evaluation recommended.' : 'No urgent state returned for this visit.'}</span>
-            </div>
-          </section>
-
-          <section className="panel wide">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">SOAP</div>
-                <h2>Summary for selected visit</h2>
-              </div>
-            </div>
-            <pre className="code-block">{formatSummary(doctorSummary)}</pre>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Follow-up</div>
-                <h2>Schedule reminder</h2>
-              </div>
-            </div>
-            <div className="stack compact">
-              <input type="datetime-local" value={doctorReminderTime} onChange={(event) => setDoctorReminderTime(event.target.value)} />
-              <textarea rows={3} value={doctorReminderMessage} onChange={(event) => setDoctorReminderMessage(event.target.value)} />
-              <button className="primary" onClick={() => void scheduleFollowUp()} disabled={!selectedPatientId}>Schedule follow-up</button>
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Prescription</div>
-                <h2>Write prescription</h2>
-              </div>
-            </div>
-            <div className="stack compact">
-              <textarea rows={3} value={prescriptionNotes} onChange={(event) => setPrescriptionNotes(event.target.value)} />
-              <button className="secondary" onClick={() => void createPrescription()} disabled={!selectedVisit}>Create prescription</button>
-              <input value={prescriptionId} onChange={(event) => setPrescriptionId(event.target.value)} placeholder="Prescription ID after creation" />
-              <input value={medicationName} onChange={(event) => setMedicationName(event.target.value)} placeholder="Medicine" />
-              <input value={dosage} onChange={(event) => setDosage(event.target.value)} placeholder="Dosage" />
-              <input value={frequency} onChange={(event) => setFrequency(event.target.value)} placeholder="Frequency" />
-              <input value={duration} onChange={(event) => setDuration(event.target.value)} placeholder="Duration" />
-              <button className="primary" onClick={() => void addMedication()} disabled={!prescriptionId}>Add medication</button>
-            </div>
-          </section>
-
-          <section className="panel wide">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Profile</div>
-                <h2>Doctor profile</h2>
-              </div>
-            </div>
-            <div className="record-card">
-              <strong>{user.name}</strong>
-              <span>{user.email}</span>
-              <span>{user.phone || 'No phone number added'}</span>
-            </div>
-          </section>
         </main>
       )}
     </div>

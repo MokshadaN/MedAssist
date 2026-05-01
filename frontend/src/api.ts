@@ -45,6 +45,8 @@ export type ProfileUpdate = {
   allergies?: string;
   chronic_conditions?: string;
   address?: string;
+  specialization?: string;
+
 };
 
 export type DoctorDirectoryItem = {
@@ -326,6 +328,9 @@ export const api = {
   },
   listReports(patientId: string, token?: string | null) {
     return request<ReportOut[]>(`/reports/${patientId}`, { token });
+  },
+  listPatientReports(patientId: string, token: string) {
+    return request<ReportOut[]>(`/reports/${encodeURIComponent(patientId)}`, { token });
   },
   uploadReport(patientId: string, file: File, token?: string | null) {
     const form = new FormData();
