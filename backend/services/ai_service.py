@@ -9,7 +9,7 @@ from google import genai
 from google.genai import errors
 from dotenv import load_dotenv
 
-from utils.prompts import follow_up_prompt
+from utils.prompts import ai_reply_prompt, follow_up_prompt, intake_summary_prompt
 from services.triage_service import detect_urgent_red_flags
 
 
@@ -105,65 +105,7 @@ def safe_generate_content(contents, schema=None):
 # =====================================================
 
 def extract_and_summarize(transcript: str) -> IntakeOutput:
-
-    combined_prompt = f"""
-You are a clinical intake assistant.
-
-From the transcript below:
-
-1. Extract structured clinical data.
-2. Generate a physician-ready SOAP note.
-
-Return STRICT JSON in this format:
-
-{{
-  "structured_data": {{
-      "name": "",
-      "severity": "",
-      "duration": "",
-      "trend": "",
-      "frequency": "",
-      "triggers": [],
-      "relievers": [],
-      "impact": [],
-      "confidence": "",
-      "red_flag": false
-  }},
-  "clinical_summary": "SOAP formatted note"
-}}
-
-SOAP FORMAT REQUIREMENTS:
-
-S (Subjective):
-- Patient-reported symptoms
-- Onset
-- Severity
-- Triggers
-- Relievers
-- Impact
-
-O (Objective):
-- Only include explicitly stated observable/measurable data
-- If none: write 'No objective data available from intake.'
-
-A (Assessment):
-- Clinical impression based strictly on reported symptoms
-- No definitive diagnosis
-- No prescriptions
-
-P (Plan):
-- Suggested next evaluation steps
-- No medications
-
-STRICT RULES:
-- No diagnosis
-- No hallucination
-- Only use transcript information
-
-Transcript:
-{transcript}
-"""
-    return safe_generate_content(combined_prompt, IntakeOutput)
+    return safe_generate_content(intake_summary_prompt(transcript), IntakeOutput)
 
 # =====================================================
 # FOLLOW-UP GENERATION
@@ -293,5 +235,8 @@ def analyze_patient_transcript(transcript: str) -> dict:
     }
 
 def generate_ai_reply(user_message: str):
-    # simple placeholder logic
-    return f"AI says: I understand '{user_message}'"
+    try:
+        reply = safe_generate_content(ai_reply_prompt(user_message))
+        return reply if isinstance(reply, str) else str(reply)
+    except RuntimeError:
+        return "AI responses are unavailable until GOOGLE_API_KEY is configured."
