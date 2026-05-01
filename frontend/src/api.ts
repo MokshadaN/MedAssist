@@ -342,6 +342,12 @@ export const api = {
       body: form,
     });
   },
+  analyzeReport(reportId: string, token: string) {
+    return request<ReportOut>(`/reports/${encodeURIComponent(reportId)}/analyze`, {
+      method: 'POST',
+      token,
+    });
+  },
   deleteReport(reportId: string, token: string) {
     return request<{ status: string; report_id: string }>(`/reports/${encodeURIComponent(reportId)}`, {
       method: 'DELETE',
