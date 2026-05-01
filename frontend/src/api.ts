@@ -44,6 +44,9 @@ export type ProfileUpdate = {
   allergies?: string;
   chronic_conditions?: string;
   specialization?: string;
+  license_number?: string;
+  experience_years?: number;
+  hospital_affiliation?: string;
 };
 
 export type DoctorDirectoryItem = {
@@ -170,6 +173,21 @@ export type Reminder = {
   is_completed: boolean;
   created_at: string;
   updated_at: string;
+};
+
+export type PublicProfile = {
+  name: string;
+  age?: number | null;
+  gender?: string | null;
+  allergies?: string | null;
+  chronic_conditions?: string | null;
+  medications: Array<{
+    medicine_name: string;
+    dosage: string;
+    duration: string;
+    frequency: string;
+    prescribed_on: string;
+  }>;
 };
 
 type RequestOptions = RequestInit & {
@@ -420,6 +438,9 @@ export const api = {
     return request<{ status: string }>(`/reminders/${encodeURIComponent(reminderId)}`, {
       method: 'DELETE',
     });
+  },
+  getPublicProfile(patientId: string) {
+    return request<PublicProfile>(`/patient/public-profile/${patientId}`);
   },
 };
 

@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
+import { QRCodeCanvas } from 'qrcode.react';
 import {
   api,
   AISummary,
@@ -9,10 +10,12 @@ import {
   DoctorVisit,
   Notification,
   PatientProfile,
+  DoctorProfile,
   Prescription,
   Reminder,
   SessionState,
   API_BASE,
+  PublicProfile,
 } from './api';
 
 type AuthMode = 'login' | 'register-doctor' | 'register-patient';
@@ -107,6 +110,9 @@ function App() {
     allergies: '',
     chronic_conditions: '',
     specialization: '',
+    license_number: '',
+    experience_years: '',
+    hospital_affiliation: '',
   });
 
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
@@ -130,6 +136,9 @@ function App() {
     return value.toISOString().slice(0, 16);
   });
   const [doctorReminderMessage, setDoctorReminderMessage] = useState('Doctor visit in 2 days');
+  const [showQR, setShowQR] = useState(false);
+  const [publicProfileId, setPublicProfileId] = useState<string | null>(null);
+  const [publicProfile, setPublicProfile] = useState<PublicProfile | null>(null);
 
   const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
   const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
@@ -157,6 +166,9 @@ function App() {
       allergies: context.patient_profile?.allergies || '',
       chronic_conditions: context.patient_profile?.chronic_conditions || '',
       specialization: context.doctor_profile?.specialization || '',
+      license_number: context.doctor_profile?.license_number || '',
+      experience_years: String(context.doctor_profile?.experience_years || ''),
+      hospital_affiliation: context.doctor_profile?.hospital_affiliation || '',
     });
   };
 
@@ -186,6 +198,17 @@ function App() {
       active = false;
     };
   }, [authToken]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const profileId = params.get('profile');
+    if (profileId) {
+      setPublicProfileId(profileId);
+      api.getPublicProfile(profileId)
+        .then(setPublicProfile)
+        .catch((err) => setFlash(`Error loading profile: ${err.message}`));
+    }
+  }, []);
 
   const refreshNotifications = async () => {
     if (!authToken) return;
@@ -491,22 +514,32 @@ function App() {
 
   const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!authToken) return;
+    if (!authToken || !user) return;
     setBusy('Saving profile');
     try {
-      const context = await api.updateMe(
-        {
-          name: profileForm.name,
-          email: profileForm.email,
-          phone: profileForm.phone,
-          age: Number(profileForm.age || 0) || undefined,
-          gender: profileForm.gender,
-          allergies: profileForm.allergies,
-          chronic_conditions: profileForm.chronic_conditions,
-          specialization: profileForm.specialization,
-        },
-        authToken,
-      );
+      const payload: ProfileUpdate = {
+        name: profileForm.name || undefined,
+        email: profileForm.email || undefined,
+        phone: profileForm.phone || undefined,
+      };
+
+      if (user.role === 'patient') {
+        Object.assign(payload, {
+          age: profileForm.age ? Number(profileForm.age) : undefined,
+          gender: profileForm.gender || undefined,
+          allergies: profileForm.allergies || undefined,
+          chronic_conditions: profileForm.chronic_conditions || undefined,
+        });
+      } else if (user.role === 'doctor') {
+        Object.assign(payload, {
+          specialization: profileForm.specialization || undefined,
+          license_number: profileForm.license_number || undefined,
+          experience_years: profileForm.experience_years ? Number(profileForm.experience_years) : undefined,
+          hospital_affiliation: profileForm.hospital_affiliation || undefined,
+        });
+      }
+
+      const context = await api.updateMe(payload, authToken);
       setAuthContext(context);
       setProfileStatus('Profile updated');
     } catch (error) {
@@ -658,6 +691,69 @@ function App() {
     }
   };
 
+  if (publicProfileId) {
+    return (
+      <main className="auth-shell public-profile-view">
+        <section className="panel wide profile-card">
+          <div className="panel-head">
+            <div>
+              <div className="eyebrow">Medical Profile</div>
+              <h2>{publicProfile?.name || 'Loading profile...'}</h2>
+            </div>
+            <button className="ghost" onClick={() => (window.location.href = '/')}>Close</button>
+          </div>
+
+          {!publicProfile ? (
+            <div className="empty">Fetching patient information...</div>
+          ) : (
+            <div className="grid grid-2" style={{ marginTop: '1.5rem' }}>
+              <div className="stack">
+                <div className="eyebrow">Personal Details</div>
+                <div className="record-card">
+                  <div className="stat-mini"><span>Age</span><strong>{publicProfile.age || '--'}</strong></div>
+                  <div className="stat-mini"><span>Gender</span><strong>{publicProfile.gender || '--'}</strong></div>
+                </div>
+
+                <div className="eyebrow" style={{ marginTop: '1.5rem' }}>Medical Alerts</div>
+                <div className="alert-card urgent">
+                  <strong>Allergies</strong>
+                  <p>{publicProfile.allergies || 'No known allergies reported.'}</p>
+                </div>
+                <div className="alert-card" style={{ marginTop: '1rem' }}>
+                  <strong>Chronic Conditions</strong>
+                  <p>{publicProfile.chronic_conditions || 'No chronic conditions reported.'}</p>
+                </div>
+              </div>
+
+              <div className="stack">
+                <div className="eyebrow">Current Medications</div>
+                <div className="medication-list-public">
+                  {publicProfile.medications.map((med, i) => (
+                    <div key={i} className="record-card" style={{ marginBottom: '0.75rem' }}>
+                      <strong style={{ color: '#fff' }}>{med.medicine_name}</strong>
+                      <div className="pill-group" style={{ marginTop: '0.25rem' }}>
+                        <span className="pill">{med.dosage}</span>
+                        <span className="pill">{med.frequency}</span>
+                        <span className="pill">{med.duration}</span>
+                      </div>
+                      <small style={{ display: 'block', marginTop: '0.5rem', opacity: 0.7 }}>
+                        Prescribed: {new Date(med.prescribed_on).toLocaleDateString()}
+                      </small>
+                    </div>
+                  ))}
+                  {!publicProfile.medications.length && <div className="empty">No active medications found.</div>}
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+        <footer style={{ marginTop: '2rem', textAlign: 'center', opacity: 0.6 }}>
+          <p>MedAssist Secure Patient Sharing • {new Date().getFullYear()}</p>
+        </footer>
+      </main>
+    );
+  }
+
   if (!authReady) {
     return <div className="auth-loading panel">Loading MedAssist...</div>;
   }
@@ -806,6 +902,21 @@ function App() {
                   </label>
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
                   {profileStatus && <div className="flash subtle">{profileStatus}</div>}
+
+                  <button className="secondary" type="button" style={{ width: '100%', marginTop: '1rem' }} onClick={() => setShowQR(!showQR)}>
+                    {showQR ? 'Hide QR Profile' : 'Show QR Profile'}
+                  </button>
+
+                  {showQR && patientProfile && (
+                    <div className="qr-container animate-in" style={{ marginTop: '1rem', background: '#fff', padding: '1.25rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}>
+                      <QRCodeCanvas
+                        value={`${window.location.origin}${window.location.pathname}?profile=${patientProfile.id}`}
+                        size={160}
+                        style={{ borderRadius: '8px' }}
+                      />
+                      <p style={{ color: '#1a1a1a', fontSize: '0.85rem', fontWeight: 600, marginTop: '0.75rem', textAlign: 'center' }}>Scan to share summary</p>
+                    </div>
+                  )}
                 </form>
               </div>
             </div>

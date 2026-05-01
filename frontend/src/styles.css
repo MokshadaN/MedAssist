@@ -726,3 +726,44 @@ input:focus, textarea:focus, select:focus {
     flex: 1;
   }
 }
+
+/* Public Profile View Styles */
+.public-profile-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.public-profile-view .profile-card {
+  width: 100%;
+  animation: slideUp 0.5s ease-out;
+}
+
+.medication-list-public {
+  display: grid;
+  gap: 1rem;
+}
+
+.pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.qr-container {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.qr-container:hover {
+  transform: translateY(-4px);
+}
+
+@media (max-width: 600px) {
+  .public-profile-view {
+    padding: 1rem;
+  }
+}
