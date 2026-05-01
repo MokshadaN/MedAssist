@@ -243,3 +243,7 @@ def analyze_patient_transcript(transcript: str) -> dict:
         "clinical_summary": result.clinical_summary,
         "structured_data": data.model_dump()
     }
+
+def generate_ai_reply(user_message: str):
+    # simple placeholder logic
+    return f"AI says: I understand '{user_message}'"
