@@ -86,10 +86,16 @@ class ProfileUpdate(BaseModel):
     name: Optional[str] = Field(default=None, min_length=1, max_length=100)
     email: Optional[EmailStr] = None
     phone: Optional[str] = Field(default=None, max_length=30)
+    # Patient fields
     age: Optional[int] = Field(default=None, ge=0, le=150)
     gender: Optional[str] = Field(default=None, max_length=30)
     allergies: Optional[str] = Field(default=None, max_length=255)
     chronic_conditions: Optional[str] = Field(default=None, max_length=255)
+    # Doctor fields
+    specialization: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    license_number: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    experience_years: Optional[int] = Field(default=None, ge=0, le=100)
+    hospital_affiliation: Optional[str] = Field(default=None, max_length=150)
 
 
 class RegisterResponse(BaseModel):
