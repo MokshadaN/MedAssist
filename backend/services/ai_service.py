@@ -2,14 +2,14 @@
 
 import os
 import time
-from typing import List, Optional
+from pathlib import Path
+from typing import Any, List, Optional
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import errors
 from dotenv import load_dotenv
 
 from utils.prompts import follow_up_prompt
-from utils.voice_engine import get_patient_input
 from services.triage_service import detect_urgent_red_flags
 
 
@@ -17,7 +17,8 @@ from services.triage_service import detect_urgent_red_flags
 # CONFIG
 # =====================================================
 
-load_dotenv()
+BACKEND_DIR = Path(__file__).resolve().parents[1]
+load_dotenv(BACKEND_DIR / ".env")
 
 
 def _get_client():
@@ -197,6 +198,53 @@ def find_missing_fields(data: VisitData):
             missing.append(field)
 
     return missing
+
+
+# =====================================================
+# PREVIOUS VISIT COMPARISON (NO LLM)
+# =====================================================
+
+def compare_with_previous_visit(
+    current_structured: dict[str, Any],
+    previous_structured: dict[str, Any] | None,
+) -> dict[str, Any]:
+    if not previous_structured:
+        return {
+            "status": "no_previous_visit",
+            "changes": [],
+            "summary": "No previous visit available.",
+        }
+
+    previous_symptoms = set(previous_structured.get("symptoms") or [])
+    current_symptoms = set(current_structured.get("symptoms") or [])
+
+    if current_structured.get("name"):
+        current_symptoms.add(current_structured["name"])
+    if previous_structured.get("name"):
+        previous_symptoms.add(previous_structured["name"])
+
+    added = sorted(current_symptoms - previous_symptoms)
+    removed = sorted(previous_symptoms - current_symptoms)
+
+    changes: list[str] = []
+    if added:
+        changes.append(f"New symptoms: {', '.join(added)}")
+    if removed:
+        changes.append(f"Resolved symptoms: {', '.join(removed)}")
+
+    prev_severity = previous_structured.get("severity")
+    curr_severity = current_structured.get("severity")
+    if prev_severity and curr_severity and prev_severity != curr_severity:
+        changes.append(f"Severity changed from {prev_severity} to {curr_severity}")
+
+    if not changes:
+        changes.append("No major change detected from previous visit.")
+
+    return {
+        "status": "compared",
+        "changes": changes,
+        "summary": " | ".join(changes),
+    }
 
 
 # =====================================================
