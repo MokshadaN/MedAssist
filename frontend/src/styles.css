@@ -106,6 +106,45 @@ button {
   align-content: start;
 }
 
+.patient-shell {
+  display: grid;
+  gap: 18px;
+}
+
+.patient-portal-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(360px, 1.4fr) minmax(300px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.panel-column {
+  display: grid;
+  gap: 18px;
+}
+
+.center-column {
+  display: grid;
+  gap: 18px;
+}
+
+.hero-top {
+  padding: 20px;
+}
+
+.chat-panel,
+.summary-panel,
+.compact-panel {
+  min-height: 220px;
+}
+
+.empty-panel {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
 .app-topbar,
 .panel,
 .hero-card {
@@ -485,6 +524,7 @@ select:focus {
   .auth-shell,
   .patient-grid,
   .doctor-grid,
+  .patient-portal-grid,
   .split {
     grid-template-columns: 1fr;
   }
