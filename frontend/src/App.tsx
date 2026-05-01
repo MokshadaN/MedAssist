@@ -10,6 +10,7 @@ import {
   Notification,
   PatientProfile,
   Prescription,
+  PrescriptionItem,
   Reminder,
   SessionState,
   API_BASE,
@@ -123,6 +124,7 @@ function App() {
   const [frequency, setFrequency] = useState<FrequencyOption>('once');
   const [customInstructions, setCustomInstructions] = useState('');
   const [prescriptionDraftStatus, setPrescriptionDraftStatus] = useState('');
+  const [currentPrescriptionItems, setCurrentPrescriptionItems] = useState<PrescriptionItem[]>([]);
   const [doctorReminderTime, setDoctorReminderTime] = useState(() => {
     const value = new Date();
     value.setDate(value.getDate() + 2);
@@ -543,6 +545,7 @@ function App() {
     try {
       const prescription = await api.createPrescription(selectedVisit.visit_id, prescriptionNotes, authToken);
       setPrescriptionId(prescription.id);
+      setCurrentPrescriptionItems(prescription.items || []);
       setPrescriptionStatus('Prescription created');
     } catch (error) {
       setPrescriptionStatus(error instanceof Error ? error.message : 'Could not create prescription');
@@ -562,7 +565,7 @@ function App() {
       const medicineLabel = customInstructions.trim()
         ? `${medicationName} (${customInstructions.trim()})`
         : medicationName;
-      await api.addPrescriptionItem(
+      const newItem = await api.addPrescriptionItem(
         prescriptionId,
         {
           medicine_name: medicineLabel,
@@ -572,6 +575,7 @@ function App() {
         },
         authToken,
       );
+      setCurrentPrescriptionItems((current) => [...current, newItem]);
       setMedicationName('');
       setDosage('');
       setSyrupQuantity('');
@@ -1140,6 +1144,24 @@ function App() {
                 
                 {prescriptionId && (
                   <div className="panel animate-in" style={{ background: 'var(--surface-soft)', padding: '1rem', border: '1px dashed var(--border)' }}>
+                    {currentPrescriptionItems.length > 0 && (
+                      <div style={{ marginBottom: '1.5rem' }}>
+                        <div className="eyebrow">Added Items</div>
+                        <div className="stack compact" style={{ marginTop: '0.5rem' }}>
+                          {currentPrescriptionItems.map((item) => (
+                            <div key={item.id} className="record-card" style={{ padding: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div>
+                                <strong style={{ color: '#fff' }}>{item.medicine_name}</strong>
+                                <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
+                                  {item.dosage || 'No dosage'} • {item.frequency} • {item.duration}
+                                </div>
+                              </div>
+                              <span className="pill">Added</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     <div className="eyebrow">Add Items</div>
                     <div className="stack compact" style={{ marginTop: '0.5rem' }}>
                       <label className="field">
@@ -1195,7 +1217,7 @@ function App() {
                       className="primary"
                       style={{ marginTop: '1rem', width: '100%' }}
                       onClick={() => void addMedication()}
-                      disabled={!medicationName || (!dosage && medicineType === 'tablet') || (!syrupQuantity && medicineType === 'syrup') || !duration}
+                      disabled={!medicationName || !duration}
                     >
                       Add Item
                     </button>
