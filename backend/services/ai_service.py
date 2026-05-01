@@ -17,7 +17,9 @@ from services.triage_service import detect_urgent_red_flags
 # CONFIG
 # =====================================================
 
-load_dotenv()
+# Reliably load .env from the backend directory
+env_path = os.path.join(os.path.dirname(__file__), "..", ".env")
+load_dotenv(env_path)
 
 
 def _get_client():
