@@ -65,6 +65,7 @@ function formatReportAnalysis(parsedData?: string | null) {
     const reportDate = typeof metadata.date_of_report === 'string' ? metadata.date_of_report : 'unknown';
     const abnormal = Array.isArray(summary.abnormal_parameters) ? summary.abnormal_parameters : [];
     const snapshot = typeof summary.overall_clinical_snapshot === 'string' ? summary.overall_clinical_snapshot : '';
+    const readable = typeof data.physician_readable === 'string' ? data.physician_readable : '';
 
     return [
       `Report type: ${reportType}`,
@@ -72,6 +73,7 @@ function formatReportAnalysis(parsedData?: string | null) {
       abnormal.length ? `Abnormal parameters: ${abnormal.join(', ')}` : 'Abnormal parameters: none',
       metrics.length ? `Metrics extracted: ${metrics.length}` : 'Metrics extracted: 0',
       snapshot ? `Snapshot: ${snapshot}` : '',
+      readable ? `\nPhysician-readable report:\n${readable}` : '',
     ].join('\n');
   } catch {
     return parsedData;
@@ -264,6 +266,54 @@ function App() {
   const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
   const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
 
+  const clearUserData = () => {
+    setPatientProfile(null);
+    setDoctorProfile(null);
+    setFlash('');
+    setBusy('');
+    setShowNotifications(false);
+    
+    // Clear patient state
+    setDoctors([]);
+    setSelectedDoctorId('');
+    setPatientVisits([]);
+    setPatientReports([]);
+    setPatientPrescriptions([]);
+    setNotifications([]);
+    setPatientReminders([]);
+    setReportFile(null);
+    setIntakeStatus('');
+    setProfileStatus('');
+    setReportStatus('');
+    setPrescriptionStatus('');
+    setMedicationStatus('');
+    setNotificationStatus('');
+    
+    // Clear intake/chat state
+    setIntakeOpen(false);
+    setActiveSessionId('');
+    setIntakeText('');
+    setIntakeMessages([]);
+    setStructuredData(null);
+    setLastSummary(null);
+    setEmergencyHospitals([]);
+    setEmergencyMessage('');
+    setIsSendingIntake(false);
+
+    // Clear doctor state
+    setPatients([]);
+    setSelectedPatientId('');
+    setDoctorHistory([]);
+    setDoctorReports([]);
+    setDoctorReminders([]);
+    setDoctorReminderStatus('');
+    setSelectedVisit(null);
+    setSessionSnapshot(null);
+    setDoctorSummary(null);
+    setCurrentPrescriptionItems([]);
+    setPrescriptionDraftStatus('');
+  };
+
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.patient_id === selectedPatientId) || null,
     [patients, selectedPatientId],
@@ -427,6 +477,7 @@ function App() {
     const data = new FormData(event.currentTarget);
     setBusy('Signing in');
     try {
+      clearUserData();
       const result = await api.login(String(data.get('email') || ''), String(data.get('password') || ''));
       localStorage.setItem('medassist_token', result.access_token);
       setAuthToken(result.access_token);
@@ -469,6 +520,7 @@ function App() {
         });
       }
 
+      clearUserData();
       const result = await api.login(String(data.get('email') || ''), String(data.get('password') || ''));
       localStorage.setItem('medassist_token', result.access_token);
       setAuthToken(result.access_token);
@@ -485,16 +537,7 @@ function App() {
     localStorage.removeItem('medassist_token');
     setAuthToken('');
     setUser(null);
-    setPatientProfile(null);
-    setFlash('');
-    setIntakeStatus('');
-    setProfileStatus('');
-    setReportStatus('');
-    setPrescriptionStatus('');
-    setMedicationStatus('');
-    setNotificationStatus('');
-    setDoctorReminderStatus('');
-    setPrescriptionDraftStatus('');
+    clearUserData();
   };
 
   const startPatientVisit = async () => {
@@ -665,10 +708,28 @@ function App() {
       const uploaded = await api.uploadReport(user.id, reportFile, authToken);
       setPatientReports(await api.listReports(user.id, authToken));
       setReportFile(null);
-      const analysisSummary = formatReportAnalysis(uploaded.parsed_data);
-      setReportStatus(analysisSummary ? `Report uploaded. ${analysisSummary.split('\n')[0]}` : 'Report uploaded');
+      setReportStatus(`Report uploaded: ${uploaded.file_url.split('/').pop()}. Click Analyze to run report analysis.`);
     } catch (error) {
       setReportStatus(error instanceof Error ? error.message : 'Upload failed');
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const analyzeReport = async (reportId: string) => {
+    if (!authToken || !user) return;
+    setBusy('Analyzing report');
+    try {
+      if (user.role === 'doctor' && selectedPatientId) {
+        await api.analyzeReport(reportId, authToken);
+        setDoctorReports(await api.listPatientReports(selectedPatientId, authToken));
+      } else {
+        await api.analyzeReport(reportId, authToken);
+        setPatientReports(await api.listReports(user.id, authToken));
+      }
+      setReportStatus('Report analyzed');
+    } catch (error) {
+      setReportStatus(error instanceof Error ? error.message : 'Analysis failed');
     } finally {
       setBusy('');
     }
@@ -1193,7 +1254,7 @@ function App() {
                 {reportStatus && <div className="flash subtle">{reportStatus}</div>}
                 <div className="reports-list" style={{ marginTop: '0.5rem' }}>
                   {patientReports.map((report) => (
-                    <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                    <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
                       <div className="stack compact" style={{ gap: '0.25rem' }}>
                         <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
                         {report.parsed_data && (
@@ -1202,6 +1263,7 @@ function App() {
                           </pre>
                         )}
                       </div>
+                      <button className="secondary" type="button" onClick={() => void analyzeReport(report.id)}>Analyze</button>
                       <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                       <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
                       <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
@@ -1366,7 +1428,7 @@ function App() {
               </div>
               <div className="stack compact">
                 {doctorReports.map((report) => (
-                  <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                  <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
                     <div className="stack compact" style={{ gap: '0.25rem' }}>
                       <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
                       {report.parsed_data && (
@@ -1375,6 +1437,7 @@ function App() {
                         </pre>
                       )}
                     </div>
+                    <button className="secondary" type="button" onClick={() => void analyzeReport(report.id)}>Analyze</button>
                     <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                     <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
                     <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
