@@ -4,6 +4,8 @@ from models.metric import MedicalMetric
 from typing import List, Any
 import json
 import re
+from datetime import datetime
+from dateutil import parser as date_parser
 
 def save_report(db: Session, patient_id: str, file_url: str, parsed_data: str = None) -> Report:
     """
@@ -51,7 +53,18 @@ def update_report_analysis(db: Session, report: Report, parsed_data: str | None)
             # and that analysis dict has "detailed_metrics"
             raw_data = analysis_dict.get("analysis", {})
             metrics = raw_data.get("detailed_metrics", [])
-            save_medical_metrics(db, report.patient_id, report.id, metrics)
+            
+            # Try to get the report date
+            report_date = None
+            metadata = raw_data.get("report_metadata", {})
+            date_str = metadata.get("date_of_report")
+            if date_str:
+                try:
+                    report_date = date_parser.parse(date_str)
+                except:
+                    pass
+            
+            save_medical_metrics(db, report.patient_id, report.id, metrics, report_date)
         except Exception as e:
             print(f"Error saving individual metrics: {e}")
             
@@ -71,11 +84,12 @@ def _clean_numeric_value(value_str: str) -> float | None:
         pass
     return None
 
-def save_medical_metrics(db: Session, patient_id: str, report_id: str, metrics: List[dict]) -> List[MedicalMetric]:
+def save_medical_metrics(db: Session, patient_id: str, report_id: str, metrics: List[dict], measured_at: datetime = None) -> List[MedicalMetric]:
     """
     Save extracted metrics to the medical_metrics table.
     """
     db_metrics = []
+    timestamp = measured_at or datetime.utcnow()
     for m in metrics:
         raw_val = str(m.get("value", ""))
         db_metric = MedicalMetric(
@@ -86,7 +100,8 @@ def save_medical_metrics(db: Session, patient_id: str, report_id: str, metrics: 
             raw_value=raw_val,
             units=m.get("units"),
             interpretation=m.get("interpretation"),
-            severity=m.get("severity")
+            severity=m.get("severity"),
+            measured_at=timestamp
         )
         db.add(db_metric)
         db_metrics.append(db_metric)
