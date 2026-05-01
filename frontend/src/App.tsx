@@ -84,6 +84,7 @@ function App() {
   const [intakeMessages, setIntakeMessages] = useState<ChatMessage[]>([]);
   const [structuredData, setStructuredData] = useState<Record<string, unknown> | null>(null);
   const [lastSummary, setLastSummary] = useState<AISummary | null>(null);
+  const [isSendingIntake, setIsSendingIntake] = useState(false);
 
   const [profileForm, setProfileForm] = useState({
     name: '',
@@ -113,6 +114,9 @@ function App() {
     return value.toISOString().slice(0, 16);
   });
   const [doctorReminderMessage, setDoctorReminderMessage] = useState('Doctor visit in 2 days');
+
+  const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
+  const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.patient_id === selectedPatientId) || null,
@@ -251,6 +255,16 @@ function App() {
     });
   }, [authToken, selectedVisit?.session_id]);
 
+  useEffect(() => {
+    if (!authToken || !selectedTimelineVisit?.session_id) {
+      setTimelineSummary(null);
+      return;
+    }
+    api.getSummary(selectedTimelineVisit.session_id, authToken)
+      .then(setTimelineSummary)
+      .catch(() => setTimelineSummary(null));
+  }, [authToken, selectedTimelineVisit?.session_id]);
+
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -260,7 +274,7 @@ function App() {
       localStorage.setItem('medassist_token', result.access_token);
       setAuthToken(result.access_token);
       setAuthContext(result);
-      setFlash(`Signed in as ${result.user.name}`);
+      // setFlash(`Signed in as ${result.user.name}`);
     } catch (error) {
       setFlash(error instanceof Error ? error.message : 'Login failed');
     } finally {
@@ -335,8 +349,9 @@ function App() {
   };
 
   const sendIntakeAnswer = async () => {
-    if (!authToken || !activeSessionId || !intakeText.trim()) return;
+    if (!authToken || !activeSessionId || !intakeText.trim() || isSendingIntake) return;
     const answer = intakeText.trim();
+    setIsSendingIntake(true);
     setBusy('Saving answer');
     try {
       const response = await api.answerIntake(
@@ -368,6 +383,7 @@ function App() {
       setFlash(error instanceof Error ? error.message : 'Could not save intake answer');
     } finally {
       setBusy('');
+      setIsSendingIntake(false);
     }
   };
 
@@ -605,15 +621,30 @@ function App() {
                 <div className="stat-mini"><span>Gender</span><strong>{patientProfile?.gender || '--'}</strong></div>
                 <div className="stat-mini"><span>Visits</span><strong>{patientVisits.length}</strong></div>
               </div>
-              
+
               <div className="profile-details-form">
                 <div className="eyebrow" style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Medical Profile</div>
                 <form className="stack compact" onSubmit={saveProfile}>
-                  <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Phone Number" />
-                  <input value={profileForm.age} onChange={(e) => setProfileForm({ ...profileForm, age: e.target.value })} placeholder="Age" type="number" />
-                  <input value={profileForm.gender} onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })} placeholder="Gender" />
-                  <textarea rows={2} value={profileForm.allergies} onChange={(e) => setProfileForm({ ...profileForm, allergies: e.target.value })} placeholder="Allergies (e.g., Penicillin)" />
-                  <textarea rows={2} value={profileForm.chronic_conditions} onChange={(e) => setProfileForm({ ...profileForm, chronic_conditions: e.target.value })} placeholder="Chronic Conditions" />
+                  <label className="field">
+                    <span>Phone Number</span>
+                    <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Enter phone number" />
+                  </label>
+                  <label className="field">
+                    <span>Age</span>
+                    <input value={profileForm.age} onChange={(e) => setProfileForm({ ...profileForm, age: e.target.value })} placeholder="Enter age" type="number" />
+                  </label>
+                  <label className="field">
+                    <span>Gender</span>
+                    <input value={profileForm.gender} onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })} placeholder="Enter gender" />
+                  </label>
+                  <label className="field">
+                    <span>Allergies</span>
+                    <textarea rows={2} value={profileForm.allergies} onChange={(e) => setProfileForm({ ...profileForm, allergies: e.target.value })} placeholder="Example: Penicillin" />
+                  </label>
+                  <label className="field">
+                    <span>Chronic Conditions</span>
+                    <textarea rows={2} value={profileForm.chronic_conditions} onChange={(e) => setProfileForm({ ...profileForm, chronic_conditions: e.target.value })} placeholder="Example: Diabetes" />
+                  </label>
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
                 </form>
               </div>
@@ -659,10 +690,24 @@ function App() {
                         <div key={`${message.role}-${index}`} className={`bubble ${message.role}`}>{message.text}</div>
                       ))}
                     </div>
-                    <div className="chat-compose">
-                      <textarea rows={2} value={intakeText} onChange={(event) => setIntakeText(event.target.value)} placeholder="Type your response..." />
-                      <button className="primary" onClick={() => void sendIntakeAnswer()}>Send</button>
-                    </div>
+                    <form
+                      className="chat-compose"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        void sendIntakeAnswer();
+                      }}
+                    >
+                      <textarea
+                        rows={2}
+                        value={intakeText}
+                        onChange={(event) => setIntakeText(event.target.value)}
+                        placeholder="Type your response..."
+                        disabled={isSendingIntake}
+                      />
+                      <button className="primary" type="submit" disabled={isSendingIntake || !intakeText.trim()}>
+                        {isSendingIntake ? 'Thinking...' : 'Send'}
+                      </button>
+                    </form>
                   </div>
                   <div className="summary-card">
                     <div className="eyebrow" style={{ marginBottom: '1rem' }}>Live SOAP Generation</div>
@@ -719,6 +764,151 @@ function App() {
                   {!patientPrescriptions.length && <div className="empty">No active prescriptions.</div>}
                 </div>
               </section>
+            </div>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
+                  <div className="eyebrow">Documents</div>
+                  <h2>Lab Reports</h2>
+                </div>
+              </div>
+              <div className="stack compact">
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} style={{ flex: 1 }} />
+                  <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload</button>
+                </div>
+                <div className="reports-list" style={{ marginTop: '0.5rem' }}>
+                  {patientReports.map((report) => (
+                    <a className="link-row" key={report.id} href={report.file_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd"></path></svg>
+                      {report.file_url.split('/').pop()}
+                    </a>
+                  ))}
+                  {!patientReports.length && <div className="empty">No reports uploaded.</div>}
+                </div>
+              </div>
+            </section>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
+                  <div className="eyebrow">History</div>
+                  <h2>Visit Timeline</h2>
+                </div>
+              </div>
+              <div className="horizontal-timeline">
+                <div className="timeline-line"></div>
+                <div className="timeline-dot-wrapper">
+                  {patientVisits.map((visit) => (
+                    <div key={visit.visit_id} className="timeline-item-node" onClick={() => setSelectedTimelineVisit(visit)}>
+                      <div className="timeline-label-above">Dr. {visit.doctor_name.split(' ').pop()}</div>
+                      <div className="timeline-dot-row">
+                        <div
+                          className={`timeline-dot ${selectedTimelineVisit?.visit_id === visit.visit_id ? 'active' : ''}`}
+                          title="Click to view details"
+                        ></div>
+                      </div>
+                      <div className="timeline-label-below">{new Date(visit.created_at).toLocaleDateString()}</div>
+                    </div>
+                  ))}
+                  {!patientVisits.length && <div className="empty" style={{ width: '100%', textAlign: 'center' }}>No visits yet.</div>}
+                </div>
+              </div>
+
+              {selectedTimelineVisit && (
+                <div className="panel visit-details-box animate-in">
+                  <div className="panel-head">
+                    <div>
+                      <div className="eyebrow">Visit Details</div>
+                      <h2>Dr. {selectedTimelineVisit.doctor_name}</h2>
+                      <p>{formatDate(selectedTimelineVisit.created_at)} • {selectedTimelineVisit.status.toUpperCase()}</p>
+                    </div>
+                    <button className="ghost" onClick={() => setSelectedTimelineVisit(null)}>Close</button>
+                  </div>
+                  <div className="stack">
+                    <div className="summary-card">
+                      <div className="eyebrow">Clinical Summary (SOAP)</div>
+                      <pre className="code-block">{formatSummary(timelineSummary)}</pre>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+          </div>
+        </main>
+      ) : (
+        <main className="dashboard-layout">
+          {/* LEFT SIDEBAR: Doctor Profile */}
+          <aside className="profile-sidebar">
+            <div className="panel profile-card">
+              <div className="profile-header">
+                <div className="profile-avatar">{user.name.charAt(0)}</div>
+                <h2>{user.name}</h2>
+                <span className="pill" style={{ marginTop: '0.5rem' }}>Medical Professional</span>
+              </div>
+              <div className="profile-stats">
+                <div className="stat-mini"><span>Patients</span><strong>{patients.length}</strong></div>
+                <div className="stat-mini"><span>Role</span><strong>Doctor</strong></div>
+              </div>
+
+              <div className="profile-details-form">
+                <div className="eyebrow" style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Professional Profile</div>
+                <div className="stack compact">
+                  <div className="record-card">
+                    <div className="eyebrow">Email</div>
+                    <p style={{ margin: 0, fontSize: '0.9rem' }}>{user.email}</p>
+                  </div>
+                  <div className="record-card">
+                    <div className="eyebrow">Contact</div>
+                    <p style={{ margin: 0, fontSize: '0.9rem' }}>{user.phone || 'Not provided'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* MAIN CONTENT AREA */}
+          <div className="dashboard-content stack">
+            <section className="hero-card">
+              <div className="hero-head">
+                <div>
+                  <div className="eyebrow">Current Case</div>
+                  <h2>{selectedPatient?.patient_name || 'No patient selected'}</h2>
+                  <p>{selectedPatient ? `${selectedPatient.patient_email} - ${selectedPatient.visit_count} visits` : 'Select a patient to view history and generate SOAP summaries.'}</p>
+                </div>
+                <span className="pill">{selectedVisit?.status || 'Select Visit'}</span>
+              </div>
+              <div className="stats" style={{ marginTop: '1.5rem' }}>
+                <div className="stat"><span>Total Visits</span><strong>{doctorHistory.length}</strong></div>
+                <div className="stat"><span>Session Status</span><strong>{sessionSnapshot?.status || 'N/A'}</strong></div>
+                <div className="stat"><span>Messages</span><strong>{sessionSnapshot?.messages.length || 0}</strong></div>
+              </div>
+            </section>
+
+            <div className="grid grid-2">
+              <section className="panel">
+                <div className="panel-head">
+                  <div>
+                    <div className="eyebrow">Directory</div>
+                    <h2>Patient List</h2>
+                  </div>
+                </div>
+                <div className="table-list" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {patients.map((patient) => (
+                    <button
+                      key={patient.patient_id}
+                      className={`list-row ${selectedPatientId === patient.patient_id ? 'active' : ''}`}
+                      onClick={() => setSelectedPatientId(patient.patient_id)}
+                    >
+                      <strong>{patient.patient_name}</strong>
+                      <span style={{ fontSize: '0.8rem' }}>{patient.patient_email}</span>
+                      <span className="pill" style={{ fontSize: '0.7rem' }}>{patient.visit_count} visits</span>
+                    </button>
+                  ))}
+                  {!patients.length && <div className="empty">No patients found.</div>}
+                </div>
+              </section>
 
               <section className="panel">
                 <div className="panel-head">
@@ -727,175 +917,99 @@ function App() {
                     <h2>Visit Timeline</h2>
                   </div>
                 </div>
-                <div className="stack compact">
-                  {patientVisits.map((visit) => (
-                    <button key={visit.visit_id} className="timeline-item">
-                      <strong style={{ color: '#fff' }}>Dr. {visit.doctor_name}</strong>
+                <div className="stack compact" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                  {doctorHistory.map((visit) => (
+                    <button
+                      key={visit.visit_id}
+                      className={`timeline-item ${selectedVisit?.visit_id === visit.visit_id ? 'active' : ''}`}
+                      onClick={() => setSelectedVisit(visit)}
+                    >
+                      <strong style={{ color: '#fff' }}>Visit on {new Date(visit.created_at).toLocaleDateString()}</strong>
                       <span>{visit.status.toUpperCase()} • {formatDate(visit.created_at)}</span>
                     </button>
                   ))}
-                  {!patientVisits.length && <div className="empty">Your previous visits will appear here.</div>}
+                  {!doctorHistory.length && <div className="empty">No history for this patient.</div>}
+                </div>
+              </section>
+            </div>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
+                  <div className="eyebrow">Analysis</div>
+                  <h2>SOAP Summary</h2>
+                </div>
+              </div>
+              <pre className="code-block">{formatSummary(doctorSummary)}</pre>
+            </section>
+
+            <div className="grid grid-2">
+              <section className="panel">
+                <div className="panel-head">
+                  <div>
+                    <div className="eyebrow">Follow-up</div>
+                    <h2>Schedule Reminder</h2>
+                  </div>
+                </div>
+                <div className="stack compact">
+                  <input type="datetime-local" value={doctorReminderTime} onChange={(e) => setDoctorReminderTime(e.target.value)} />
+                  <textarea rows={3} value={doctorReminderMessage} onChange={(e) => setDoctorReminderMessage(e.target.value)} placeholder="Message for patient..." />
+                  <button className="primary" onClick={() => void scheduleFollowUp()} disabled={!selectedPatientId}>Set Reminder</button>
                 </div>
               </section>
 
               <section className="panel">
                 <div className="panel-head">
                   <div>
-                    <div className="eyebrow">Documents</div>
-                    <h2>Lab Reports</h2>
+                    <div className="eyebrow">Triage</div>
+                    <h2>Status Check</h2>
                   </div>
                 </div>
-                <div className="stack compact">
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} style={{ flex: 1 }} />
-                    <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload</button>
-                  </div>
-                  <div className="reports-list" style={{ marginTop: '0.5rem' }}>
-                    {patientReports.map((report) => (
-                      <a className="link-row" key={report.id} href={report.file_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd"></path></svg>
-                        {report.file_url.split('/').pop()}
-                      </a>
-                    ))}
-                    {!patientReports.length && <div className="empty">No reports uploaded.</div>}
-                  </div>
+                <div className={`alert-card ${sessionSnapshot?.status === 'urgent' ? 'urgent' : ''}`} style={{ height: '100%' }}>
+                  <strong style={{ color: '#fff' }}>{sessionSnapshot?.status?.toUpperCase() || 'NORMAL'}</strong>
+                  <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                    {sessionSnapshot?.status === 'urgent' 
+                      ? 'Immediate medical evaluation recommended based on AI triage.' 
+                      : 'No urgent indicators detected in current session.'}
+                  </p>
                 </div>
               </section>
             </div>
+
+            <section className="panel wide">
+              <div className="panel-head">
+                <div>
+                  <div className="eyebrow">Care Plan</div>
+                  <h2>Prescription Studio</h2>
+                </div>
+              </div>
+              <div className="stack compact">
+                <div className="row" style={{ gap: '1rem' }}>
+                  <div style={{ flex: 2 }}>
+                    <textarea rows={2} value={prescriptionNotes} onChange={(e) => setPrescriptionNotes(e.target.value)} placeholder="Overall prescription notes..." />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <button className="secondary" style={{ height: '100%', width: '100%' }} onClick={() => void createPrescription()} disabled={!selectedVisit}>
+                      Create ID
+                    </button>
+                  </div>
+                </div>
+                
+                {prescriptionId && (
+                  <div className="panel animate-in" style={{ background: 'var(--surface-soft)', padding: '1rem', border: '1px dashed var(--border)' }}>
+                    <div className="eyebrow">Add Medication</div>
+                    <div className="grid grid-2" style={{ marginTop: '0.5rem' }}>
+                      <input value={medicationName} onChange={(e) => setMedicationName(e.target.value)} placeholder="Medicine name" />
+                      <input value={dosage} onChange={(e) => setDosage(e.target.value)} placeholder="Dosage (e.g. 500mg)" />
+                      <input value={frequency} onChange={(e) => setFrequency(e.target.value)} placeholder="Frequency (e.g. 1-0-1)" />
+                      <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Duration (e.g. 5 days)" />
+                    </div>
+                    <button className="primary" style={{ marginTop: '1rem', width: '100%' }} onClick={() => void addMedication()}>Add Item</button>
+                  </div>
+                )}
+              </div>
+            </section>
           </div>
-        </main>
-      ) : (
-        <main className="grid doctor-grid">
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Patients</div>
-                <h2>Select patient</h2>
-              </div>
-            </div>
-            <div className="table-list">
-              {patients.map((patient) => (
-                <button
-                  key={patient.patient_id}
-                  className={`list-row ${selectedPatientId === patient.patient_id ? 'active' : ''}`}
-                  onClick={() => setSelectedPatientId(patient.patient_id)}
-                >
-                  <strong>{patient.patient_name}</strong>
-                  <span>{patient.patient_email}</span>
-                  <span>{patient.visit_count} visits</span>
-                </button>
-              ))}
-              {!patients.length && <div className="empty">No patients yet. Completed patient visits will appear here.</div>}
-            </div>
-          </section>
-
-          <section className="hero-card">
-            <div className="hero-head">
-              <div>
-                <div className="eyebrow">Selected patient</div>
-                <h2>{selectedPatient?.patient_name || 'No patient selected'}</h2>
-                <p>{selectedPatient ? `${selectedPatient.patient_email} - ${selectedPatient.visit_count} visits` : 'Choose a patient to load timeline and SOAP summaries.'}</p>
-              </div>
-              <span className="pill">{selectedVisit?.status || 'No visit'}</span>
-            </div>
-            <div className="stats">
-              <div className="stat"><span>Visits</span><strong>{doctorHistory.length}</strong></div>
-              <div className="stat"><span>Red flags</span><strong>{sessionSnapshot?.status === 'urgent' ? 1 : 0}</strong></div>
-              <div className="stat"><span>Messages</span><strong>{sessionSnapshot?.messages.length || 0}</strong></div>
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Timeline</div>
-                <h2>Visit timeline</h2>
-              </div>
-            </div>
-            <div className="stack compact">
-              {doctorHistory.map((visit) => (
-                <button
-                  key={visit.visit_id}
-                  className={`timeline-item ${selectedVisit?.visit_id === visit.visit_id ? 'active' : ''}`}
-                  onClick={() => setSelectedVisit(visit)}
-                >
-                  <strong>{visit.doctor_name}</strong>
-                  <span>{visit.status} - {formatDate(visit.created_at)}</span>
-                </button>
-              ))}
-              {!doctorHistory.length && <div className="empty">No visit history for this patient.</div>}
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Urgent red flags</div>
-                <h2>Triage state</h2>
-              </div>
-            </div>
-            <div className={`alert-card ${sessionSnapshot?.status === 'urgent' ? 'urgent' : ''}`}>
-              <strong>{sessionSnapshot?.status || 'No session loaded'}</strong>
-              <span>{sessionSnapshot?.status === 'urgent' ? 'Immediate medical evaluation recommended.' : 'No urgent state returned for this visit.'}</span>
-            </div>
-          </section>
-
-          <section className="panel wide">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">SOAP</div>
-                <h2>Summary for selected visit</h2>
-              </div>
-            </div>
-            <pre className="code-block">{formatSummary(doctorSummary)}</pre>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Follow-up</div>
-                <h2>Schedule reminder</h2>
-              </div>
-            </div>
-            <div className="stack compact">
-              <input type="datetime-local" value={doctorReminderTime} onChange={(event) => setDoctorReminderTime(event.target.value)} />
-              <textarea rows={3} value={doctorReminderMessage} onChange={(event) => setDoctorReminderMessage(event.target.value)} />
-              <button className="primary" onClick={() => void scheduleFollowUp()} disabled={!selectedPatientId}>Schedule follow-up</button>
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Prescription</div>
-                <h2>Write prescription</h2>
-              </div>
-            </div>
-            <div className="stack compact">
-              <textarea rows={3} value={prescriptionNotes} onChange={(event) => setPrescriptionNotes(event.target.value)} />
-              <button className="secondary" onClick={() => void createPrescription()} disabled={!selectedVisit}>Create prescription</button>
-              <input value={prescriptionId} onChange={(event) => setPrescriptionId(event.target.value)} placeholder="Prescription ID after creation" />
-              <input value={medicationName} onChange={(event) => setMedicationName(event.target.value)} placeholder="Medicine" />
-              <input value={dosage} onChange={(event) => setDosage(event.target.value)} placeholder="Dosage" />
-              <input value={frequency} onChange={(event) => setFrequency(event.target.value)} placeholder="Frequency" />
-              <input value={duration} onChange={(event) => setDuration(event.target.value)} placeholder="Duration" />
-              <button className="primary" onClick={() => void addMedication()} disabled={!prescriptionId}>Add medication</button>
-            </div>
-          </section>
-
-          <section className="panel wide">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Profile</div>
-                <h2>Doctor profile</h2>
-              </div>
-            </div>
-            <div className="record-card">
-              <strong>{user.name}</strong>
-              <span>{user.email}</span>
-              <span>{user.phone || 'No phone number added'}</span>
-            </div>
-          </section>
         </main>
       )}
     </div>
