@@ -1,12 +1,19 @@
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List
-import urllib.parse
+from pathlib import Path
+import mimetypes
+import shutil
+import uuid
 
+from core.dependencies import get_current_user, require_roles
+from models.report import Report
 from schemas.report import ReportOut
 from services import report_service
 from core.database import SessionLocal
+
+UPLOAD_DIR = Path(__file__).resolve().parents[4] / "uploads" / "reports"
 
 # Dependency to get DB session
 def get_db():
@@ -22,14 +29,23 @@ router = APIRouter()
 def upload_report(
     patient_id: str, 
     file: UploadFile = File(...), 
+    current_user=Depends(require_roles("patient", "doctor")),
     db: Session = Depends(get_db)
 ):
     """
     Upload a patient report and save its metadata.
     """
     try:
-        # Mock file upload logic
-        file_url = f"http://127.0.0.1:8000/api/v1/reports/download/{urllib.parse.quote(file.filename)}"
+        if current_user.role == "patient" and current_user.id != patient_id:
+            raise HTTPException(status_code=403, detail="You can only upload reports for your own profile")
+
+        UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+        safe_name = f"{uuid.uuid4()}_{Path(file.filename).name}"
+        disk_path = UPLOAD_DIR / safe_name
+        with disk_path.open("wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        file_url = f"/api/v1/reports/download/{safe_name}"
         
         # Save report record in database via service
         report = report_service.save_report(
@@ -39,16 +55,42 @@ def upload_report(
             parsed_data="Sample parsed data from report" # Placeholder for OCR/AI processing
         )
         return report
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to upload report: {str(e)}")
 
 @router.get("/download/{filename}")
-def download_mock_report(filename: str):
+def download_report(
+    filename: str,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     """
-    Mock endpoint to serve fake uploaded reports and prevent ERR_CONNECTION_REFUSED.
+    Serve uploaded reports to the owning patient or any doctor.
     """
-    decoded_name = urllib.parse.unquote(filename)
-    return HTMLResponse(content=f"<html><body style='font-family:sans-serif;padding:2rem;'><h2>Mock Report Preview</h2><p>File: <strong>{decoded_name}</strong></p><p>This is a simulated report viewer since no actual S3/Cloud storage is configured.</p></body></html>")
+    report = db.query(Report).filter(Report.file_url.endswith(filename)).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    if current_user.role == "patient" and report.patient_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only view your own reports")
+
+    if current_user.role not in {"patient", "doctor"}:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    disk_path = UPLOAD_DIR / filename
+    if not disk_path.exists():
+        raise HTTPException(status_code=404, detail="Report file not found on server")
+
+    media_type, _ = mimetypes.guess_type(disk_path.name)
+
+    return FileResponse(
+        path=disk_path,
+        filename=Path(filename).name,
+        media_type=media_type or "application/octet-stream",
+        content_disposition_type="inline",
+    )
 
 @router.get("/{patient_id}", response_model=List[ReportOut])
 def get_reports(patient_id: str, db: Session = Depends(get_db)):
@@ -56,4 +98,4 @@ def get_reports(patient_id: str, db: Session = Depends(get_db)):
     Retrieve all reports for a specific patient.
     """
     reports = report_service.get_reports(db, patient_id=patient_id)
-    return reports
+    return reports

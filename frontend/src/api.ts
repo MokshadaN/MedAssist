@@ -313,6 +313,9 @@ export const api = {
   listReports(patientId: string, token?: string | null) {
     return request<ReportOut[]>(`/reports/${patientId}`, { token });
   },
+  listPatientReports(patientId: string, token: string) {
+    return request<ReportOut[]>(`/reports/${encodeURIComponent(patientId)}`, { token });
+  },
   uploadReport(patientId: string, file: File, token?: string | null) {
     const form = new FormData();
     form.append('file', file);
