@@ -475,7 +475,7 @@ export const api = {
     });
   },
   getPublicProfile(patientId: string) {
-    return request<PublicProfile>(`/patient/public-profile/${patientId}`);
+    return request<PublicProfile>(`/patient/public/${patientId}`);
   },
 };
 
