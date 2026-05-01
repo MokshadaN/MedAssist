@@ -187,6 +187,20 @@ export type Reminder = {
   updated_at: string;
 };
 
+export type MedicalMetric = {
+  id: string;
+  patient_id: string;
+  report_id: string;
+  parameter: string;
+  value?: number | null;
+  raw_value: string;
+  units?: string | null;
+  interpretation?: string | null;
+  severity?: string | null;
+  measured_at: string;
+  created_at: string;
+};
+
 type RequestOptions = RequestInit & {
   token?: string | null;
 };
@@ -448,6 +462,10 @@ export const api = {
     return request<{ status: string }>(`/reminders/${encodeURIComponent(reminderId)}`, {
       method: 'DELETE',
     });
+  },
+  getPatientMetrics(patientId: string, parameter: string | null, token: string) {
+    const url = `/reports/${encodeURIComponent(patientId)}/metrics${parameter ? `?parameter=${encodeURIComponent(parameter)}` : ''}`;
+    return request<MedicalMetric[]>(url, { token });
   },
 };
 

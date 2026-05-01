@@ -1,4 +1,39 @@
 import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
+import { 
+  Heart, 
+  User, 
+  Stethoscope, 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  LogOut, 
+  Menu, 
+  X, 
+  ChevronRight, 
+  ChevronDown, 
+  Bell, 
+  Search, 
+  Plus, 
+  Activity, 
+  ShieldAlert, 
+  Send, 
+  Mic, 
+  Video, 
+  FileText, 
+  Upload, 
+  Check, 
+  History, 
+  TrendingUp, 
+  Trash2, 
+  MessageCircle, 
+  Camera, 
+  Microscope, 
+  Star, 
+  ThumbsUp, 
+  Smartphone, 
+  AlertTriangle 
+} from 'lucide-react';
+import HealthMetricsChart from './components/HealthMetricsChart';
 import {
   api,
   AISummary,
@@ -1105,6 +1140,8 @@ function App() {
               </section>
             </div>
 
+            <HealthMetricsChart patientId={user.id} token={authToken} />
+
             <section className="panel wide">
               <div className="panel-head">
                 <div>
@@ -1284,6 +1321,8 @@ function App() {
                 </div>
               </section>
             </div>
+
+            {selectedPatientId && <HealthMetricsChart patientId={selectedPatientId} token={authToken} key={selectedPatientId} />}
 
             <section className="panel wide">
               <div className="panel-head">
