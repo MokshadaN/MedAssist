@@ -80,6 +80,43 @@ def _get_groq_client():
     return Groq(api_key=api_key)
 
 
+def detect_urgent_red_flags(text: str, user_id: str | None = None, db: Session | None = None) -> dict:
+    """
+    Analyze text for medical emergency red flags.
+
+    Uses Groq when configured, falls back to regex, and attaches nearby hospital
+    information when urgent red flags are found and patient address is available.
+    """
+    client = _get_groq_client()
+
+    if not client:
+        print("Warning: GROQ_API_KEY missing. Using regex fallback for triage.")
+        result = _detect_urgent_red_flags_regex(text)
+    else:
+        try:
+            completion = client.chat.completions.create(
+                model="llama-3.1-8b-instant",
+                messages=[
+                    {"role": "system", "content": TRIAGE_SYSTEM_PROMPT},
+                    {"role": "user", "content": triage_prompt(text)},
+                ],
+                temperature=0.0,
+                response_format={"type": "json_object"},
+            )
+
+            response_json = completion.choices[0].message.content
+            data = json.loads(response_json)
+            result = {
+                "urgent": data.get("urgent", False),
+                "matched_terms": data.get("matched_terms", []),
+            }
+        except Exception as exc:
+            print(f"Warning: Groq triage API error: {exc}")
+            result = _detect_urgent_red_flags_regex(text)
+
+    return _attach_nearby_hospitals(result, user_id, db)
+
+
 def _attach_nearby_hospitals(result: dict, user_id: str | None, db: Session | None) -> dict:
     if not result.get("urgent") or not user_id or not db:
         return result
@@ -118,38 +155,3 @@ def _attach_nearby_hospitals(result: dict, user_id: str | None, db: Session | No
     return result
 
 
-def detect_urgent_red_flags(text: str, user_id: str | None = None, db: Session | None = None) -> dict:
-    """
-    Analyze text for medical emergency red flags.
-
-    Uses Groq when configured, falls back to regex, and attaches nearby hospital
-    information when urgent red flags are found and patient address is available.
-    """
-    client = _get_groq_client()
-
-    if not client:
-        print("Warning: GROQ_API_KEY missing. Using regex fallback for triage.")
-        result = _detect_urgent_red_flags_regex(text)
-    else:
-        try:
-            completion = client.chat.completions.create(
-                model="llama-3.1-8b-instant",
-                messages=[
-                    {"role": "system", "content": TRIAGE_SYSTEM_PROMPT},
-                    {"role": "user", "content": triage_prompt(text)},
-                ],
-                temperature=0.0,
-                response_format={"type": "json_object"},
-            )
-
-            response_json = completion.choices[0].message.content
-            data = json.loads(response_json)
-            result = {
-                "urgent": data.get("urgent", False),
-                "matched_terms": data.get("matched_terms", []),
-            }
-        except Exception as exc:
-            print(f"Warning: Groq triage API error: {exc}")
-            result = _detect_urgent_red_flags_regex(text)
-
-    return _attach_nearby_hospitals(result, user_id, db)

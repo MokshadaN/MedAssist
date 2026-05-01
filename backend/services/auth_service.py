@@ -170,6 +170,19 @@ def update_user_context(db: Session, user: User, data: ProfileUpdate):
             if isinstance(value, str):
                 value = _normalize_text(value)
             setattr(profile, field, value)
+    elif user.role == "doctor":
+        profile = db.query(DoctorProfile).filter(DoctorProfile.user_id == user.id).first()
+        if not profile:
+            profile = DoctorProfile(user_id=user.id)
+            db.add(profile)
+
+        for field in ("specialization", "license_number", "experience_years", "hospital_affiliation"):
+            if field not in update_data:
+                continue
+            value = update_data[field]
+            if isinstance(value, str):
+                value = _normalize_text(value)
+            setattr(profile, field, value)
 
     db.commit()
     db.refresh(user)
