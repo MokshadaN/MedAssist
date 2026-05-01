@@ -591,150 +591,178 @@ function App() {
       )}
 
       {user.role === 'patient' ? (
-        <main className="grid patient-grid">
-          <section className="hero-card wide">
-            <div className="hero-head">
-              <div>
-                <div className="eyebrow">Current care</div>
-                <h2>Start a new visit</h2>
-                <p>Select a doctor, answer the questionnaire, and your SOAP summary will be sent to the doctor's dashboard.</p>
+        <main className="dashboard-layout">
+          {/* LEFT SIDEBAR: Patient Profile Summary */}
+          <aside className="profile-sidebar">
+            <div className="panel profile-card">
+              <div className="profile-header">
+                <div className="profile-avatar">{user.name.charAt(0)}</div>
+                <h2>{user.name}</h2>
+                <span className="pill" style={{ marginTop: '0.5rem' }}>Active Patient</span>
               </div>
-              <div className="action-group">
-                <select value={selectedDoctorId} onChange={(event) => setSelectedDoctorId(event.target.value)}>
-                  {doctors.map((doctor) => (
-                    <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
-                  ))}
-                </select>
-                <button className="primary" onClick={() => void startPatientVisit()} disabled={!selectedDoctorId}>Add new visit</button>
+              <div className="profile-stats">
+                <div className="stat-mini"><span>Age</span><strong>{patientProfile?.age || '--'}</strong></div>
+                <div className="stat-mini"><span>Gender</span><strong>{patientProfile?.gender || '--'}</strong></div>
+                <div className="stat-mini"><span>Visits</span><strong>{patientVisits.length}</strong></div>
+              </div>
+              
+              <div className="profile-details-form">
+                <div className="eyebrow" style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>Medical Profile</div>
+                <form className="stack compact" onSubmit={saveProfile}>
+                  <input value={profileForm.phone} onChange={(e) => setProfileForm({ ...profileForm, phone: e.target.value })} placeholder="Phone Number" />
+                  <input value={profileForm.age} onChange={(e) => setProfileForm({ ...profileForm, age: e.target.value })} placeholder="Age" type="number" />
+                  <input value={profileForm.gender} onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })} placeholder="Gender" />
+                  <textarea rows={2} value={profileForm.allergies} onChange={(e) => setProfileForm({ ...profileForm, allergies: e.target.value })} placeholder="Allergies (e.g., Penicillin)" />
+                  <textarea rows={2} value={profileForm.chronic_conditions} onChange={(e) => setProfileForm({ ...profileForm, chronic_conditions: e.target.value })} placeholder="Chronic Conditions" />
+                  <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
+                </form>
               </div>
             </div>
-          </section>
+          </aside>
 
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Reminders</div>
-                <h2>Important soon</h2>
-              </div>
-              <button className="ghost" onClick={() => void createPatientReminder('Doctor visit in 2 days', 2)}>+ 2 days</button>
-            </div>
-            <div className="stack compact">
-              {patientReminders.map((reminder) => (
-                <div key={reminder.id} className={`reminder-row ${reminder.is_completed ? 'done' : ''}`}>
-                  <div>
-                    <span className={`badge ${isUrgent(reminder) ? 'urgent' : ''}`}>{reminderLabel(reminder)}</span>
-                    <strong>{reminder.message}</strong>
-                    <span>{formatDate(reminder.time)}</span>
-                  </div>
+          {/* MAIN CONTENT AREA */}
+          <div className="dashboard-content stack">
+            {/* HERO SECTION */}
+            <section className="hero-card">
+              <div className="hero-head">
+                <div>
+                  <div className="eyebrow">Consultation</div>
+                  <h2>Start a new visit</h2>
+                  <p>Select a specialist, complete your AI triage questionnaire, and your results will be sent to the doctor.</p>
                 </div>
-              ))}
-              {!patientReminders.length && <div className="empty">No reminders yet.</div>}
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Timeline</div>
-                <h2>Visit history</h2>
-              </div>
-            </div>
-            <div className="stack compact">
-              {patientVisits.map((visit) => (
-                <button key={visit.visit_id} className="timeline-item">
-                  <strong>{visit.doctor_name}</strong>
-                  <span>{visit.status} - {formatDate(visit.created_at)}</span>
-                </button>
-              ))}
-              {!patientVisits.length && <div className="empty">Your visits will appear here after intake is completed.</div>}
-            </div>
-          </section>
-
-          <section className="panel wide">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Questionnaire</div>
-                <h2>Chat flow timeline</h2>
-              </div>
-              {intakeOpen && <button className="ghost" onClick={() => setIntakeOpen(false)}>Hide</button>}
-            </div>
-            {intakeOpen ? (
-              <div className="split">
-                <div className="chat-card">
-                  <div className="chat-log">
-                    {intakeMessages.map((message, index) => (
-                      <div key={`${message.role}-${index}`} className={`bubble ${message.role}`}>{message.text}</div>
+                <div className="action-group">
+                  <select value={selectedDoctorId} onChange={(event) => setSelectedDoctorId(event.target.value)} style={{ minWidth: '200px' }}>
+                    <option value="" disabled>Select a doctor...</option>
+                    {doctors.map((doctor) => (
+                      <option key={doctor.id} value={doctor.id}>Dr. {doctor.name}</option>
                     ))}
+                  </select>
+                  <button className="primary" onClick={() => void startPatientVisit()} disabled={!selectedDoctorId}>Begin Intake</button>
+                </div>
+              </div>
+            </section>
+
+            {/* AI INTAKE STUDIO (Expands when active) */}
+            {intakeOpen && (
+              <section className="panel wide intake-studio">
+                <div className="panel-head">
+                  <div>
+                    <div className="eyebrow">AI Assistant</div>
+                    <h2>Intake Studio</h2>
                   </div>
-                  <div className="chat-compose">
-                    <textarea rows={3} value={intakeText} onChange={(event) => setIntakeText(event.target.value)} placeholder="Type your answer" />
-                    <button className="primary" onClick={() => void sendIntakeAnswer()}>Send answer</button>
+                  <button className="ghost" onClick={() => setIntakeOpen(false)}>Close Session</button>
+                </div>
+                <div className="split">
+                  <div className="chat-card">
+                    <div className="chat-log">
+                      {intakeMessages.map((message, index) => (
+                        <div key={`${message.role}-${index}`} className={`bubble ${message.role}`}>{message.text}</div>
+                      ))}
+                    </div>
+                    <div className="chat-compose">
+                      <textarea rows={2} value={intakeText} onChange={(event) => setIntakeText(event.target.value)} placeholder="Type your response..." />
+                      <button className="primary" onClick={() => void sendIntakeAnswer()}>Send</button>
+                    </div>
+                  </div>
+                  <div className="summary-card">
+                    <div className="eyebrow" style={{ marginBottom: '1rem' }}>Live SOAP Generation</div>
+                    <pre className="code-block">{formatSummary(lastSummary)}</pre>
                   </div>
                 </div>
-                <pre className="code-block">{formatSummary(lastSummary)}</pre>
-              </div>
-            ) : (
-              <div className="empty">Click Add new visit to open the questionnaire.</div>
+              </section>
             )}
-          </section>
 
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Reports</div>
-                <h2>All reports</h2>
-              </div>
-            </div>
-            <div className="stack compact">
-              <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} />
-              <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload report</button>
-              {patientReports.map((report) => (
-                <a className="link-row" key={report.id} href={report.file_url} target="_blank" rel="noreferrer">{report.file_url}</a>
-              ))}
-              {!patientReports.length && <div className="empty">No reports uploaded yet.</div>}
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Prescriptions</div>
-                <h2>All prescriptions</h2>
-              </div>
-            </div>
-            <div className="stack compact">
-              {patientPrescriptions.map((prescription) => (
-                <div className="record-card" key={prescription.id}>
-                  <strong>{prescription.notes || 'Prescription'}</strong>
-                  <span>{formatDate(prescription.created_at)}</span>
-                  {prescription.items.map((item) => (
-                    <span key={item.id}>{item.medicine_name} - {item.dosage} - {item.frequency} - {item.duration}</span>
-                  ))}
+            {/* TWO-COLUMN DASHBOARD METRICS */}
+            <div className="grid grid-2">
+              <section className="panel">
+                <div className="panel-head">
+                  <div>
+                    <div className="eyebrow">Schedule</div>
+                    <h2>Follow-ups & Reminders</h2>
+                  </div>
                 </div>
-              ))}
-              {!patientPrescriptions.length && <div className="empty">No prescriptions yet.</div>}
-            </div>
-          </section>
+                <div className="stack compact">
+                  {patientReminders.map((reminder) => (
+                    <div key={reminder.id} className={`reminder-row ${reminder.is_completed ? 'done' : ''}`}>
+                      <div>
+                        <span className={`badge ${isUrgent(reminder) ? 'urgent' : ''}`} style={{ marginBottom: '0.25rem' }}>{reminderLabel(reminder)}</span>
+                        <strong style={{ display: 'block', color: '#fff' }}>{reminder.message}</strong>
+                        <span style={{ fontSize: '0.85rem' }}>{formatDate(reminder.time)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {!patientReminders.length && <div className="empty">No upcoming reminders.</div>}
+                </div>
+              </section>
 
-          <section className="panel wide">
-            <div className="panel-head">
-              <div>
-                <div className="eyebrow">Profile</div>
-                <h2>Lookup and edit details</h2>
-              </div>
-              <span className="pill">{patientProfile?.allergies ? 'Allergies recorded' : 'No allergy details'}</span>
+              <section className="panel">
+                <div className="panel-head">
+                  <div>
+                    <div className="eyebrow">Medical</div>
+                    <h2>Active Prescriptions</h2>
+                  </div>
+                </div>
+                <div className="stack compact">
+                  {patientPrescriptions.map((prescription) => (
+                    <div className="record-card" key={prescription.id}>
+                      <strong style={{ color: '#fff' }}>{prescription.notes || 'Prescription Details'}</strong>
+                      <span style={{ fontSize: '0.85rem' }}>{formatDate(prescription.created_at)}</span>
+                      <div className="medication-list" style={{ marginTop: '0.5rem' }}>
+                        {prescription.items.map((item) => (
+                          <div key={item.id} className="pill" style={{ marginRight: '0.5rem', marginBottom: '0.5rem' }}>
+                            {item.medicine_name} • {item.dosage} • {item.frequency}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                  {!patientPrescriptions.length && <div className="empty">No active prescriptions.</div>}
+                </div>
+              </section>
+
+              <section className="panel">
+                <div className="panel-head">
+                  <div>
+                    <div className="eyebrow">History</div>
+                    <h2>Visit Timeline</h2>
+                  </div>
+                </div>
+                <div className="stack compact">
+                  {patientVisits.map((visit) => (
+                    <button key={visit.visit_id} className="timeline-item">
+                      <strong style={{ color: '#fff' }}>Dr. {visit.doctor_name}</strong>
+                      <span>{visit.status.toUpperCase()} • {formatDate(visit.created_at)}</span>
+                    </button>
+                  ))}
+                  {!patientVisits.length && <div className="empty">Your previous visits will appear here.</div>}
+                </div>
+              </section>
+
+              <section className="panel">
+                <div className="panel-head">
+                  <div>
+                    <div className="eyebrow">Documents</div>
+                    <h2>Lab Reports</h2>
+                  </div>
+                </div>
+                <div className="stack compact">
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} style={{ flex: 1 }} />
+                    <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload</button>
+                  </div>
+                  <div className="reports-list" style={{ marginTop: '0.5rem' }}>
+                    {patientReports.map((report) => (
+                      <a className="link-row" key={report.id} href={report.file_url} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd"></path></svg>
+                        {report.file_url.split('/').pop()}
+                      </a>
+                    ))}
+                    {!patientReports.length && <div className="empty">No reports uploaded.</div>}
+                  </div>
+                </div>
+              </section>
             </div>
-            <form className="profile-grid" onSubmit={saveProfile}>
-              <input value={profileForm.name} onChange={(event) => setProfileForm({ ...profileForm, name: event.target.value })} placeholder="Name" />
-              <input value={profileForm.email} onChange={(event) => setProfileForm({ ...profileForm, email: event.target.value })} placeholder="Email" />
-              <input value={profileForm.phone} onChange={(event) => setProfileForm({ ...profileForm, phone: event.target.value })} placeholder="Phone" />
-              <input value={profileForm.age} onChange={(event) => setProfileForm({ ...profileForm, age: event.target.value })} placeholder="Age" />
-              <input value={profileForm.gender} onChange={(event) => setProfileForm({ ...profileForm, gender: event.target.value })} placeholder="Gender" />
-              <textarea rows={3} value={profileForm.allergies} onChange={(event) => setProfileForm({ ...profileForm, allergies: event.target.value })} placeholder="Allergies" />
-              <textarea rows={3} value={profileForm.chronic_conditions} onChange={(event) => setProfileForm({ ...profileForm, chronic_conditions: event.target.value })} placeholder="Chronic conditions" />
-              <button className="primary" type="submit">Save profile</button>
-            </form>
-          </section>
+          </div>
         </main>
       ) : (
         <main className="grid doctor-grid">
