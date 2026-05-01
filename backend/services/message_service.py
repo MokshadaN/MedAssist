@@ -18,6 +18,9 @@ def create_message(db, session_id: str, message: str, sender: str):
 
 
 def get_messages(db, session_id: str):
-    return db.query(ChatMessage).filter(
-        ChatMessage.session_id == session_id
-    ).all()
+    return (
+        db.query(ChatMessage)
+        .filter(ChatMessage.session_id == session_id)
+        .order_by(ChatMessage.timestamp.asc())
+        .all()
+    )
