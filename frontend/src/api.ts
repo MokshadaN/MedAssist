@@ -489,7 +489,7 @@ export const api = {
     });
   },
   getPublicProfile(patientId: string) {
-    return request<PublicProfile>(`/patient/public-profile/${patientId}`);
+    return request<PublicProfile>(`/patient/public/${patientId}`);
   },
   getPatientMetrics(patientId: string, parameter: string | null, token: string) {
     const path = parameter 
