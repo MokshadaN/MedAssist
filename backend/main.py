@@ -14,7 +14,7 @@ from core.database import Base, engine
 import models  # noqa: F401
 
 # Import schemas so the package modules load cleanly.
-from schemas import ai, auth, feedback, message, prescription, reminder, report, session, triage, visit  # noqa: F401
+from schemas import ai, auth, feedback, message, prescription, reminder, report, risk, session, triage, visit  # noqa: F401
 
 from api.v1.router import api_router
 
