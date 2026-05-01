@@ -6,6 +6,8 @@ import json
 from groq import Groq
 from dotenv import load_dotenv
 
+from utils.prompts import TRIAGE_SYSTEM_PROMPT, triage_prompt
+
 # Reliably load .env from the backend directory
 env_path = os.path.join(os.path.dirname(__file__), "..", ".env")
 load_dotenv(env_path)
@@ -101,27 +103,17 @@ def detect_urgent_red_flags(text: str) -> dict:
         print("⚠ GROQ_API_KEY missing. Using regex fallback for triage.")
         return _detect_urgent_red_flags_regex(text)
 
-    prompt = f"""You are a medical triage AI. Analyze the patient transcript below to determine if this is a severe medical emergency requiring immediate attention (like a heart attack, stroke, severe bleeding, or extreme pain).
-    
-Transcript: "{text}"
-
-Return a STRICT JSON object in this exact format:
-{{
-    "urgent": true or false,
-    "matched_terms": ["list of concerning phrases from transcript, empty if none"]
-}}
-"""
     try:
         completion = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a medical emergency detection JSON API. You MUST return strictly valid JSON and nothing else."
+                    "content": TRIAGE_SYSTEM_PROMPT
                 },
                 {
                     "role": "user",
-                    "content": prompt
+                    "content": triage_prompt(text)
                 }
             ],
             temperature=0.0,
