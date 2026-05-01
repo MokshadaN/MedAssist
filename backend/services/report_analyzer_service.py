@@ -1,4 +1,4 @@
-"""Gemini-based report analyzer for uploaded medical images."""
+"""Gemini-based report analyzer for uploaded medical reports."""
 
 from __future__ import annotations
 
@@ -83,6 +83,52 @@ def _extract_json(raw_text: str) -> dict[str, Any]:
     return json.loads(payload)
 
 
+def _build_physician_readable_output(data: dict[str, Any]) -> str:
+    output_buffer: list[str] = []
+
+    meta = data.get("report_metadata", {})
+    output_buffer.append("=== REPORT METADATA ===")
+    output_buffer.append(f"Report Type: {meta.get('report_type', 'N/A')}")
+    output_buffer.append(f"Date: {meta.get('date_of_report', 'N/A')}")
+    output_buffer.append("-" * 75)
+
+    header = f"{'Test Parameter':<28} | {'Value':<10} | {'Units':<10} | {'Status':<10} | {'Severity':<10}"
+    output_buffer.append(header)
+    output_buffer.append("-" * 75)
+
+    for row in data.get("detailed_metrics", []):
+        p = str(row.get("parameter", "N/A"))
+        v = str(row.get("value", "N/A"))
+        u = str(row.get("units", "N/A"))
+        s = str(row.get("interpretation", "Normal"))
+        sev = str(row.get("severity", "Normal"))
+        output_buffer.append(f"{p:<28} | {v:<10} | {u:<10} | {s:<10} | {sev:<10}")
+
+    output_buffer.append("")
+    output_buffer.append("=== CLINICAL SUMMARY ===")
+    summary = data.get("clinical_summary", {})
+    if isinstance(summary, dict):
+        abnormal = summary.get("abnormal_parameters", [])
+        output_buffer.append(f"Abnormal Parameters: {', '.join(abnormal) if abnormal else 'None'}")
+        output_buffer.append("")
+        output_buffer.append("System-wise Grouping:")
+        system_group = summary.get("system_wise_grouping", {})
+        if isinstance(system_group, dict):
+            for key, value in system_group.items():
+                output_buffer.append(f"  {key}: {value}")
+        output_buffer.append(f"Hematologic Pattern: {summary.get('hematologic_pattern', 'N/A')}")
+        critical = summary.get("critical_flags", [])
+        output_buffer.append(f"Critical Flags: {', '.join(critical) if critical else 'None'}")
+        output_buffer.append(f"Internal Consistency Notes: {summary.get('internal_consistency_notes', 'N/A')}")
+        output_buffer.append("")
+        output_buffer.append("Overall Clinical Snapshot:")
+        output_buffer.append(summary.get("overall_clinical_snapshot", "N/A"))
+    else:
+        output_buffer.append(str(summary))
+
+    return "\n".join(output_buffer)
+
+
 def analyze_report_image(file_path: str | Path) -> dict[str, Any]:
     image_path = Path(file_path)
     if not image_path.exists():
@@ -115,6 +161,7 @@ def analyze_report_image(file_path: str | Path) -> dict[str, Any]:
                 "source_file": image_path.name,
                 "analysis": data,
                 "raw_text": raw_text,
+                "physician_readable": _build_physician_readable_output(data),
             }
         except errors.ClientError as exc:
             last_error = exc
