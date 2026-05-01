@@ -87,29 +87,18 @@ function formatReportAnalysis(parsedData?: string | null) {
 
   try {
     const data = JSON.parse(parsedData) as Record<string, unknown>;
-    const metadata = (data.report_metadata && typeof data.report_metadata === 'object')
-      ? (data.report_metadata as Record<string, unknown>)
-      : {};
     const summary = (data.clinical_summary && typeof data.clinical_summary === 'object')
       ? (data.clinical_summary as Record<string, unknown>)
       : {};
-    const metrics = Array.isArray(data.detailed_metrics) ? data.detailed_metrics : [];
-    const reportType = typeof metadata.report_type === 'string' ? metadata.report_type : 'unknown';
-    const reportDate = typeof metadata.date_of_report === 'string' ? metadata.date_of_report : 'unknown';
-    const abnormal = Array.isArray(summary.abnormal_parameters) ? summary.abnormal_parameters : [];
-    const snapshot = typeof summary.overall_clinical_snapshot === 'string' ? summary.overall_clinical_snapshot : '';
-    const readable = typeof data.physician_readable === 'string' ? data.physician_readable : '';
+    
+    // Show only the overall clinical snapshot
+    const snapshot = typeof summary.overall_clinical_snapshot === 'string' 
+      ? summary.overall_clinical_snapshot 
+      : '';
 
-    return [
-      `Report type: ${reportType}`,
-      `Date: ${reportDate}`,
-      abnormal.length ? `Abnormal parameters: ${abnormal.join(', ')}` : 'Abnormal parameters: none',
-      metrics.length ? `Metrics extracted: ${metrics.length}` : 'Metrics extracted: 0',
-      snapshot ? `Snapshot: ${snapshot}` : '',
-      readable ? `\nPhysician-readable report:\n${readable}` : '',
-    ].join('\n');
+    return snapshot || 'Analysis complete. No summary found.';
   } catch {
-    return parsedData;
+    return parsedData || '';
   }
 }
 
@@ -1140,7 +1129,7 @@ function App() {
               </section>
             </div>
 
-            <HealthMetricsChart patientId={user.id} token={authToken} />
+            <HealthMetricsChart patientId={user.id} token={authToken} refreshTrigger={patientReports} />
 
             <section className="panel wide">
               <div className="panel-head">
@@ -1322,7 +1311,7 @@ function App() {
               </section>
             </div>
 
-            {selectedPatientId && <HealthMetricsChart patientId={selectedPatientId} token={authToken} key={selectedPatientId} />}
+            {selectedPatientId && <HealthMetricsChart patientId={selectedPatientId} token={authToken} key={selectedPatientId} refreshTrigger={doctorReports} />}
 
             <section className="panel wide">
               <div className="panel-head">
