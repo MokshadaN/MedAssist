@@ -1,6 +1,11 @@
 from sqlalchemy.orm import Session
 from models.report import Report
-from typing import List
+from models.metric import MedicalMetric
+from typing import List, Any
+import json
+import re
+from datetime import datetime
+from dateutil import parser as date_parser
 
 def save_report(db: Session, patient_id: str, file_url: str, parsed_data: str = None) -> Report:
     """
@@ -39,4 +44,76 @@ def update_report_analysis(db: Session, report: Report, parsed_data: str | None)
     db.add(report)
     db.commit()
     db.refresh(report)
+    
+    # Also save the individual metrics for easier graphing
+    if parsed_data:
+        try:
+            analysis_dict = json.loads(parsed_data)
+            # The structure in report_analyzer_service is {"analysis": { ... }}
+            # and that analysis dict has "detailed_metrics"
+            raw_data = analysis_dict.get("analysis", {})
+            metrics = raw_data.get("detailed_metrics", [])
+            
+            # Try to get the report date
+            report_date = None
+            metadata = raw_data.get("report_metadata", {})
+            date_str = metadata.get("date_of_report")
+            if date_str:
+                try:
+                    report_date = date_parser.parse(date_str)
+                except:
+                    pass
+            
+            save_medical_metrics(db, report.patient_id, report.id, metrics, report_date)
+        except Exception as e:
+            print(f"Error saving individual metrics: {e}")
+            
     return report
+
+def _clean_numeric_value(value_str: str) -> float | None:
+    """
+    Try to extract a float value from a string.
+    Handles formats like '12.5', '12.5 mg/dL', '< 5.0', etc.
+    """
+    try:
+        # Match the first number in the string (integer or decimal)
+        match = re.search(r"[-+]?\d*\.\d+|\d+", value_str)
+        if match:
+            return float(match.group())
+    except:
+        pass
+    return None
+
+def save_medical_metrics(db: Session, patient_id: str, report_id: str, metrics: List[dict], measured_at: datetime = None) -> List[MedicalMetric]:
+    """
+    Save extracted metrics to the medical_metrics table.
+    """
+    db_metrics = []
+    timestamp = measured_at or datetime.utcnow()
+    for m in metrics:
+        raw_val = str(m.get("value", ""))
+        db_metric = MedicalMetric(
+            patient_id=patient_id,
+            report_id=report_id,
+            parameter=m.get("parameter", "Unknown"),
+            value=_clean_numeric_value(raw_val),
+            raw_value=raw_val,
+            units=m.get("units"),
+            interpretation=m.get("interpretation"),
+            severity=m.get("severity"),
+            measured_at=timestamp
+        )
+        db.add(db_metric)
+        db_metrics.append(db_metric)
+    
+    db.commit()
+    return db_metrics
+
+def get_patient_metrics(db: Session, patient_id: str, parameter: str = None) -> List[MedicalMetric]:
+    """
+    Retrieve metrics for a patient, optionally filtered by parameter name.
+    """
+    query = db.query(MedicalMetric).filter(MedicalMetric.patient_id == patient_id)
+    if parameter:
+        query = query.filter(MedicalMetric.parameter.ilike(f"%{parameter}%"))
+    return query.order_by(MedicalMetric.measured_at.desc()).all()

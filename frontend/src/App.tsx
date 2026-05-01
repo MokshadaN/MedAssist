@@ -1,5 +1,40 @@
 import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
+import { 
+  Heart, 
+  User, 
+  Stethoscope, 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  LogOut, 
+  Menu, 
+  X, 
+  ChevronRight, 
+  ChevronDown, 
+  Bell, 
+  Search, 
+  Plus, 
+  Activity, 
+  ShieldAlert, 
+  Send, 
+  Mic, 
+  Video, 
+  FileText, 
+  Upload, 
+  Check, 
+  History, 
+  TrendingUp, 
+  Trash2, 
+  MessageCircle, 
+  Camera, 
+  Microscope, 
+  Star, 
+  ThumbsUp, 
+  Smartphone, 
+  AlertTriangle 
+} from 'lucide-react';
+import HealthMetricsChart from './components/HealthMetricsChart';
 import {
   api,
   AISummary,
@@ -54,30 +89,19 @@ function formatReportAnalysis(parsedData?: string | null) {
   if (!parsedData) return '';
 
   try {
-    const data = JSON.parse(parsedData) as Record<string, unknown>;
-    const metadata = (data.report_metadata && typeof data.report_metadata === 'object')
-      ? (data.report_metadata as Record<string, unknown>)
-      : {};
-    const summary = (data.clinical_summary && typeof data.clinical_summary === 'object')
-      ? (data.clinical_summary as Record<string, unknown>)
-      : {};
-    const metrics = Array.isArray(data.detailed_metrics) ? data.detailed_metrics : [];
-    const reportType = typeof metadata.report_type === 'string' ? metadata.report_type : 'unknown';
-    const reportDate = typeof metadata.date_of_report === 'string' ? metadata.date_of_report : 'unknown';
-    const abnormal = Array.isArray(summary.abnormal_parameters) ? summary.abnormal_parameters : [];
-    const snapshot = typeof summary.overall_clinical_snapshot === 'string' ? summary.overall_clinical_snapshot : '';
-    const readable = typeof data.physician_readable === 'string' ? data.physician_readable : '';
+    const data = JSON.parse(parsedData) as Record<string, any>;
+    // The Gemini JSON is nested under the 'analysis' key
+    const analysis = data.analysis || data;
+    const summary = analysis.clinical_summary || {};
+    
+    // Show only the overall clinical snapshot
+    const snapshot = typeof summary.overall_clinical_snapshot === 'string' 
+      ? summary.overall_clinical_snapshot 
+      : '';
 
-    return [
-      `Report type: ${reportType}`,
-      `Date: ${reportDate}`,
-      abnormal.length ? `Abnormal parameters: ${abnormal.join(', ')}` : 'Abnormal parameters: none',
-      metrics.length ? `Metrics extracted: ${metrics.length}` : 'Metrics extracted: 0',
-      snapshot ? `Snapshot: ${snapshot}` : '',
-      readable ? `\nPhysician-readable report:\n${readable}` : '',
-    ].join('\n');
+    return snapshot || 'Analysis complete. No summary found.';
   } catch {
-    return parsedData;
+    return parsedData || '';
   }
 }
 
@@ -209,6 +233,7 @@ function App() {
   const [prescriptionStatus, setPrescriptionStatus] = useState('');
   const [medicationStatus, setMedicationStatus] = useState('');
   const [notificationStatus, setNotificationStatus] = useState('');
+  const [analyzingId, setAnalyzingId] = useState<string | null>(null);
 
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState('');
@@ -744,6 +769,7 @@ function App() {
 
   const analyzeReport = async (reportId: string) => {
     if (!authToken || !user) return;
+    setAnalyzingId(reportId);
     setBusy('Analyzing report');
     try {
       if (user.role === 'doctor' && selectedPatientId) {
@@ -758,6 +784,7 @@ function App() {
       setReportStatus(error instanceof Error ? error.message : 'Analysis failed');
     } finally {
       setBusy('');
+      setAnalyzingId(null);
     }
   };
 
@@ -1367,7 +1394,14 @@ function App() {
                           </pre>
                         )}
                       </div>
-                      <button className="secondary" type="button" onClick={() => void analyzeReport(report.id)}>Analyze</button>
+                     <button 
+                      className="secondary" 
+                      type="button" 
+                      onClick={() => void analyzeReport(report.id)}
+                      disabled={analyzingId === report.id}
+                    >
+                      {analyzingId === report.id ? 'Analyzing...' : 'Analyze'}
+                    </button>
                       <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                       <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
                       <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
@@ -1423,6 +1457,8 @@ function App() {
                 </div>
               )}
             </section>
+            
+            <HealthMetricsChart patientId={user.id} token={authToken} refreshTrigger={patientReports} />
           </div>
         </main>
       ) : (
@@ -1523,6 +1559,8 @@ function App() {
               </section>
             </div>
 
+            {selectedPatientId && <HealthMetricsChart patientId={selectedPatientId} token={authToken} key={selectedPatientId} refreshTrigger={doctorReports} />}
+
             <section className="panel wide">
               <div className="panel-head">
                 <div>
@@ -1541,7 +1579,14 @@ function App() {
                         </pre>
                       )}
                     </div>
-                    <button className="secondary" type="button" onClick={() => void analyzeReport(report.id)}>Analyze</button>
+                    <button 
+                      className="secondary" 
+                      type="button" 
+                      onClick={() => void analyzeReport(report.id)}
+                      disabled={analyzingId === report.id}
+                    >
+                      {analyzingId === report.id ? 'Analyzing...' : 'Analyze'}
+                    </button>
                     <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                     <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
                     <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
