@@ -126,6 +126,7 @@ export type AISummary = {
 export type ReportOut = {
   id: string;
   file_url: string;
+  parsed_data?: string | null;
 };
 
 export type SessionState = {
@@ -339,6 +340,12 @@ export const api = {
       method: 'POST',
       token,
       body: form,
+    });
+  },
+  deleteReport(reportId: string, token: string) {
+    return request<{ status: string; report_id: string }>(`/reports/${encodeURIComponent(reportId)}`, {
+      method: 'DELETE',
+      token,
     });
   },
   createVisit(patientId: string, sessionId: string, token: string) {
