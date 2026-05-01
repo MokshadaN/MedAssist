@@ -1,14 +1,26 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-router = APIRouter()
+from core.dependencies import get_db, require_roles
+from schemas.risk import RiskCheckCreate, RiskCheckOut
+from services.risk_service import get_latest_risk_check, run_risk_check
 
-@router.post("/run")
-def run_risk_check(prescription_id: str):
-    return {
-        "severity": "low",
-        "issues": []
-    }
+router = APIRouter(tags=["risk"])
 
-@router.get("/{prescription_id}")
-def get_risk(prescription_id: str):
-    return {"issues": []}
+
+@router.post("/run", response_model=RiskCheckOut)
+def run_prescription_risk_check(
+    data: RiskCheckCreate,
+    current_user=Depends(require_roles("doctor")),
+    db: Session = Depends(get_db),
+):
+    return run_risk_check(db, data.prescription_id, current_user.id)
+
+
+@router.get("/{prescription_id}", response_model=RiskCheckOut)
+def get_risk(
+    prescription_id: str,
+    current_user=Depends(require_roles("doctor")),
+    db: Session = Depends(get_db),
+):
+    return get_latest_risk_check(db, prescription_id, current_user.id)
