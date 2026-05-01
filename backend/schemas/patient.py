@@ -26,3 +26,14 @@ class PatientProfileOut(PatientProfileBase):
 
     class Config:
         from_attributes = True
+
+
+class PatientProfilePublic(BaseModel):
+    name: str
+    age: Optional[int]
+    gender: Optional[str]
+    allergies: Optional[str]
+    chronic_conditions: Optional[str]
+
+    class Config:
+        from_attributes = True
