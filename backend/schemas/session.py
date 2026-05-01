@@ -22,6 +22,15 @@ class IntakeAnswerCreate(BaseModel):
     previous_structured: dict[str, Any] | None = None
 
 
+class EmergencyHospital(BaseModel):
+    name: str
+    phone: str | None = None
+    address: str | None = None
+    distance_meters: float | None = None
+    opening_hours: str | None = None
+    is_open: bool | None = None
+
+
 class IntakeResponse(BaseModel):
     session_id: str
     status: str
@@ -34,3 +43,5 @@ class IntakeResponse(BaseModel):
     comparison: dict[str, Any] | None = None
     summary_id: str | None = None
     matched_terms: list[str] = Field(default_factory=list)
+    nearest_hospitals: list[EmergencyHospital] = Field(default_factory=list)
+    emergency_message: str | None = None
