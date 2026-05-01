@@ -4,12 +4,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from core.dependencies import get_current_user, get_db
-from schemas.patient import PatientProfileCreate, PatientProfileOut, PatientProfileUpdate
+from schemas.patient import PatientProfileCreate, PatientProfileOut, PatientProfileUpdate, PatientProfilePublic
 from services.patient_service import (
     create_patient_profile,
     get_patient_profile,
     update_patient_profile,
-    get_patient_by_user_id
+    get_patient_by_user_id,
+    get_public_profile
 )
 
 router = APIRouter(tags=["patient"])
@@ -48,3 +49,15 @@ def update_profile(
     if not updated_profile:
         raise HTTPException(status_code=404, detail="Patient profile not found")
     return updated_profile
+
+
+@router.get("/public/{profile_id}", response_model=PatientProfilePublic)
+def get_public_patient_profile(
+    profile_id: str,
+    db: Session = Depends(get_db),
+):
+    """Get a public summary of a patient profile (unauthenticated)."""
+    profile = get_public_profile(db, profile_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Patient profile not found")
+    return profile

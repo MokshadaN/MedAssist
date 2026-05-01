@@ -11,12 +11,14 @@ import {
   EmergencyHospital,
   Notification,
   PatientProfile,
+  PatientPublicProfile,
   Prescription,
   PrescriptionItem,
   Reminder,
   SessionState,
   API_BASE,
 } from './api';
+import { QRCodeSVG } from 'qrcode.react';
 
 type AuthMode = 'login' | 'register-doctor' | 'register-patient';
 type ChatMessage = { role: 'assistant' | 'user'; text: string };
@@ -106,11 +108,83 @@ function openStatus(hospital: EmergencyHospital) {
   return hospital.opening_hours ? `Hours: ${hospital.opening_hours}` : 'Open status not listed';
 }
 
+function PublicProfileView({ profile, loading }: { profile: PatientPublicProfile | null, loading: boolean }) {
+  if (loading) return <div className="auth-loading panel">Loading profile...</div>;
+  if (!profile) return <div className="auth-loading panel">Profile not found or link expired.</div>;
+
+  return (
+    <main className="auth-shell" style={{ justifyContent: 'center' }}>
+      <section className="panel auth-card" style={{ maxWidth: '500px', width: '100%', padding: '2rem' }}>
+        <div className="brand" style={{ marginBottom: '2rem', justifyContent: 'center' }}>
+          <div className="brand-badge">M</div>
+          <div style={{ textAlign: 'center' }}>
+            <div className="eyebrow">MedAssist Emergency</div>
+            <h1>Medical Summary</h1>
+          </div>
+        </div>
+
+        <div className="stack" style={{ gap: '1.5rem' }}>
+          <div className="profile-header" style={{ alignItems: 'center' }}>
+            <div className="profile-avatar" style={{ width: '80px', height: '80px', fontSize: '2rem' }}>{profile.name.charAt(0)}</div>
+            <h2 style={{ fontSize: '1.75rem', marginTop: '1rem' }}>{profile.name}</h2>
+            <span className="pill urgent" style={{ marginTop: '0.5rem' }}>Emergency Information</span>
+          </div>
+
+          <div className="grid grid-2" style={{ gap: '1rem' }}>
+            <div className="stat-card" style={{ background: 'var(--surface-soft)', padding: '1rem', borderRadius: '12px' }}>
+              <div className="eyebrow">Age</div>
+              <strong style={{ fontSize: '1.25rem' }}>{profile.age || 'Not listed'}</strong>
+            </div>
+            <div className="stat-card" style={{ background: 'var(--surface-soft)', padding: '1rem', borderRadius: '12px' }}>
+              <div className="eyebrow">Gender</div>
+              <strong style={{ fontSize: '1.25rem' }}>{profile.gender || 'Not listed'}</strong>
+            </div>
+          </div>
+
+          <div className="panel" style={{ background: 'rgba(255, 71, 87, 0.1)', borderColor: 'rgba(255, 71, 87, 0.3)' }}>
+            <div className="eyebrow" style={{ color: '#ff4757' }}>Allergies</div>
+            <p style={{ marginTop: '0.5rem', fontWeight: '600' }}>{profile.allergies || 'None reported'}</p>
+          </div>
+
+          <div className="panel">
+            <div className="eyebrow">Chronic Conditions</div>
+            <p style={{ marginTop: '0.5rem' }}>{profile.chronic_conditions || 'None reported'}</p>
+          </div>
+
+          <div style={{ textAlign: 'center', opacity: 0.6, fontSize: '0.85rem' }}>
+            This information is provided for emergency medical purposes only.
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function App() {
+  const isPublicRoute = window.location.pathname.startsWith('/public-profile/');
+  const publicProfileId = isPublicRoute ? window.location.pathname.split('/').pop() : null;
+
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
   const [doctorProfile, setDoctorProfile] = useState<DoctorProfile | null>(null);
+
+  const [publicProfile, setPublicProfile] = useState<PatientPublicProfile | null>(null);
+  const [publicLoading, setPublicLoading] = useState(isPublicRoute);
+  const [showQR, setShowQR] = useState(false);
+
+  useEffect(() => {
+    if (isPublicRoute && publicProfileId) {
+      api.getPublicProfile(publicProfileId)
+        .then(setPublicProfile)
+        .catch((err) => setFlash(err.message))
+        .finally(() => setPublicLoading(false));
+    }
+  }, [isPublicRoute, publicProfileId]);
+
+  if (isPublicRoute) {
+    return <PublicProfileView profile={publicProfile} loading={publicLoading} />;
+  }
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [authReady, setAuthReady] = useState(!localStorage.getItem('medassist_token'));
   const [busy, setBusy] = useState('');
@@ -913,6 +987,25 @@ function App() {
                     <span>Chronic Conditions</span>
                     <textarea rows={2} value={profileForm.chronic_conditions} onChange={(e) => setProfileForm({ ...profileForm, chronic_conditions: e.target.value })} placeholder="Example: Diabetes" />
                   </label>
+
+                  <div className="panel" style={{ background: 'var(--surface-soft)', marginTop: '1rem', border: '1px dashed var(--border)' }}>
+                    <div className="eyebrow" style={{ marginBottom: '0.5rem' }}>Emergency QR</div>
+                    <p style={{ fontSize: '0.8rem', opacity: 0.8, marginBottom: '1rem' }}>
+                      Emergency responders can scan this to see your vital medical details instantly.
+                    </p>
+                    
+                    {showQR ? (
+                      <div style={{ background: '#fff', padding: '1rem', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <QRCodeSVG 
+                          value={`${window.location.origin}/public-profile/${patientProfile?.id}`}
+                          size={150}
+                        />
+                        <button type="button" className="ghost" style={{ marginTop: '0.5rem', color: '#000' }} onClick={() => setShowQR(false)}>Hide QR</button>
+                      </div>
+                    ) : (
+                      <button type="button" className="secondary" style={{ width: '100%' }} onClick={() => setShowQR(true)}>Show Emergency QR</button>
+                    )}
+                  </div>
 
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
                   {profileStatus && <div className="flash subtle">{profileStatus}</div>}

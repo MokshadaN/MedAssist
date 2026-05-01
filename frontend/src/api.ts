@@ -129,6 +129,14 @@ export type ReportOut = {
   parsed_data?: string | null;
 };
 
+export type PatientPublicProfile = {
+  name: string;
+  age?: number | null;
+  gender?: string | null;
+  allergies?: string | null;
+  chronic_conditions?: string | null;
+};
+
 export type SessionState = {
   session_id: string;
   status: string;
@@ -442,6 +450,9 @@ export const api = {
     return request<{ status: string }>(`/reminders/${encodeURIComponent(reminderId)}`, {
       method: 'DELETE',
     });
+  },
+  getPublicProfile(profileId: string) {
+    return request<PatientPublicProfile>(`/patient/public/${profileId}`);
   },
 };
 

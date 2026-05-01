@@ -792,3 +792,8 @@ input:focus, textarea:focus, select:focus {
     flex: 1;
   }
 }
+
+/* Emergency QR Profile Styles */
+.urgent { background: #ff4757 !important; color: #fff !important; }
+.stat-card strong { color: #fff; }
+.profile-avatar { background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
