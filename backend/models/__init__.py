@@ -13,3 +13,5 @@ from .risk import RiskCheck
 from .feedback import Feedback
 from .notification import Notification
 from .reminder import Reminder
+from .metric import MedicalMetric
+

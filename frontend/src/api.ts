@@ -197,21 +197,6 @@ export type Reminder = {
   updated_at: string;
 };
 
-export type PublicProfile = {
-  name: string;
-  age?: number | null;
-  gender?: string | null;
-  allergies?: string | null;
-  chronic_conditions?: string | null;
-  medications: Array<{
-    medicine_name: string;
-    dosage: string;
-    duration: string;
-    frequency: string;
-    prescribed_on: string;
-  }>;
-};
-
 type RequestOptions = RequestInit & {
   token?: string | null;
 };
@@ -473,9 +458,6 @@ export const api = {
     return request<{ status: string }>(`/reminders/${encodeURIComponent(reminderId)}`, {
       method: 'DELETE',
     });
-  },
-  getPublicProfile(patientId: string) {
-    return request<PublicProfile>(`/patient/public-profile/${patientId}`);
   },
 };
 
