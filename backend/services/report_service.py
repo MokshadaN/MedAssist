@@ -21,3 +21,11 @@ def get_reports(db: Session, patient_id: str) -> List[Report]:
     Get all reports for a specific patient.
     """
     return db.query(Report).filter(Report.patient_id == patient_id).all()
+
+
+def delete_report(db: Session, report: Report) -> None:
+    """
+    Delete a report record from the database.
+    """
+    db.delete(report)
+    db.commit()

@@ -7,6 +7,7 @@ import {
   DoctorDirectoryItem,
   DoctorPatient,
   DoctorVisit,
+  DoctorProfile,
   EmergencyHospital,
   Notification,
   PatientProfile,
@@ -44,6 +45,35 @@ function formatSummary(summary?: AISummary | null) {
     `Assessment: ${summary.assessment || 'Not documented'}`,
     `Plan: ${summary.plan || 'Not documented'}`,
   ].join('\n\n');
+}
+
+function formatReportAnalysis(parsedData?: string | null) {
+  if (!parsedData) return '';
+
+  try {
+    const data = JSON.parse(parsedData) as Record<string, unknown>;
+    const metadata = (data.report_metadata && typeof data.report_metadata === 'object')
+      ? (data.report_metadata as Record<string, unknown>)
+      : {};
+    const summary = (data.clinical_summary && typeof data.clinical_summary === 'object')
+      ? (data.clinical_summary as Record<string, unknown>)
+      : {};
+    const metrics = Array.isArray(data.detailed_metrics) ? data.detailed_metrics : [];
+    const reportType = typeof metadata.report_type === 'string' ? metadata.report_type : 'unknown';
+    const reportDate = typeof metadata.date_of_report === 'string' ? metadata.date_of_report : 'unknown';
+    const abnormal = Array.isArray(summary.abnormal_parameters) ? summary.abnormal_parameters : [];
+    const snapshot = typeof summary.overall_clinical_snapshot === 'string' ? summary.overall_clinical_snapshot : '';
+
+    return [
+      `Report type: ${reportType}`,
+      `Date: ${reportDate}`,
+      abnormal.length ? `Abnormal parameters: ${abnormal.join(', ')}` : 'Abnormal parameters: none',
+      metrics.length ? `Metrics extracted: ${metrics.length}` : 'Metrics extracted: 0',
+      snapshot ? `Snapshot: ${snapshot}` : '',
+    ].join('\n');
+  } catch {
+    return parsedData;
+  }
 }
 
 function reminderLabel(reminder: Reminder) {
@@ -90,7 +120,7 @@ function App() {
   const [doctors, setDoctors] = useState<DoctorDirectoryItem[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
   const [patientVisits, setPatientVisits] = useState<DoctorVisit[]>([]);
-  const [patientReports, setPatientReports] = useState<Array<{ id: string; file_url: string }>>([]);
+  const [patientReports, setPatientReports] = useState<Array<{ id: string; file_url: string; parsed_data?: string | null }>>([]);
   const [patientPrescriptions, setPatientPrescriptions] = useState<Prescription[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [patientReminders, setPatientReminders] = useState<Reminder[]>([]);
@@ -133,7 +163,7 @@ function App() {
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
   const [doctorHistory, setDoctorHistory] = useState<DoctorVisit[]>([]);
-  const [doctorReports, setDoctorReports] = useState<Array<{ id: string; file_url: string }>>([]);
+  const [doctorReports, setDoctorReports] = useState<Array<{ id: string; file_url: string; parsed_data?: string | null }>>([]);
   const [doctorReminders, setDoctorReminders] = useState<Reminder[]>([]);
   const [doctorReminderStatus, setDoctorReminderStatus] = useState('');
   const [selectedVisit, setSelectedVisit] = useState<DoctorVisit | null>(null);
@@ -558,12 +588,32 @@ function App() {
     if (!authToken || !user || !reportFile) return;
     setBusy('Uploading report');
     try {
-      await api.uploadReport(user.id, reportFile, authToken);
+      const uploaded = await api.uploadReport(user.id, reportFile, authToken);
       setPatientReports(await api.listReports(user.id, authToken));
       setReportFile(null);
-      setReportStatus('Report uploaded');
+      const analysisSummary = formatReportAnalysis(uploaded.parsed_data);
+      setReportStatus(analysisSummary ? `Report uploaded. ${analysisSummary.split('\n')[0]}` : 'Report uploaded');
     } catch (error) {
       setReportStatus(error instanceof Error ? error.message : 'Upload failed');
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const deleteReport = async (reportId: string) => {
+    if (!authToken || !user) return;
+    if (!window.confirm('Delete this uploaded report?')) return;
+    setBusy('Deleting report');
+    try {
+      await api.deleteReport(reportId, authToken);
+      if (user.role === 'doctor' && selectedPatientId) {
+        setDoctorReports(await api.listPatientReports(selectedPatientId, authToken));
+      } else {
+        setPatientReports(await api.listReports(user.id, authToken));
+      }
+      setReportStatus('Report deleted');
+    } catch (error) {
+      setReportStatus(error instanceof Error ? error.message : 'Delete failed');
     } finally {
       setBusy('');
     }
@@ -1050,10 +1100,18 @@ function App() {
                 {reportStatus && <div className="flash subtle">{reportStatus}</div>}
                 <div className="reports-list" style={{ marginTop: '0.5rem' }}>
                   {patientReports.map((report) => (
-                    <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto', alignItems: 'center', gap: '0.75rem' }}>
-                      <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                    <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                      <div className="stack compact" style={{ gap: '0.25rem' }}>
+                        <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                        {report.parsed_data && (
+                          <pre className="code-block" style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                            {formatReportAnalysis(report.parsed_data)}
+                          </pre>
+                        )}
+                      </div>
                       <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                       <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
+                      <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
                     </div>
                   ))}
                   {!patientReports.length && <div className="empty">No reports uploaded.</div>}
@@ -1215,10 +1273,18 @@ function App() {
               </div>
               <div className="stack compact">
                 {doctorReports.map((report) => (
-                  <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto', alignItems: 'center', gap: '0.75rem' }}>
-                    <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                  <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                    <div className="stack compact" style={{ gap: '0.25rem' }}>
+                      <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                      {report.parsed_data && (
+                        <pre className="code-block" style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                          {formatReportAnalysis(report.parsed_data)}
+                        </pre>
+                      )}
+                    </div>
                     <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                     <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
+                    <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
                   </div>
                 ))}
                 {!doctorReports.length && <div className="empty">No reports uploaded for this patient.</div>}
