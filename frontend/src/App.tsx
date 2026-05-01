@@ -1187,20 +1187,7 @@ function App() {
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
                   {profileStatus && <div className="flash subtle">{profileStatus}</div>}
 
-                  <button className="secondary" type="button" style={{ width: '100%', marginTop: '1rem' }} onClick={() => setShowQR(!showQR)}>
-                    {showQR ? 'Hide QR Profile' : 'Show QR Profile'}
-                  </button>
 
-                  {showQR && patientProfile && (
-                    <div className="qr-container animate-in" style={{ marginTop: '1rem', background: '#fff', padding: '1.25rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}>
-                      <QRCodeCanvas
-                        value={`${window.location.origin}${window.location.pathname}?profile=${patientProfile.id}`}
-                        size={160}
-                        style={{ borderRadius: '8px' }}
-                      />
-                      <p style={{ color: '#1a1a1a', fontSize: '0.85rem', fontWeight: 600, marginTop: '0.75rem', textAlign: 'center' }}>Scan to share summary</p>
-                    </div>
-                  )}
                 </form>
               </div>
             </div>
