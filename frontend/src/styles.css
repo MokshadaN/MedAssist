@@ -442,6 +442,12 @@ input:focus, textarea:focus, select:focus {
   border: 1px solid rgba(16,185,129,0.2);
 }
 
+.active-pill {
+  background: rgba(56, 189, 248, 0.2);
+  color: #fff;
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
 .badge.urgent, .alert-card.urgent {
   background: var(--danger-soft);
   color: var(--danger);

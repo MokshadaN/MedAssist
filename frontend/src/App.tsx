@@ -17,6 +17,7 @@ import {
 
 type AuthMode = 'login' | 'register-doctor' | 'register-patient';
 type ChatMessage = { role: 'assistant' | 'user'; text: string };
+type FrequencyOption = 'once' | 'twice' | 'thrice';
 
 const emptyProfile: PatientProfile = {
   id: '',
@@ -115,9 +116,13 @@ function App() {
   const [prescriptionNotes, setPrescriptionNotes] = useState('Continue current therapy and monitor response.');
   const [prescriptionId, setPrescriptionId] = useState('');
   const [medicationName, setMedicationName] = useState('');
+  const [medicineType, setMedicineType] = useState<'tablet' | 'syrup'>('tablet');
   const [dosage, setDosage] = useState('');
+  const [syrupQuantity, setSyrupQuantity] = useState('');
   const [duration, setDuration] = useState('');
-  const [frequency, setFrequency] = useState('');
+  const [frequency, setFrequency] = useState<FrequencyOption>('once');
+  const [customInstructions, setCustomInstructions] = useState('');
+  const [prescriptionDraftStatus, setPrescriptionDraftStatus] = useState('');
   const [doctorReminderTime, setDoctorReminderTime] = useState(() => {
     const value = new Date();
     value.setDate(value.getDate() + 2);
@@ -353,6 +358,7 @@ function App() {
     setMedicationStatus('');
     setNotificationStatus('');
     setDoctorReminderStatus('');
+    setPrescriptionDraftStatus('');
   };
 
   const startPatientVisit = async () => {
@@ -549,15 +555,29 @@ function App() {
     if (!authToken || !prescriptionId) return;
     setBusy('Adding medication');
     try {
+      const dosageValue =
+        medicineType === 'syrup'
+          ? `${syrupQuantity.trim() || 'Quantity not specified'}`
+          : dosage.trim();
+      const medicineLabel = customInstructions.trim()
+        ? `${medicationName} (${customInstructions.trim()})`
+        : medicationName;
       await api.addPrescriptionItem(
         prescriptionId,
-        { medicine_name: medicationName, dosage, duration, frequency },
+        {
+          medicine_name: medicineLabel,
+          dosage: dosageValue,
+          duration,
+          frequency: frequency === 'once' ? '1 time/day' : frequency === 'twice' ? '2 times/day' : '3 times/day',
+        },
         authToken,
       );
       setMedicationName('');
       setDosage('');
+      setSyrupQuantity('');
       setDuration('');
-      setFrequency('');
+      setFrequency('once');
+      setCustomInstructions('');
       setMedicationStatus('Medication added');
     } catch (error) {
       setMedicationStatus(error instanceof Error ? error.message : 'Could not add medication');
@@ -1120,14 +1140,65 @@ function App() {
                 
                 {prescriptionId && (
                   <div className="panel animate-in" style={{ background: 'var(--surface-soft)', padding: '1rem', border: '1px dashed var(--border)' }}>
-                    <div className="eyebrow">Add Medication</div>
-                    <div className="grid grid-2" style={{ marginTop: '0.5rem' }}>
-                      <input value={medicationName} onChange={(e) => setMedicationName(e.target.value)} placeholder="Medicine name" />
-                      <input value={dosage} onChange={(e) => setDosage(e.target.value)} placeholder="Dosage (e.g. 500mg)" />
-                      <input value={frequency} onChange={(e) => setFrequency(e.target.value)} placeholder="Frequency (e.g. 1-0-1)" />
-                      <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Duration (e.g. 5 days)" />
+                    <div className="eyebrow">Add Items</div>
+                    <div className="stack compact" style={{ marginTop: '0.5rem' }}>
+                      <label className="field">
+                        <span>Medicine Name</span>
+                        <input value={medicationName} onChange={(e) => setMedicationName(e.target.value)} placeholder="Medicine name" />
+                      </label>
+                      <div className="row" style={{ gap: '0.75rem' }}>
+                        <label className={`pill ${medicineType === 'tablet' ? 'active-pill' : ''}`} style={{ cursor: 'pointer' }}>
+                          <input type="radio" name="medicineType" checked={medicineType === 'tablet'} onChange={() => setMedicineType('tablet')} style={{ marginRight: '0.5rem' }} />
+                          Tablet
+                        </label>
+                        <label className={`pill ${medicineType === 'syrup' ? 'active-pill' : ''}`} style={{ cursor: 'pointer' }}>
+                          <input type="radio" name="medicineType" checked={medicineType === 'syrup'} onChange={() => setMedicineType('syrup')} style={{ marginRight: '0.5rem' }} />
+                          Syrup
+                        </label>
+                      </div>
+                      {medicineType === 'tablet' ? (
+                        <label className="field">
+                          <span>Dosage</span>
+                          <input value={dosage} onChange={(e) => setDosage(e.target.value)} placeholder="Dosage (e.g. 500mg)" />
+                        </label>
+                      ) : (
+                        <label className="field">
+                          <span>Quantity</span>
+                          <input value={syrupQuantity} onChange={(e) => setSyrupQuantity(e.target.value)} placeholder="Quantity (e.g. 5 ml)" />
+                        </label>
+                      )}
+                      <div className="field">
+                        <span>Frequency</span>
+                        <div className="row" style={{ gap: '0.75rem' }}>
+                          {([
+                            ['once', 'Once a day'],
+                            ['twice', 'Twice a day'],
+                            ['thrice', 'Thrice a day'],
+                          ] as Array<[FrequencyOption, string]>).map(([value, label]) => (
+                            <label key={value} className={`pill ${frequency === value ? 'active-pill' : ''}`} style={{ cursor: 'pointer' }}>
+                              <input type="radio" name="frequency" checked={frequency === value} onChange={() => setFrequency(value)} style={{ marginRight: '0.5rem' }} />
+                              {label}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      <label className="field">
+                        <span>Duration</span>
+                        <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Duration (e.g. 5 days)" />
+                      </label>
+                      <label className="field">
+                        <span>Custom Instructions</span>
+                        <textarea rows={2} value={customInstructions} onChange={(e) => setCustomInstructions(e.target.value)} placeholder="Add special instructions or notes" />
+                      </label>
                     </div>
-                    <button className="primary" style={{ marginTop: '1rem', width: '100%' }} onClick={() => void addMedication()}>Add Item</button>
+                    <button
+                      className="primary"
+                      style={{ marginTop: '1rem', width: '100%' }}
+                      onClick={() => void addMedication()}
+                      disabled={!medicationName || (!dosage && medicineType === 'tablet') || (!syrupQuantity && medicineType === 'syrup') || !duration}
+                    >
+                      Add Item
+                    </button>
                     {medicationStatus && <div className="flash subtle" style={{ marginTop: '0.75rem' }}>{medicationStatus}</div>}
                   </div>
                 )}
