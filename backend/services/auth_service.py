@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from models.doctor import DoctorProfile
 from models.patient import PatientProfile
 from models.user import User
-from schemas.auth import DoctorRegister, PatientRegister
+from schemas.auth import DoctorRegister, PatientRegister, ProfileUpdate
 from utils.security import create_access_token, hash_password, verify_password
 
 
@@ -134,4 +134,42 @@ def get_current_user(db: Session, user_id: str):
 
 
 def get_user_context(db: Session, user: User):
+    return _build_user_payload(db, user)
+
+
+def update_user_context(db: Session, user: User, data: ProfileUpdate):
+    update_data = data.model_dump(exclude_unset=True)
+
+    if "email" in update_data and update_data["email"] is not None:
+        email = str(update_data["email"]).strip().lower()
+        existing_user = db.query(User).filter(User.email == email, User.id != user.id).first()
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
+        user.email = email
+
+    if "name" in update_data and update_data["name"] is not None:
+        user.name = _normalize_text(update_data["name"]) or user.name
+
+    if "phone" in update_data:
+        user.phone = _normalize_text(update_data["phone"])
+
+    if user.role == "patient":
+        profile = db.query(PatientProfile).filter(PatientProfile.user_id == user.id).first()
+        if not profile:
+            profile = PatientProfile(user_id=user.id)
+            db.add(profile)
+
+        for field in ("age", "gender", "allergies", "chronic_conditions"):
+            if field not in update_data:
+                continue
+            value = update_data[field]
+            if isinstance(value, str):
+                value = _normalize_text(value)
+            setattr(profile, field, value)
+
+    db.commit()
+    db.refresh(user)
     return _build_user_payload(db, user)

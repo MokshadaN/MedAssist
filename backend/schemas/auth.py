@@ -82,6 +82,16 @@ class PatientProfileOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class ProfileUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = Field(default=None, max_length=30)
+    age: Optional[int] = Field(default=None, ge=0, le=150)
+    gender: Optional[str] = Field(default=None, max_length=30)
+    allergies: Optional[str] = Field(default=None, max_length=255)
+    chronic_conditions: Optional[str] = Field(default=None, max_length=255)
+
+
 class RegisterResponse(BaseModel):
     user: UserOut
     doctor_profile: Optional[DoctorProfileOut] = None

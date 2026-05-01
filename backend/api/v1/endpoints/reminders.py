@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from core.dependencies import get_db
+from core.dependencies import get_db, require_roles
 from schemas.reminder import ReminderCreate, ReminderOut, ReminderUpdate
 from services.reminder_service import (
     create_reminder,
@@ -16,8 +16,27 @@ from services.reminder_service import (
 router = APIRouter(tags=["reminders"])
 
 
+@router.post("/me", response_model=ReminderOut, status_code=status.HTTP_201_CREATED)
+def create_my_reminder(
+    data: ReminderCreate,
+    current_user=Depends(require_roles("patient")),
+    db: Session = Depends(get_db),
+):
+    return create_reminder(db, current_user.id, data.message, data.time)
+
+
+@router.get("/me", response_model=list[ReminderOut])
+def list_my_reminders(
+    current_user=Depends(require_roles("patient")),
+    db: Session = Depends(get_db),
+):
+    return get_reminders(db, current_user.id)
+
+
 @router.post("/create", response_model=ReminderOut, status_code=status.HTTP_201_CREATED)
 def create_reminder_endpoint(data: ReminderCreate, db: Session = Depends(get_db)):
+    if not data.user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="user_id is required")
     return create_reminder(db, data.user_id, data.message, data.time)
 
 

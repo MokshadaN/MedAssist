@@ -9,6 +9,7 @@ from schemas.auth import (
     DoctorRegister,
     LoginResponse,
     PatientRegister,
+    ProfileUpdate,
     RegisterResponse,
     UserOut,
 )
@@ -17,6 +18,7 @@ from services.auth_service import (
     get_user_context,
     register_doctor,
     register_patient,
+    update_user_context,
 )
 
 router = APIRouter(tags=["auth"])
@@ -42,3 +44,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 @router.get("/me", response_model=RegisterResponse)
 def get_me(current_user=Depends(get_current_user), db: Session = Depends(get_db)):
     return get_user_context(db, current_user)
+
+
+@router.patch("/me", response_model=RegisterResponse)
+def update_me(
+    data: ProfileUpdate,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    return update_user_context(db, current_user, data)

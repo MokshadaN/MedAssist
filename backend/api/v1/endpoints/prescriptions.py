@@ -7,6 +7,7 @@ from core.dependencies import get_db, require_roles
 from schemas.prescription import PrescriptionCreate, PrescriptionItemCreate
 from services.prescription_service import add_item as add_item_service
 from services.prescription_service import create_prescription as create_prescription_service
+from services.prescription_service import get_patient_prescriptions
 from services.prescription_service import get_prescription_by_visit
 
 router = APIRouter(tags=["prescriptions"])
@@ -37,6 +38,14 @@ def add_item(
         data.frequency,
         current_user.id,
     )
+
+
+@router.get("/my")
+def get_my_prescriptions(
+    current_user=Depends(require_roles("patient")),
+    db: Session = Depends(get_db),
+):
+    return get_patient_prescriptions(db, current_user.id)
 
 
 @router.get("/{visit_id}")
