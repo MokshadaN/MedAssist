@@ -97,12 +97,12 @@ def get_nearby_hospitals(latitude: float, longitude: float, radius: int = 5000) 
     query = f"""
     [out:json][timeout:25];
     (
-      node["amenity"~"hospital|clinic|doctors"](around:{radius},{latitude},{longitude});
-      way["amenity"~"hospital|clinic|doctors"](around:{radius},{latitude},{longitude});
-      relation["amenity"~"hospital|clinic|doctors"](around:{radius},{latitude},{longitude});
-      node["healthcare"~"hospital|clinic|doctor"](around:{radius},{latitude},{longitude});
-      way["healthcare"~"hospital|clinic|doctor"](around:{radius},{latitude},{longitude});
-      relation["healthcare"~"hospital|clinic|doctor"](around:{radius},{latitude},{longitude});
+      node["amenity"~"hospital|clinic|doctors|ambulance_station"](around:{radius},{latitude},{longitude});
+      way["amenity"~"hospital|clinic|doctors|ambulance_station"](around:{radius},{latitude},{longitude});
+      relation["amenity"~"hospital|clinic|doctors|ambulance_station"](around:{radius},{latitude},{longitude});
+      node["healthcare"~"hospital|clinic|doctor|ambulance"](around:{radius},{latitude},{longitude});
+      way["healthcare"~"hospital|clinic|doctor|ambulance"](around:{radius},{latitude},{longitude});
+      relation["healthcare"~"hospital|clinic|doctor|ambulance"](around:{radius},{latitude},{longitude});
     );
     out center;
     """
