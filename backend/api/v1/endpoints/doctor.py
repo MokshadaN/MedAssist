@@ -1,17 +1,36 @@
 """Doctor endpoints."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-router = APIRouter()
+from core.dependencies import get_db, require_roles
+from schemas.doctor import DoctorPatientOut, DoctorVisitHistoryOut, DoctorVisitOut
+from services.visit_service import get_doctor_patients, get_patient_history, get_visit_details
 
-@router.get("/patients")
-def get_patients():
-    return [{"patient_id": "p1"}, {"patient_id": "p2"}]
+router = APIRouter(tags=["doctor"])
 
-@router.get("/visit/{visit_id}")
-def get_visit(visit_id: str):
-    return {"visit_id": visit_id, "details": {}}
 
-@router.get("/history/{patient_id}")
-def get_history(patient_id: str):
-    return [{"visit_id": "v1"}, {"visit_id": "v2"}]
+@router.get("/patients", response_model=list[DoctorPatientOut])
+def get_patients(
+    current_user=Depends(require_roles("doctor")),
+    db: Session = Depends(get_db),
+):
+    return get_doctor_patients(db, current_user.id)
+
+
+@router.get("/visit/{visit_id}", response_model=DoctorVisitOut)
+def get_visit(
+    visit_id: str,
+    current_user=Depends(require_roles("doctor")),
+    db: Session = Depends(get_db),
+):
+    return get_visit_details(db, visit_id, current_user.id)
+
+
+@router.get("/history/{patient_id}", response_model=list[DoctorVisitHistoryOut])
+def get_history(
+    patient_id: str,
+    current_user=Depends(require_roles("doctor")),
+    db: Session = Depends(get_db),
+):
+    return get_patient_history(db, patient_id, current_user.id)

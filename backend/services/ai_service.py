@@ -18,7 +18,13 @@ from services.triage_service import detect_urgent_red_flags
 # =====================================================
 
 load_dotenv()
-client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
+
+def _get_client():
+    api_key = os.getenv("GOOGLE_API_KEY")
+    if not api_key:
+        return None
+    return genai.Client(api_key=api_key)
 
 PRIMARY_MODEL = "gemini-3-flash-preview"
 BACKUP_MODEL = "gemini-2.5-flash"
@@ -54,6 +60,9 @@ class IntakeOutput(BaseModel):
 # =====================================================
 
 def safe_generate_content(contents, schema=None):
+    client = _get_client()
+    if client is None:
+        raise RuntimeError("GOOGLE_API_KEY is not configured")
 
     models_to_try = [PRIMARY_MODEL, BACKUP_MODEL]
 
@@ -204,7 +213,14 @@ def analyze_patient_transcript(transcript: str) -> dict:
         }
 
     # 🔍 Analyzing...
-    result = extract_and_summarize(transcript)
+    try:
+        result = extract_and_summarize(transcript)
+    except RuntimeError as exc:
+        return {
+            "status": "unavailable",
+            "message": str(exc),
+        }
+
     data = result.structured_data
     missing = find_missing_fields(data)
 
@@ -227,3 +243,7 @@ def analyze_patient_transcript(transcript: str) -> dict:
         "clinical_summary": result.clinical_summary,
         "structured_data": data.model_dump()
     }
+
+def generate_ai_reply(user_message: str):
+    # simple placeholder logic
+    return f"AI says: I understand '{user_message}'"
