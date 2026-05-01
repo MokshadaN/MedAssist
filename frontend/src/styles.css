@@ -571,10 +571,6 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 /* Horizontal Timeline */
 .horizontal-timeline {
   display: flex;
@@ -685,13 +681,8 @@ input:focus, textarea:focus, select:focus {
   cursor: pointer;
   min-width: 92px;
   white-space: nowrap;
-=======
-=======
->>>>>>> 5ce46bd (mic input working)
-=======
->>>>>>> 5ce46bd (mic input working)
-=======
->>>>>>> 5ce46bd (mic input working)
+}
+
 .voice-btn {
   background: var(--surface-soft);
   color: var(--text-secondary);
@@ -734,14 +725,4 @@ input:focus, textarea:focus, select:focus {
   .chat-compose textarea {
     flex: 1;
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 5ce46bd (mic input working)
-=======
->>>>>>> 5ce46bd (mic input working)
-=======
->>>>>>> 5ce46bd (mic input working)
-=======
->>>>>>> 5ce46bd (mic input working)
 }
