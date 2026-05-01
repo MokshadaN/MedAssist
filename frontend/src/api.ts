@@ -4,9 +4,52 @@ export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: 'patient' | 'doctor' | string;
   phone?: string | null;
   created_at?: string | null;
+};
+
+export type PatientProfile = {
+  id: string;
+  user_id: string;
+  age?: number | null;
+  gender?: string | null;
+  allergies?: string | null;
+  chronic_conditions?: string | null;
+};
+
+export type DoctorProfile = {
+  id: string;
+  user_id: string;
+  specialization?: string | null;
+  license_number?: string | null;
+  experience_years?: number | null;
+  hospital_affiliation?: string | null;
+};
+
+export type AuthContext = {
+  access_token?: string;
+  token_type?: string;
+  user: AuthUser;
+  doctor_profile?: DoctorProfile | null;
+  patient_profile?: PatientProfile | null;
+};
+
+export type ProfileUpdate = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  age?: number;
+  gender?: string;
+  allergies?: string;
+  chronic_conditions?: string;
+};
+
+export type DoctorDirectoryItem = {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string | null;
 };
 
 export type DoctorPatient = {
@@ -47,12 +90,12 @@ export type IntakeResponse = {
   message: string;
   input_mode?: 'text' | 'voice' | null;
   next_question?: string | null;
-  missing_fields: string[];
+  missing_fields?: string[];
   structured_data?: Record<string, unknown> | null;
   clinical_summary?: string | null;
   comparison?: Record<string, unknown> | null;
   summary_id?: string | null;
-  matched_terms: string[];
+  matched_terms?: string[];
 };
 
 export type AISummary = {
@@ -82,7 +125,30 @@ export type SessionState = {
 };
 
 export type Notification = {
+  id: string;
+  user_id: string;
   message: string;
+  type: string;
+  is_read: boolean;
+  created_at: string;
+};
+
+export type PrescriptionItem = {
+  id: string;
+  prescription_id: string;
+  medicine_name: string;
+  dosage: string;
+  duration: string;
+  frequency: string;
+};
+
+export type Prescription = {
+  id: string;
+  visit_id: string;
+  doctor_id: string;
+  notes?: string | null;
+  created_at: string;
+  items: PrescriptionItem[];
 };
 
 export type RiskCheck = {
@@ -147,7 +213,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 export const api = {
   login(email: string, password: string) {
     const body = new URLSearchParams({ username: email, password });
-    return request<{ access_token: string; token_type: string; user: AuthUser }>(`/auth/login`, {
+    return request<AuthContext & { access_token: string; token_type: string }>(`/auth/login`, {
       method: 'POST',
       body,
       headers: {
@@ -156,7 +222,14 @@ export const api = {
     });
   },
   me(token: string) {
-    return request<{ user: AuthUser }>(`/auth/me`, { token });
+    return request<AuthContext>(`/auth/me`, { token });
+  },
+  updateMe(payload: ProfileUpdate, token: string) {
+    return request<AuthContext>(`/auth/me`, {
+      method: 'PATCH',
+      token,
+      body: JSON.stringify(payload),
+    });
   },
   registerDoctor(tokenPayload: {
     name: string;
@@ -168,7 +241,7 @@ export const api = {
     experience_years: number;
     hospital_affiliation?: string;
   }) {
-    return request(`/auth/register/doctor`, {
+    return request<AuthContext>(`/auth/register/doctor`, {
       method: 'POST',
       body: JSON.stringify(tokenPayload),
     });
@@ -183,16 +256,22 @@ export const api = {
     allergies?: string;
     chronic_conditions?: string;
   }) {
-    return request(`/auth/register/patient`, {
+    return request<AuthContext>(`/auth/register/patient`, {
       method: 'POST',
       body: JSON.stringify(tokenPayload),
     });
+  },
+  listDoctors(token: string) {
+    return request<DoctorDirectoryItem[]>(`/doctor/directory`, { token });
   },
   listPatients(token: string) {
     return request<DoctorPatient[]>(`/doctor/patients`, { token });
   },
   getPatientHistory(patientId: string, token: string) {
     return request<DoctorVisit[]>(`/doctor/history/${patientId}`, { token });
+  },
+  getMyVisits(token: string) {
+    return request<DoctorVisit[]>(`/visit/my`, { token });
   },
   getVisit(visitId: string, token: string) {
     return request<DoctorVisit>(`/doctor/visit/${visitId}`, { token });
@@ -228,13 +307,6 @@ export const api = {
       body: JSON.stringify({ transcript }),
     });
   },
-  generateSummary(transcript: string, token?: string | null) {
-    return request<Record<string, unknown>>(`/ai/generate-summary`, {
-      method: 'POST',
-      token,
-      body: JSON.stringify({ transcript }),
-    });
-  },
   getSummary(sessionId: string, token: string) {
     return request<AISummary>(`/ai/summary/${sessionId}`, { token });
   },
@@ -256,6 +328,12 @@ export const api = {
       token,
     });
   },
+  createPatientVisit(doctorId: string, sessionId: string, token: string) {
+    return request<DoctorVisit>(`/visit/patient-create?doctor_id=${encodeURIComponent(doctorId)}&session_id=${encodeURIComponent(sessionId)}`, {
+      method: 'POST',
+      token,
+    });
+  },
   closeVisit(visitId: string, token: string) {
     return request<DoctorVisit>(`/visit/close?visit_id=${encodeURIComponent(visitId)}`, {
       method: 'PUT',
@@ -263,17 +341,20 @@ export const api = {
     });
   },
   getPrescription(visitId: string, token: string) {
-    return request<Record<string, unknown>>(`/prescription/${visitId}`, { token });
+    return request<Prescription>(`/prescription/${visitId}`, { token });
+  },
+  getMyPrescriptions(token: string) {
+    return request<Prescription[]>(`/prescription/my`, { token });
   },
   createPrescription(visitId: string, notes: string, token: string) {
-    return request<Record<string, unknown>>(`/prescription/create`, {
+    return request<Prescription>(`/prescription/create`, {
       method: 'POST',
       token,
       body: JSON.stringify({ visit_id: visitId, notes }),
     });
   },
   addPrescriptionItem(prescriptionId: string, item: { medicine_name: string; dosage: string; duration: string; frequency: string }, token: string) {
-    return request<Record<string, unknown>>(`/prescription/add-item?prescription_id=${encodeURIComponent(prescriptionId)}`, {
+    return request<PrescriptionItem>(`/prescription/add-item?prescription_id=${encodeURIComponent(prescriptionId)}`, {
       method: 'POST',
       token,
       body: JSON.stringify(item),
@@ -288,21 +369,23 @@ export const api = {
   getFeedback(visitId: string) {
     return request<{ rating: number }>(`/feedback/${visitId}`);
   },
-  listNotifications() {
-    return request<Notification[]>(`/notifications`);
+  listNotifications(token: string) {
+    return request<Notification[]>(`/notifications`, { token });
   },
-  markNotificationRead(notificationId: string) {
-    return request<{ status: string }>(`/notifications/mark-read?notification_id=${encodeURIComponent(notificationId)}`, {
+  markNotificationRead(notificationId: string, token: string) {
+    return request<Notification>(`/notifications/mark-read?notification_id=${encodeURIComponent(notificationId)}`, {
       method: 'POST',
+      token,
     });
   },
-  runRiskCheck(prescriptionId: string) {
+  runRiskCheck(prescriptionId: string, token: string) {
     return request<RiskCheck>(`/risk/run?prescription_id=${encodeURIComponent(prescriptionId)}`, {
       method: 'POST',
+      token,
     });
   },
-  getRiskCheck(prescriptionId: string) {
-    return request<Record<string, unknown>>(`/risk/${prescriptionId}`);
+  getRiskCheck(prescriptionId: string, token: string) {
+    return request<Record<string, unknown>>(`/risk/${prescriptionId}`, { token });
   },
   createReminder(payload: { user_id: string; message: string; time: string }) {
     return request<Reminder>(`/reminders/create`, {
@@ -310,8 +393,18 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  createMyReminder(payload: { message: string; time: string }, token: string) {
+    return request<Reminder>(`/reminders/me`, {
+      method: 'POST',
+      token,
+      body: JSON.stringify(payload),
+    });
+  },
   listReminders(userId: string) {
     return request<Reminder[]>(`/reminders/${encodeURIComponent(userId)}`);
+  },
+  listMyReminders(token: string) {
+    return request<Reminder[]>(`/reminders/me`, { token });
   },
   completeReminder(reminderId: string) {
     return request<Reminder>(`/reminders/${encodeURIComponent(reminderId)}/complete`, {

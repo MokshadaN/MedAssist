@@ -1,128 +1,163 @@
-import { useEffect, useMemo, useState } from 'react';
-import { api, AuthUser, DoctorPatient, DoctorVisit, IntakeResponse, Reminder, SessionState } from './api';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import {
+  api,
+  AISummary,
+  AuthContext,
+  AuthUser,
+  DoctorDirectoryItem,
+  DoctorPatient,
+  DoctorVisit,
+  Notification,
+  PatientProfile,
+  Prescription,
+  Reminder,
+  SessionState,
+} from './api';
 
-type Page = 'dashboard' | 'intake' | 'records';
 type AuthMode = 'login' | 'register-doctor' | 'register-patient';
+type ChatMessage = { role: 'assistant' | 'user'; text: string };
 
-const navigation: Array<{ id: Page; label: string; hint: string }> = [
-  { id: 'dashboard', label: 'Dashboard', hint: 'Patients and alerts' },
-  { id: 'intake', label: 'Intake Studio', hint: 'Chat, triage, SOAP' },
-  { id: 'records', label: 'Records Lab', hint: 'Reports and prescriptions' },
-];
+const emptyProfile: PatientProfile = {
+  id: '',
+  user_id: '',
+  age: null,
+  gender: '',
+  allergies: '',
+  chronic_conditions: '',
+};
 
-function formatJson(value: unknown) {
-  if (value == null) return 'No data yet';
-  if (typeof value === 'string') return value;
-  return JSON.stringify(value, null, 2);
+function formatDate(value?: string | null) {
+  if (!value) return 'Not scheduled';
+  return new Date(value).toLocaleString();
 }
 
-function initialVisitSummary(visit?: DoctorVisit | null) {
-  if (!visit) return 'No visit selected.';
-  return `${visit.patient_name} • ${visit.status} • ${visit.created_at}`;
+function formatSummary(summary?: AISummary | null) {
+  if (!summary) return 'No SOAP summary available yet.';
+  return [
+    `Subjective: ${summary.subjective || 'Not documented'}`,
+    `Objective: ${summary.objective || 'Not documented'}`,
+    `Assessment: ${summary.assessment || 'Not documented'}`,
+    `Plan: ${summary.plan || 'Not documented'}`,
+  ].join('\n\n');
+}
+
+function reminderLabel(reminder: Reminder) {
+  const due = new Date(reminder.time);
+  const today = new Date();
+  const startToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+  const startDue = new Date(due.getFullYear(), due.getMonth(), due.getDate()).getTime();
+  const days = Math.round((startDue - startToday) / 86400000);
+  if (days < 0) return 'Overdue';
+  if (days === 0) return 'Due today';
+  if (days === 1) return 'Due tomorrow';
+  if (days <= 2) return `In ${days} days`;
+  return formatDate(reminder.time);
+}
+
+function isUrgent(reminder: Reminder) {
+  const text = reminder.message.toLowerCase();
+  return text.includes('urgent') || reminderLabel(reminder) === 'Overdue' || reminderLabel(reminder) === 'Due today';
 }
 
 function App() {
-  const [page, setPage] = useState<Page>('dashboard');
-  const [authToken, setAuthToken] = useState<string>(() => localStorage.getItem('medassist_token') || '');
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
   const [authMode, setAuthMode] = useState<AuthMode>('login');
-  const [authReady, setAuthReady] = useState<boolean>(() => !localStorage.getItem('medassist_token'));
-  const [busy, setBusy] = useState<string | null>(null);
-  const [flash, setFlash] = useState<string | null>(null);
+  const [authReady, setAuthReady] = useState(!localStorage.getItem('medassist_token'));
+  const [busy, setBusy] = useState('');
+  const [flash, setFlash] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const [doctors, setDoctors] = useState<DoctorDirectoryItem[]>([]);
+  const [selectedDoctorId, setSelectedDoctorId] = useState('');
+  const [patientVisits, setPatientVisits] = useState<DoctorVisit[]>([]);
+  const [patientReports, setPatientReports] = useState<Array<{ id: string; file_url: string }>>([]);
+  const [patientPrescriptions, setPatientPrescriptions] = useState<Prescription[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [patientReminders, setPatientReminders] = useState<Reminder[]>([]);
+  const [reportFile, setReportFile] = useState<File | null>(null);
+
+  const [intakeOpen, setIntakeOpen] = useState(false);
+  const [activeSessionId, setActiveSessionId] = useState('');
+  const [intakeText, setIntakeText] = useState('');
+  const [intakeMessages, setIntakeMessages] = useState<ChatMessage[]>([]);
+  const [structuredData, setStructuredData] = useState<Record<string, unknown> | null>(null);
+  const [lastSummary, setLastSummary] = useState<AISummary | null>(null);
+
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    age: '',
+    gender: '',
+    allergies: '',
+    chronic_conditions: '',
+  });
 
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
-  const [history, setHistory] = useState<DoctorVisit[]>([]);
+  const [doctorHistory, setDoctorHistory] = useState<DoctorVisit[]>([]);
   const [selectedVisit, setSelectedVisit] = useState<DoctorVisit | null>(null);
   const [sessionSnapshot, setSessionSnapshot] = useState<SessionState | null>(null);
-  const [summaryText, setSummaryText] = useState('');
-  const [reports, setReports] = useState<Array<{ id: string; file_url: string }>>([]);
-  const [notifications, setNotifications] = useState<Array<{ message: string }>>([]);
-  const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [riskResult, setRiskResult] = useState<string>('');
-  const [visitRiskSnapshot, setVisitRiskSnapshot] = useState<string>('');
-  const [feedbackSnapshot, setFeedbackSnapshot] = useState<string>('');
-  const [prescriptionSnapshot, setPrescriptionSnapshot] = useState<string>('');
-  const [notificationIdInput, setNotificationIdInput] = useState('');
-  const [feedbackRating, setFeedbackRating] = useState('4');
-  const [feedbackComments, setFeedbackComments] = useState('');
-
-  const [patientIdInput, setPatientIdInput] = useState('');
-  const [sessionIdInput, setSessionIdInput] = useState('');
-  const [intakeMessage, setIntakeMessage] = useState('');
-  const [freeMessage, setFreeMessage] = useState('');
-  const [intakeTranscript, setIntakeTranscript] = useState('');
-  const [structuredData, setStructuredData] = useState<Record<string, unknown> | null>(null);
-  const [triageResult, setTriageResult] = useState<string>('');
-  const [aiSummaryDraft, setAiSummaryDraft] = useState<string>('');
-  const [sessionId, setSessionId] = useState('');
-  const [messages, setMessages] = useState<Array<{ role: string; text: string }>>([]);
-
-  const [reportPatientId, setReportPatientId] = useState('');
-  const [reportFile, setReportFile] = useState<File | null>(null);
-  const [reminderUserId, setReminderUserId] = useState('');
-  const [reminderMessage, setReminderMessage] = useState('');
-  const [reminderTime, setReminderTime] = useState(() => {
-    const value = new Date();
-    value.setHours(value.getHours() + 24);
-    return value.toISOString().slice(0, 16);
-  });
-  const [visitCreationPatientId, setVisitCreationPatientId] = useState('');
-  const [visitCreationSessionId, setVisitCreationSessionId] = useState('');
-  const [prescriptionVisitId, setPrescriptionVisitId] = useState('');
+  const [doctorSummary, setDoctorSummary] = useState<AISummary | null>(null);
   const [prescriptionNotes, setPrescriptionNotes] = useState('Continue current therapy and monitor response.');
   const [prescriptionId, setPrescriptionId] = useState('');
   const [medicationName, setMedicationName] = useState('');
   const [dosage, setDosage] = useState('');
   const [duration, setDuration] = useState('');
   const [frequency, setFrequency] = useState('');
+  const [doctorReminderTime, setDoctorReminderTime] = useState(() => {
+    const value = new Date();
+    value.setDate(value.getDate() + 2);
+    return value.toISOString().slice(0, 16);
+  });
+  const [doctorReminderMessage, setDoctorReminderMessage] = useState('Doctor visit in 2 days');
 
   const selectedPatient = useMemo(
     () => patients.find((patient) => patient.patient_id === selectedPatientId) || null,
     [patients, selectedPatientId],
   );
 
-  useEffect(() => {
-    const syncPage = () => {
-      const next = window.location.pathname.replace('/', '') as Page;
-      if (navigation.some((item) => item.id === next)) {
-        setPage(next);
-      } else {
-        setPage('dashboard');
-      }
-    };
-    syncPage();
-    window.addEventListener('popstate', syncPage);
-    return () => window.removeEventListener('popstate', syncPage);
-  }, []);
+  const selectedDoctor = useMemo(
+    () => doctors.find((doctor) => doctor.id === selectedDoctorId) || null,
+    [doctors, selectedDoctorId],
+  );
+
+  const setAuthContext = (context: AuthContext) => {
+    setUser(context.user);
+    setPatientProfile(context.patient_profile || null);
+    setProfileForm({
+      name: context.user.name || '',
+      email: context.user.email || '',
+      phone: context.user.phone || '',
+      age: String(context.patient_profile?.age || ''),
+      gender: context.patient_profile?.gender || '',
+      allergies: context.patient_profile?.allergies || '',
+      chronic_conditions: context.patient_profile?.chronic_conditions || '',
+    });
+  };
 
   useEffect(() => {
     if (!authToken) {
       setUser(null);
+      setPatientProfile(null);
       setAuthReady(true);
       return;
     }
 
     let active = true;
     setAuthReady(false);
-
     api.me(authToken)
-      .then((res) => {
-        if (active) {
-          setUser(res.user);
-        }
+      .then((context) => {
+        if (active) setAuthContext(context);
       })
       .catch(() => {
-        if (active) {
-          localStorage.removeItem('medassist_token');
-          setAuthToken('');
-          setUser(null);
-        }
+        localStorage.removeItem('medassist_token');
+        setAuthToken('');
       })
       .finally(() => {
-        if (active) {
-          setAuthReady(true);
-        }
+        if (active) setAuthReady(true);
       });
 
     return () => {
@@ -130,388 +165,286 @@ function App() {
     };
   }, [authToken]);
 
-  useEffect(() => {
-    if (user) {
-      setPage('dashboard');
-      window.history.replaceState({}, '', '/');
-    }
-  }, [user]);
-
-  useEffect(() => {
+  const refreshNotifications = async () => {
     if (!authToken) return;
+    try {
+      setNotifications(await api.listNotifications(authToken));
+    } catch (error) {
+      setFlash(error instanceof Error ? error.message : 'Could not load notifications');
+    }
+  };
 
-    setBusy('Loading dashboard data');
-    Promise.allSettled([api.listPatients(authToken), api.listNotifications()])
-      .then(([patientsResult, notificationsResult]) => {
-        if (patientsResult.status === 'fulfilled') {
-          setPatients(patientsResult.value);
-          setSelectedPatientId((current) => current || patientsResult.value[0]?.patient_id || '');
-          setPatientIdInput((current) => current || patientsResult.value[0]?.patient_id || '');
-          setReportPatientId((current) => current || patientsResult.value[0]?.patient_id || '');
-          setReminderUserId((current) => current || patientsResult.value[0]?.patient_id || '');
-          setVisitCreationPatientId((current) => current || patientsResult.value[0]?.patient_id || '');
-        }
-        if (notificationsResult.status === 'fulfilled') {
-          setNotifications(notificationsResult.value);
-        }
-      })
-      .finally(() => setBusy(null));
-  }, [authToken]);
+  const refreshPatientData = async () => {
+    if (!authToken || !user || user.role !== 'patient') return;
+    setBusy('Loading your dashboard');
+    try {
+      const [doctorList, visits, reports, prescriptions, reminders, notes] = await Promise.all([
+        api.listDoctors(authToken),
+        api.getMyVisits(authToken),
+        api.listReports(user.id, authToken),
+        api.getMyPrescriptions(authToken),
+        api.listMyReminders(authToken),
+        api.listNotifications(authToken),
+      ]);
+      setDoctors(doctorList);
+      setSelectedDoctorId((current) => current || doctorList[0]?.id || '');
+      setPatientVisits(visits);
+      setPatientReports(reports);
+      setPatientPrescriptions(prescriptions);
+      setPatientReminders(reminders);
+      setNotifications(notes);
+    } catch (error) {
+      setFlash(error instanceof Error ? error.message : 'Could not load patient dashboard');
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const refreshDoctorData = async () => {
+    if (!authToken || !user || user.role !== 'doctor') return;
+    setBusy('Loading doctor dashboard');
+    try {
+      const [loadedPatients, notes] = await Promise.all([
+        api.listPatients(authToken),
+        api.listNotifications(authToken),
+      ]);
+      setPatients(loadedPatients);
+      setNotifications(notes);
+      setSelectedPatientId((current) => current || loadedPatients[0]?.patient_id || '');
+    } catch (error) {
+      setFlash(error instanceof Error ? error.message : 'Could not load doctor dashboard');
+    } finally {
+      setBusy('');
+    }
+  };
 
   useEffect(() => {
-    if (!selectedPatientId || !authToken) {
-      setHistory([]);
-      setReports([]);
-      setReminders([]);
+    void refreshPatientData();
+    void refreshDoctorData();
+  }, [authToken, user?.id, user?.role]);
+
+  useEffect(() => {
+    if (!authToken || !selectedPatientId || user?.role !== 'doctor') return;
+    setBusy('Loading patient timeline');
+    api.getPatientHistory(selectedPatientId, authToken)
+      .then((history) => {
+        setDoctorHistory(history);
+        setSelectedVisit(history[0] || null);
+      })
+      .catch((error) => setFlash(error instanceof Error ? error.message : 'Could not load patient history'))
+      .finally(() => setBusy(''));
+  }, [authToken, selectedPatientId, user?.role]);
+
+  useEffect(() => {
+    if (!authToken || !selectedVisit?.session_id) {
+      setSessionSnapshot(null);
+      setDoctorSummary(null);
       return;
     }
 
-    setBusy('Loading patient history');
     Promise.allSettled([
-      api.getPatientHistory(selectedPatientId, authToken),
-      api.listReports(selectedPatientId, authToken),
-      api.listReminders(selectedPatientId),
-    ])
-      .then(([historyResult, reportsResult, remindersResult]) => {
-        if (historyResult.status === 'fulfilled') {
-          setHistory(historyResult.value);
-          setSelectedVisit(historyResult.value[0] || null);
-        }
-        if (reportsResult.status === 'fulfilled') {
-          setReports(reportsResult.value);
-        }
-        if (remindersResult.status === 'fulfilled') {
-          setReminders(remindersResult.value);
-        }
-      })
-      .finally(() => setBusy(null));
-  }, [selectedPatientId, authToken]);
+      api.getSession(selectedVisit.session_id, authToken),
+      api.getSummary(selectedVisit.session_id, authToken),
+    ]).then(([sessionResult, summaryResult]) => {
+      setSessionSnapshot(sessionResult.status === 'fulfilled' ? sessionResult.value : null);
+      setDoctorSummary(summaryResult.status === 'fulfilled' ? summaryResult.value : null);
+    });
+  }, [authToken, selectedVisit?.session_id]);
 
-  useEffect(() => {
-    if (!selectedVisit || !authToken) return;
-
-    if (selectedVisit.session_id) {
-      setSessionIdInput(selectedVisit.session_id);
-      setVisitCreationSessionId(selectedVisit.session_id);
-    }
-    setPrescriptionVisitId(selectedVisit.visit_id);
-
-    api.getSession(selectedVisit.session_id || selectedVisit.visit_id, authToken)
-      .then(setSessionSnapshot)
-      .catch(() => setSessionSnapshot(null));
-
-    if (selectedVisit.session_id) {
-      api.getSummary(selectedVisit.session_id, authToken)
-        .then((summary) => {
-          setSummaryText(
-            [
-              `Subjective: ${summary.subjective}`,
-              `Objective: ${summary.objective}`,
-              `Assessment: ${summary.assessment}`,
-              `Plan: ${summary.plan}`,
-            ].join('\n\n'),
-          );
-        })
-        .catch(() => setSummaryText('No SOAP summary found for this session.'));
-    } else {
-      setSummaryText('No SOAP summary found for this session.');
-    }
-
-    api.getFeedback(selectedVisit.visit_id)
-      .then((feedback) => setFeedbackSnapshot(formatJson(feedback)))
-      .catch(() => setFeedbackSnapshot('No feedback found for this visit.'));
-
-    api.getPrescription(selectedVisit.visit_id, authToken)
-      .then((prescription) => setPrescriptionSnapshot(formatJson(prescription)))
-      .catch(() => setPrescriptionSnapshot('No prescription found for this visit.'));
-  }, [selectedVisit, authToken]);
-
-  const navigate = (next: Page) => {
-    window.history.pushState({}, '', `/${next === 'dashboard' ? '' : next}`);
-    setPage(next);
-  };
-
-  const setAuth = (token: string) => {
-    localStorage.setItem('medassist_token', token);
-    setAuthToken(token);
-  };
-
-  const clearAuth = () => {
-    localStorage.removeItem('medassist_token');
-    setAuthToken('');
-    setUser(null);
-    setPage('dashboard');
-    setAuthMode('login');
-    setFlash(null);
-    window.history.replaceState({}, '', '/');
-  };
-
-  const handleLogin = async (form: HTMLFormElement) => {
-    const data = new FormData(form);
-    const email = String(data.get('email') || '');
-    const password = String(data.get('password') || '');
+  const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
     setBusy('Signing in');
     try {
-      const result = await api.login(email, password);
-      setAuth(result.access_token);
-      setUser(result.user);
+      const result = await api.login(String(data.get('email') || ''), String(data.get('password') || ''));
+      localStorage.setItem('medassist_token', result.access_token);
+      setAuthToken(result.access_token);
+      setAuthContext(result);
       setFlash(`Signed in as ${result.user.name}`);
     } catch (error) {
       setFlash(error instanceof Error ? error.message : 'Login failed');
     } finally {
-      setBusy(null);
+      setBusy('');
     }
   };
 
-  const handleRegisterDoctor = async (form: HTMLFormElement) => {
-    const data = new FormData(form);
-    setBusy('Creating doctor account');
+  const handleRegister = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    setBusy('Creating account');
     try {
-      await api.registerDoctor({
-        name: String(data.get('name') || ''),
-        email: String(data.get('email') || ''),
-        password: String(data.get('password') || ''),
-        phone: String(data.get('phone') || ''),
-        specialization: String(data.get('specialization') || ''),
-        license_number: String(data.get('license_number') || ''),
-        experience_years: Number(data.get('experience_years') || 0),
-        hospital_affiliation: String(data.get('hospital_affiliation') || ''),
-      });
-      const email = String(data.get('email') || '');
-      const password = String(data.get('password') || '');
-      const result = await api.login(email, password);
-      setAuth(result.access_token);
-      setUser(result.user);
+      if (authMode === 'register-doctor') {
+        await api.registerDoctor({
+          name: String(data.get('name') || ''),
+          email: String(data.get('email') || ''),
+          password: String(data.get('password') || ''),
+          phone: String(data.get('phone') || ''),
+          specialization: String(data.get('specialization') || ''),
+          license_number: String(data.get('license_number') || ''),
+          experience_years: Number(data.get('experience_years') || 0),
+          hospital_affiliation: String(data.get('hospital_affiliation') || ''),
+        });
+      } else {
+        await api.registerPatient({
+          name: String(data.get('name') || ''),
+          email: String(data.get('email') || ''),
+          password: String(data.get('password') || ''),
+          phone: String(data.get('phone') || ''),
+          age: Number(data.get('age') || 0) || undefined,
+          gender: String(data.get('gender') || ''),
+          allergies: String(data.get('allergies') || ''),
+          chronic_conditions: String(data.get('chronic_conditions') || ''),
+        });
+      }
+
+      const result = await api.login(String(data.get('email') || ''), String(data.get('password') || ''));
+      localStorage.setItem('medassist_token', result.access_token);
+      setAuthToken(result.access_token);
+      setAuthContext(result);
       setFlash(`Welcome, ${result.user.name}`);
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Doctor registration failed');
+      setFlash(error instanceof Error ? error.message : 'Registration failed');
     } finally {
-      setBusy(null);
+      setBusy('');
     }
   };
 
-  const handleRegisterPatient = async (form: HTMLFormElement) => {
-    const data = new FormData(form);
-    setBusy('Creating patient account');
-    try {
-      await api.registerPatient({
-        name: String(data.get('name') || ''),
-        email: String(data.get('email') || ''),
-        password: String(data.get('password') || ''),
-        phone: String(data.get('phone') || ''),
-        age: Number(data.get('age') || 0) || undefined,
-        gender: String(data.get('gender') || ''),
-        allergies: String(data.get('allergies') || ''),
-        chronic_conditions: String(data.get('chronic_conditions') || ''),
-      });
-      const email = String(data.get('email') || '');
-      const password = String(data.get('password') || '');
-      const result = await api.login(email, password);
-      setAuth(result.access_token);
-      setUser(result.user);
-      setFlash(`Welcome, ${result.user.name}`);
-    } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Patient registration failed');
-    } finally {
-      setBusy(null);
-    }
+  const signOut = () => {
+    localStorage.removeItem('medassist_token');
+    setAuthToken('');
+    setUser(null);
+    setPatientProfile(null);
+    setFlash('');
   };
 
-  const startSession = async () => {
-    if (!authToken || !patientIdInput) return;
-    setBusy('Starting intake session');
+  const startPatientVisit = async () => {
+    if (!authToken || !user || !selectedDoctorId) return;
+    setBusy('Starting questionnaire');
     try {
-      const result = await api.startSession(patientIdInput, authToken);
-      setSessionId(result.id);
-      setSessionIdInput(result.id);
-      setMessages(result.initial_question ? [{ role: 'assistant', text: result.initial_question }] : []);
-      setFlash(`Session ${result.id} started`);
-      navigate('intake');
+      const started = await api.startSession(user.id, authToken);
+      setActiveSessionId(started.id);
+      setIntakeMessages(started.initial_question ? [{ role: 'assistant', text: started.initial_question }] : []);
+      setStructuredData(null);
+      setLastSummary(null);
+      setIntakeOpen(true);
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not start session');
+      setFlash(error instanceof Error ? error.message : 'Could not start visit');
     } finally {
-      setBusy(null);
+      setBusy('');
     }
   };
 
   const sendIntakeAnswer = async () => {
-    if (!authToken || !sessionIdInput || !intakeMessage) return;
-    setBusy('Saving intake answer');
+    if (!authToken || !activeSessionId || !intakeText.trim()) return;
+    const answer = intakeText.trim();
+    setBusy('Saving answer');
     try {
       const response = await api.answerIntake(
-        sessionIdInput,
+        activeSessionId,
         {
-          message: intakeMessage,
+          message: answer,
           input_mode: 'text',
           previous_structured: structuredData,
         },
         authToken,
       );
-
-      setStructuredData(response.structured_data || structuredData);
-      setMessages((current) => [
+      setIntakeMessages((current) => [
         ...current,
-        { role: 'user', text: intakeMessage },
-        { role: 'assistant', text: response.next_question || response.message },
+        { role: 'user', text: answer },
+        { role: 'assistant', text: response.next_question || response.clinical_summary || response.message },
       ]);
-      setIntakeTranscript((current) => `${current}\n${intakeMessage}`.trim());
-      setIntakeMessage('');
-      setFlash(`Session ${response.session_id} updated`);
+      setIntakeText('');
+      if (response.structured_data) setStructuredData(response.structured_data);
+
+      if (response.status === 'complete') {
+        const visit = await api.createPatientVisit(selectedDoctorId, response.session_id, authToken);
+        const summary = await api.getSummary(response.session_id, authToken);
+        setLastSummary(summary);
+        setPatientVisits((current) => [visit, ...current.filter((item) => item.visit_id !== visit.visit_id)]);
+        setFlash(`Visit sent to ${selectedDoctor?.name || 'doctor'}`);
+        await refreshPatientData();
+      }
     } catch (error) {
       setFlash(error instanceof Error ? error.message : 'Could not save intake answer');
     } finally {
-      setBusy(null);
+      setBusy('');
     }
   };
 
-  const sendFreeMessage = async () => {
-    if (!authToken || !sessionIdInput || !freeMessage) return;
-    setBusy('Sending message');
+  const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!authToken) return;
+    setBusy('Saving profile');
     try {
-      const reply = await api.sendMessage(sessionIdInput, freeMessage, authToken);
-      setMessages((current) => [
-        ...current,
-        { role: 'user', text: freeMessage },
-        { role: 'assistant', text: reply.message },
-      ]);
-      setFreeMessage('');
+      const context = await api.updateMe(
+        {
+          name: profileForm.name,
+          email: profileForm.email,
+          phone: profileForm.phone,
+          age: Number(profileForm.age || 0) || undefined,
+          gender: profileForm.gender,
+          allergies: profileForm.allergies,
+          chronic_conditions: profileForm.chronic_conditions,
+        },
+        authToken,
+      );
+      setAuthContext(context);
+      setFlash('Profile updated');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Chat message failed');
+      setFlash(error instanceof Error ? error.message : 'Could not update profile');
     } finally {
-      setBusy(null);
+      setBusy('');
     }
   };
 
-  const runTriage = async () => {
-    if (!intakeTranscript) return;
-    setBusy('Running triage');
-    try {
-      const result = await api.analyzeTriage(intakeTranscript, authToken || null);
-      setTriageResult(formatJson(result));
-    } catch (error) {
-      setTriageResult(error instanceof Error ? error.message : 'Triage failed');
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const runAI = async () => {
-    if (!intakeTranscript) return;
-    setBusy('Generating summary');
-    try {
-      const result = await api.generateSummary(intakeTranscript, authToken || null);
-      setAiSummaryDraft(formatJson(result));
-    } catch (error) {
-      setAiSummaryDraft(error instanceof Error ? error.message : 'Summary failed');
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const refreshSession = async () => {
-    if (!authToken || !sessionIdInput) return;
-    setBusy('Refreshing session');
-    try {
-      const snapshot = await api.getSession(sessionIdInput, authToken);
-      setSessionSnapshot(snapshot);
-    } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not refresh session');
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const uploadReport = async () => {
-    if (!authToken || !reportPatientId || !reportFile) return;
+  const uploadPatientReport = async () => {
+    if (!authToken || !user || !reportFile) return;
     setBusy('Uploading report');
     try {
-      await api.uploadReport(reportPatientId, reportFile, authToken);
-      setReports(await api.listReports(reportPatientId, authToken));
+      await api.uploadReport(user.id, reportFile, authToken);
+      setPatientReports(await api.listReports(user.id, authToken));
+      setReportFile(null);
       setFlash('Report uploaded');
     } catch (error) {
       setFlash(error instanceof Error ? error.message : 'Upload failed');
     } finally {
-      setBusy(null);
+      setBusy('');
     }
   };
 
-  const createReminder = async () => {
-    if (!reminderUserId || !reminderMessage || !reminderTime) return;
-    setBusy('Creating reminder');
+  const createPatientReminder = async (message: string, daysFromNow: number) => {
+    if (!authToken) return;
+    const time = new Date();
+    time.setDate(time.getDate() + daysFromNow);
     try {
-      const created = await api.createReminder({
-        user_id: reminderUserId,
-        message: reminderMessage,
-        time: reminderTime,
-      });
-      setReminders((current) => [created, ...current]);
-      setReminderMessage('');
-      setFlash('Reminder created');
+      const reminder = await api.createMyReminder({ message, time: time.toISOString() }, authToken);
+      setPatientReminders((current) => [reminder, ...current]);
     } catch (error) {
       setFlash(error instanceof Error ? error.message : 'Could not create reminder');
-    } finally {
-      setBusy(null);
     }
   };
 
-  const completeReminder = async (reminderId: string) => {
+  const markNotificationRead = async (notification: Notification) => {
+    if (!authToken) return;
     try {
-      const updated = await api.completeReminder(reminderId);
-      setReminders((current) => current.map((item) => (item.id === updated.id ? updated : item)));
+      const updated = await api.markNotificationRead(notification.id, authToken);
+      setNotifications((current) => current.map((item) => (item.id === updated.id ? updated : item)));
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not complete reminder');
-    }
-  };
-
-  const removeReminder = async (reminderId: string) => {
-    try {
-      await api.deleteReminder(reminderId);
-      setReminders((current) => current.filter((item) => item.id !== reminderId));
-    } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not delete reminder');
-    }
-  };
-
-  const createVisit = async () => {
-    if (!authToken || !visitCreationPatientId || !visitCreationSessionId) return;
-    setBusy('Creating visit');
-    try {
-      const created = await api.createVisit(visitCreationPatientId, visitCreationSessionId, authToken);
-      setSelectedVisit(created);
-      setFlash(`Visit ${created.visit_id} created`);
-      navigate('records');
-    } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not create visit');
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const closeSelectedVisit = async () => {
-    if (!authToken || !selectedVisit) return;
-    setBusy('Closing visit');
-    try {
-      const updated = await api.closeVisit(selectedVisit.visit_id, authToken);
-      setSelectedVisit(updated);
-      setFlash(`Visit ${updated.visit_id} closed`);
-    } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not close visit');
-    } finally {
-      setBusy(null);
+      setFlash(error instanceof Error ? error.message : 'Could not mark notification read');
     }
   };
 
   const createPrescription = async () => {
-    if (!authToken || !prescriptionVisitId) return;
+    if (!authToken || !selectedVisit) return;
     setBusy('Creating prescription');
     try {
-      const created = await api.createPrescription(prescriptionVisitId, prescriptionNotes, authToken);
-      setPrescriptionId(String((created as { id?: string }).id || ''));
+      const prescription = await api.createPrescription(selectedVisit.visit_id, prescriptionNotes, authToken);
+      setPrescriptionId(prescription.id);
       setFlash('Prescription created');
     } catch (error) {
       setFlash(error instanceof Error ? error.message : 'Could not create prescription');
     } finally {
-      setBusy(null);
+      setBusy('');
     }
   };
 
@@ -521,621 +454,422 @@ function App() {
     try {
       await api.addPrescriptionItem(
         prescriptionId,
-        {
-          medicine_name: medicationName,
-          dosage,
-          duration,
-          frequency,
-        },
+        { medicine_name: medicationName, dosage, duration, frequency },
         authToken,
       );
+      setMedicationName('');
+      setDosage('');
+      setDuration('');
+      setFrequency('');
       setFlash('Medication added');
     } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not add item');
+      setFlash(error instanceof Error ? error.message : 'Could not add medication');
     } finally {
-      setBusy(null);
+      setBusy('');
     }
   };
 
-  const runRisk = async () => {
-    if (!prescriptionId) return;
-    setBusy('Checking risk');
+  const scheduleFollowUp = async () => {
+    if (!selectedPatientId || !doctorReminderMessage || !doctorReminderTime) return;
     try {
-      const result = await api.runRiskCheck(prescriptionId);
-      setRiskResult(formatJson(result));
+      await api.createReminder({
+        user_id: selectedPatientId,
+        message: doctorReminderMessage,
+        time: new Date(doctorReminderTime).toISOString(),
+      });
+      setFlash('Follow-up reminder scheduled');
     } catch (error) {
-      setRiskResult(error instanceof Error ? error.message : 'Risk check failed');
-    } finally {
-      setBusy(null);
+      setFlash(error instanceof Error ? error.message : 'Could not schedule follow-up');
     }
   };
 
-  const refreshVisitRisk = async () => {
-    if (!prescriptionId) return;
-    try {
-      setVisitRiskSnapshot(formatJson(await api.getRiskCheck(prescriptionId)));
-    } catch (error) {
-      setVisitRiskSnapshot(error instanceof Error ? error.message : 'Could not fetch risk record');
-    }
-  };
-
-  const submitFeedback = async () => {
-    if (!selectedVisit) return;
-    setBusy('Submitting feedback');
-    try {
-      await api.submitFeedback(selectedVisit.visit_id, Number(feedbackRating || 0), feedbackComments);
-      setFlash('Feedback stored');
-    } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Feedback failed');
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const refreshNotifications = async () => {
-    try {
-      setNotifications(await api.listNotifications());
-    } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not refresh notifications');
-    }
-  };
-
-  const markNotificationRead = async () => {
-    if (!notificationIdInput) return;
-    setBusy('Updating notification');
-    try {
-      await api.markNotificationRead(notificationIdInput);
-      setFlash('Notification marked as read');
-    } catch (error) {
-      setFlash(error instanceof Error ? error.message : 'Could not update notification');
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  if (!authReady && authToken && !user) {
-    return (
-      <div className="auth-loading">
-        <div className="panel auth-card">
-          <div className="eyebrow">MedAssist AI</div>
-          <h1>Loading your workspace</h1>
-          <p>Verifying your session...</p>
-        </div>
-      </div>
-    );
+  if (!authReady) {
+    return <div className="auth-loading panel">Loading MedAssist...</div>;
   }
 
   if (!user) {
     return (
-      <div className="auth-shell">
-        <div className="auth-hero">
-          <div className="brand auth-brand">
+      <main className="auth-shell">
+        <section className="auth-hero">
+          <div className="brand">
             <div className="brand-badge">M</div>
             <div>
-              <div className="eyebrow">MedAssist AI</div>
-              <h1>Clinical workbench for intake, SOAP, and follow-up</h1>
+              <div className="eyebrow">MedAssist</div>
+              <h1>Care records without the paperwork maze</h1>
             </div>
           </div>
-          <p>
-            Sign in to manage patients, start intake sessions, generate SOAP notes, and handle reminders in one workspace.
-          </p>
+          <p>Patients can start a visit, complete intake, review reports and prescriptions, and keep profile details current. Doctors can track timelines and act on the generated SOAP summary.</p>
           <div className="auth-points">
-            <div className="chip">Patient dashboard</div>
-            <div className="chip">AI triage</div>
-            <div className="chip">Prescriptions and reminders</div>
+            <span className="pill">Patient intake</span>
+            <span className="pill">SOAP summaries</span>
+            <span className="pill">Follow-up reminders</span>
           </div>
-        </div>
+        </section>
 
-        <div className="panel auth-card">
-          <div className="panel-head">
-            <div>
-              <div className="eyebrow">Access</div>
-              <h2>{authMode === 'login' ? 'Sign in' : authMode === 'register-doctor' ? 'Register doctor' : 'Register patient'}</h2>
-            </div>
-            <span className="pill">{authMode}</span>
-          </div>
-
+        <section className="panel auth-card">
           <div className="tabs">
-            <button className={authMode === 'login' ? 'tab active' : 'tab'} onClick={() => setAuthMode('login')}>Login</button>
-            <button className={authMode === 'register-doctor' ? 'tab active' : 'tab'} onClick={() => setAuthMode('register-doctor')}>Doctor</button>
-            <button className={authMode === 'register-patient' ? 'tab active' : 'tab'} onClick={() => setAuthMode('register-patient')}>Patient</button>
+            <button className={`tab ${authMode === 'login' ? 'active' : ''}`} onClick={() => setAuthMode('login')}>Login</button>
+            <button className={`tab ${authMode === 'register-patient' ? 'active' : ''}`} onClick={() => setAuthMode('register-patient')}>Patient</button>
+            <button className={`tab ${authMode === 'register-doctor' ? 'active' : ''}`} onClick={() => setAuthMode('register-doctor')}>Doctor</button>
           </div>
 
-          {authMode === 'login' && (
-            <form
-              className="stack"
-              onSubmit={(event) => {
-                event.preventDefault();
-                void handleLogin(event.currentTarget);
-              }}
-            >
-              <input name="email" placeholder="doctor@clinic.com" type="email" required />
-              <input name="password" placeholder="Password" type="password" required />
-              <button className="primary" type="submit">Sign in</button>
-            </form>
-          )}
-
-          {authMode === 'register-doctor' && (
-            <form
-              className="stack"
-              onSubmit={(event) => {
-                event.preventDefault();
-                void handleRegisterDoctor(event.currentTarget);
-              }}
-            >
-              <input name="name" placeholder="Doctor name" required />
-              <input name="email" placeholder="doctor@clinic.com" type="email" required />
-              <input name="password" placeholder="Password" type="password" required />
-              <input name="phone" placeholder="Phone" />
-              <input name="specialization" placeholder="Specialization" required />
-              <input name="license_number" placeholder="License number" required />
-              <input name="experience_years" placeholder="Experience years" type="number" min="0" required />
-              <input name="hospital_affiliation" placeholder="Hospital affiliation" />
-              <button className="primary" type="submit">Create account</button>
-            </form>
-          )}
-
-          {authMode === 'register-patient' && (
-            <form
-              className="stack"
-              onSubmit={(event) => {
-                event.preventDefault();
-                void handleRegisterPatient(event.currentTarget);
-              }}
-            >
-              <input name="name" placeholder="Patient name" required />
-              <input name="email" placeholder="patient@clinic.com" type="email" required />
-              <input name="password" placeholder="Password" type="password" required />
-              <input name="phone" placeholder="Phone" />
-              <input name="age" placeholder="Age" type="number" min="0" />
-              <input name="gender" placeholder="Gender" />
-              <input name="allergies" placeholder="Allergies" />
-              <input name="chronic_conditions" placeholder="Chronic conditions" />
-              <button className="primary" type="submit">Create account</button>
-            </form>
-          )}
-
-          {flash && <div className="flash" style={{ marginTop: 12 }}>{flash}</div>}
-        </div>
-      </div>
+          <form className="stack" onSubmit={authMode === 'login' ? handleLogin : handleRegister}>
+            {authMode !== 'login' && <input name="name" placeholder="Full name" required />}
+            <input name="email" type="email" placeholder="Email" required />
+            <input name="password" type="password" placeholder="Password" required />
+            {authMode !== 'login' && <input name="phone" placeholder="Phone number" />}
+            {authMode === 'register-patient' && (
+              <>
+                <input name="age" type="number" placeholder="Age" />
+                <input name="gender" placeholder="Gender" />
+                <input name="allergies" placeholder="Allergies" />
+                <input name="chronic_conditions" placeholder="Chronic conditions" />
+              </>
+            )}
+            {authMode === 'register-doctor' && (
+              <>
+                <input name="specialization" placeholder="Specialization" required />
+                <input name="license_number" placeholder="License number" required />
+                <input name="experience_years" type="number" placeholder="Years of experience" required />
+                <input name="hospital_affiliation" placeholder="Hospital affiliation" />
+              </>
+            )}
+            <button className="primary" type="submit">{authMode === 'login' ? 'Sign in' : 'Create account'}</button>
+          </form>
+          {flash && <div className="flash">{flash}</div>}
+          {busy && <div className="flash subtle">{busy}...</div>}
+        </section>
+      </main>
     );
   }
 
   return (
     <div className="app-shell">
-      <aside className="sidebar">
+      <header className="app-topbar">
         <div className="brand">
           <div className="brand-badge">M</div>
           <div>
-            <div className="eyebrow">MedAssist AI</div>
-            <h1>Clinical Workbench</h1>
+            <div className="eyebrow">{user.role === 'patient' ? 'Patient portal' : 'Doctor dashboard'}</div>
+            <h1>{user.name}</h1>
+            <p>{user.email}</p>
           </div>
         </div>
+        <div className="topbar-actions">
+          <button className="secondary" onClick={() => setShowNotifications((value) => !value)}>
+            Notifications ({notifications.filter((item) => !item.is_read).length})
+          </button>
+          <button className="ghost" onClick={signOut}>Sign out</button>
+        </div>
+      </header>
 
-        <nav className="nav">
-          {navigation.map((item) => (
-            <button
-              key={item.id}
-              className={`nav-item ${page === item.id ? 'active' : ''}`}
-              onClick={() => navigate(item.id)}
-            >
-              <span>{item.label}</span>
-              <small>{item.hint}</small>
-            </button>
-          ))}
-        </nav>
+      {flash && <div className="flash">{flash}</div>}
+      {busy && <div className="flash subtle">{busy}...</div>}
 
-        <div className="panel auth-panel">
+      {showNotifications && (
+        <section className="panel notification-panel">
           <div className="panel-head">
             <div>
-              <div className="eyebrow">Session</div>
-              <h2>{user.name}</h2>
+              <div className="eyebrow">Inbox</div>
+              <h2>Notifications</h2>
             </div>
-            <span className="pill">{user.role}</span>
+            <button className="ghost" onClick={() => void refreshNotifications()}>Refresh</button>
           </div>
           <div className="stack compact">
-            <div className="notification">
-              <span>{user.email}</span>
+            {notifications.map((notification) => (
+              <button
+                key={notification.id}
+                className={`notification ${notification.is_read ? 'read' : ''}`}
+                onClick={() => void markNotificationRead(notification)}
+              >
+                <strong>{notification.type || 'Update'}</strong>
+                <span>{notification.message}</span>
+              </button>
+            ))}
+            {!notifications.length && <div className="empty">No notifications yet.</div>}
+          </div>
+        </section>
+      )}
+
+      {user.role === 'patient' ? (
+        <main className="grid patient-grid">
+          <section className="hero-card wide">
+            <div className="hero-head">
+              <div>
+                <div className="eyebrow">Current care</div>
+                <h2>Start a new visit</h2>
+                <p>Select a doctor, answer the questionnaire, and your SOAP summary will be sent to the doctor's dashboard.</p>
+              </div>
+              <div className="action-group">
+                <select value={selectedDoctorId} onChange={(event) => setSelectedDoctorId(event.target.value)}>
+                  {doctors.map((doctor) => (
+                    <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
+                  ))}
+                </select>
+                <button className="primary" onClick={() => void startPatientVisit()} disabled={!selectedDoctorId}>Add new visit</button>
+              </div>
             </div>
-            <button className="secondary" onClick={clearAuth}>Sign out</button>
-          </div>
-        </div>
-
-        <div className="panel">
-          <div className="panel-head">
-            <div>
-              <div className="eyebrow">Context</div>
-              <h2>Quick actions</h2>
-            </div>
-          </div>
-
-          <div className="stack compact">
-            <input value={patientIdInput} onChange={(event) => setPatientIdInput(event.target.value)} placeholder="Patient ID" />
-            <button className="secondary" onClick={() => void startSession()}>Start intake session</button>
-            <button className="secondary" onClick={() => void refreshNotifications()}>Refresh notifications</button>
-          </div>
-        </div>
-      </aside>
-
-      <main className="content">
-        <header className="topbar">
-          <div>
-            <div className="eyebrow">Workspace</div>
-            <h2>{page === 'dashboard' ? 'Patient overview' : page === 'intake' ? 'Intake and SOAP drafting' : 'Reports and prescriptions'}</h2>
-            <p>{user ? `${user.name} • ${user.email}` : 'Sign in to unlock the clinical endpoints.'}</p>
-          </div>
-          <div className="topbar-actions">
-            <button className="ghost" onClick={() => void refreshNotifications()}>Notifications</button>
-            <button className="ghost" onClick={() => void navigator.clipboard.writeText(authToken)}>Copy token</button>
-          </div>
-        </header>
-
-        {flash && <div className="flash">{flash}</div>}
-        {busy && <div className="flash subtle">{busy}...</div>}
-
-        {page === 'dashboard' && (
-          <section className="grid dashboard-grid">
-            <article className="hero-card">
-              <div className="hero-head">
-                <div>
-                  <div className="eyebrow">Patients</div>
-                  <h3>{selectedPatient?.patient_name || 'Select a patient'}</h3>
-                  <p>{selectedPatient ? `${selectedPatient.patient_email} • ${selectedPatient.visit_count} visits` : 'Choose a patient from the left panel to load history, reports, and summaries.'}</p>
-                </div>
-                <div className="hero-meta">
-                  <span className="pill">Selected {patients.length}</span>
-                  <span className="pill muted">{selectedVisit ? selectedVisit.status : 'No visit selected'}</span>
-                </div>
-              </div>
-
-              <div className="stats">
-                <div className="stat">
-                  <span>Open records</span>
-                  <strong>{history.length}</strong>
-                </div>
-                <div className="stat">
-                  <span>Reports</span>
-                  <strong>{reports.length}</strong>
-                </div>
-                <div className="stat">
-                  <span>Notifications</span>
-                  <strong>{notifications.length}</strong>
-                </div>
-              </div>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Patients</div>
-                  <h2>Doctor roster</h2>
-                </div>
-              </div>
-              <div className="table-list">
-                {patients.map((patient) => (
-                  <button
-                    key={patient.patient_id}
-                    className={`list-row ${selectedPatientId === patient.patient_id ? 'active' : ''}`}
-                    onClick={() => {
-                      setSelectedPatientId(patient.patient_id);
-                      setReportPatientId(patient.patient_id);
-                      setVisitCreationPatientId(patient.patient_id);
-                    }}
-                  >
-                    <div>
-                      <strong>{patient.patient_name}</strong>
-                      <span>{patient.patient_email}</span>
-                    </div>
-                    <div className="row-meta">
-                      <span>{patient.visit_count} visits</span>
-                      <span>{patient.last_visit_status || 'new'}</span>
-                    </div>
-                  </button>
-                ))}
-                {!patients.length && <div className="empty">No patients loaded. Sign in as a doctor to fetch /doctor/patients.</div>}
-              </div>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">History</div>
-                  <h2>Visit timeline</h2>
-                </div>
-              </div>
-              <div className="stack compact">
-                {history.map((visit) => (
-                  <button
-                    key={visit.visit_id}
-                    className={`timeline-item ${selectedVisit?.visit_id === visit.visit_id ? 'active' : ''}`}
-                    onClick={() => {
-                      setSelectedVisit(visit);
-                      setSessionIdInput(visit.session_id || '');
-                      setVisitCreationSessionId(visit.session_id || '');
-                      setPrescriptionVisitId(visit.visit_id);
-                    }}
-                  >
-                    <strong>{visit.visit_id}</strong>
-                    <span>{initialVisitSummary(visit)}</span>
-                  </button>
-                ))}
-                {!history.length && <div className="empty">The selected patient has no visit history yet.</div>}
-              </div>
-            </article>
-
-            <article className="panel wide">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">SOAP</div>
-                  <h2>Latest summary</h2>
-                </div>
-                <button className="secondary" onClick={() => selectedVisit?.session_id && void api.getSummary(selectedVisit.session_id, authToken).then((summary) => setSummaryText(formatJson(summary))).catch((error) => setSummaryText(error instanceof Error ? error.message : 'Failed'))}>Refresh</button>
-              </div>
-              <pre className="code-block">{summaryText}</pre>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Reports</div>
-                  <h2>Uploaded files</h2>
-                </div>
-              </div>
-              <div className="stack compact">
-                {reports.map((report) => (
-                  <a className="link-row" key={report.id} href={report.file_url} target="_blank" rel="noreferrer">
-                    {report.file_url}
-                  </a>
-                ))}
-                {!reports.length && <div className="empty">No reports for the selected patient.</div>}
-              </div>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Alerts</div>
-                  <h2>Notifications</h2>
-                </div>
-              </div>
-              <div className="stack compact">
-                {notifications.map((item, index) => (
-                  <div key={`${item.message}-${index}`} className="notification">
-                    <span>{item.message}</span>
-                  </div>
-                ))}
-                {!notifications.length && <div className="empty">No notifications returned by the API.</div>}
-                <input value={notificationIdInput} onChange={(event) => setNotificationIdInput(event.target.value)} placeholder="Notification ID" />
-                <button className="secondary" onClick={() => void markNotificationRead()}>Mark read</button>
-              </div>
-            </article>
           </section>
-        )}
 
-        {page === 'intake' && (
-          <section className="grid intake-grid">
-            <article className="panel wide">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Session</div>
-                  <h2>Intake chat</h2>
-                </div>
-                <button className="secondary" onClick={() => void refreshSession()}>Refresh session</button>
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Reminders</div>
+                <h2>Important soon</h2>
               </div>
-
-              <div className="split">
-                <div className="stack">
-                  <input value={sessionIdInput} onChange={(event) => setSessionIdInput(event.target.value)} placeholder="Session ID" />
-                  <input value={patientIdInput} onChange={(event) => setPatientIdInput(event.target.value)} placeholder="Patient ID" />
-                  <textarea
-                    rows={4}
-                    value={intakeMessage}
-                    onChange={(event) => setIntakeMessage(event.target.value)}
-                    placeholder="Patient response or clinical note"
-                  />
-                  <div className="row">
-                    <button className="primary" onClick={() => void sendIntakeAnswer()}>Save intake answer</button>
-                    <button className="secondary" onClick={() => void runTriage()}>Run triage</button>
-                    <button className="secondary" onClick={() => void runAI()}>Generate summary</button>
+              <button className="ghost" onClick={() => void createPatientReminder('Doctor visit in 2 days', 2)}>+ 2 days</button>
+            </div>
+            <div className="stack compact">
+              {patientReminders.map((reminder) => (
+                <div key={reminder.id} className={`reminder-row ${reminder.is_completed ? 'done' : ''}`}>
+                  <div>
+                    <span className={`badge ${isUrgent(reminder) ? 'urgent' : ''}`}>{reminderLabel(reminder)}</span>
+                    <strong>{reminder.message}</strong>
+                    <span>{formatDate(reminder.time)}</span>
                   </div>
-                  <input value={freeMessage} onChange={(event) => setFreeMessage(event.target.value)} placeholder="Follow-up chat message" />
-                  <button className="secondary" onClick={() => void sendFreeMessage()}>Send chat message</button>
                 </div>
+              ))}
+              {!patientReminders.length && <div className="empty">No reminders yet.</div>}
+            </div>
+          </section>
 
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Timeline</div>
+                <h2>Visit history</h2>
+              </div>
+            </div>
+            <div className="stack compact">
+              {patientVisits.map((visit) => (
+                <button key={visit.visit_id} className="timeline-item">
+                  <strong>{visit.doctor_name}</strong>
+                  <span>{visit.status} - {formatDate(visit.created_at)}</span>
+                </button>
+              ))}
+              {!patientVisits.length && <div className="empty">Your visits will appear here after intake is completed.</div>}
+            </div>
+          </section>
+
+          <section className="panel wide">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Questionnaire</div>
+                <h2>Chat flow timeline</h2>
+              </div>
+              {intakeOpen && <button className="ghost" onClick={() => setIntakeOpen(false)}>Hide</button>}
+            </div>
+            {intakeOpen ? (
+              <div className="split">
                 <div className="chat-card">
                   <div className="chat-log">
-                    {messages.map((message, index) => (
-                      <div key={`${message.role}-${index}`} className={`bubble ${message.role}`}>
-                        {message.text}
-                      </div>
+                    {intakeMessages.map((message, index) => (
+                      <div key={`${message.role}-${index}`} className={`bubble ${message.role}`}>{message.text}</div>
                     ))}
-                    {!messages.length && <div className="empty">Start a session to see the intake conversation here.</div>}
+                  </div>
+                  <div className="chat-compose">
+                    <textarea rows={3} value={intakeText} onChange={(event) => setIntakeText(event.target.value)} placeholder="Type your answer" />
+                    <button className="primary" onClick={() => void sendIntakeAnswer()}>Send answer</button>
                   </div>
                 </div>
+                <pre className="code-block">{formatSummary(lastSummary)}</pre>
               </div>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Structured</div>
-                  <h2>Data extracted from intake</h2>
-                </div>
-              </div>
-              <pre className="code-block">{formatJson(structuredData)}</pre>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Triage</div>
-                  <h2>Red flags</h2>
-                </div>
-              </div>
-              <pre className="code-block">{triageResult || 'No triage run yet.'}</pre>
-            </article>
-
-            <article className="panel wide">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">AI</div>
-                  <h2>Generated note</h2>
-                </div>
-              </div>
-              <pre className="code-block">{aiSummaryDraft || 'No AI summary generated yet.'}</pre>
-            </article>
-
-            <article className="panel wide">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Session Snapshot</div>
-                  <h2>Messages from the backend</h2>
-                </div>
-              </div>
-              <pre className="code-block">{formatJson(sessionSnapshot)}</pre>
-            </article>
+            ) : (
+              <div className="empty">Click Add new visit to open the questionnaire.</div>
+            )}
           </section>
-        )}
 
-        {page === 'records' && (
-          <section className="grid records-grid">
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Reports</div>
-                  <h2>Upload and browse</h2>
-                </div>
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Reports</div>
+                <h2>All reports</h2>
               </div>
-              <div className="stack compact">
-                <input value={reportPatientId} onChange={(event) => setReportPatientId(event.target.value)} placeholder="Patient ID" />
-                <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} />
-                <button className="primary" onClick={() => void uploadReport()}>Upload report</button>
-              </div>
-              <div className="stack compact">
-                {reports.map((report) => (
-                  <div className="chip" key={report.id}>{report.file_url}</div>
-                ))}
-              </div>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Visit</div>
-                  <h2>Create or close</h2>
-                </div>
-              </div>
-              <div className="stack compact">
-                <input value={visitCreationPatientId} onChange={(event) => setVisitCreationPatientId(event.target.value)} placeholder="Patient ID" />
-                <input value={visitCreationSessionId} onChange={(event) => setVisitCreationSessionId(event.target.value)} placeholder="Session ID" />
-                <button className="primary" onClick={() => void createVisit()}>Create visit</button>
-                <button className="secondary" onClick={() => void closeSelectedVisit()}>Close selected visit</button>
-              </div>
-            </article>
-
-            <article className="panel wide">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Prescription</div>
-                  <h2>Build medication orders</h2>
-                </div>
-              </div>
-              <div className="split">
-                <div className="stack">
-                  <input value={prescriptionVisitId} onChange={(event) => setPrescriptionVisitId(event.target.value)} placeholder="Visit ID" />
-                  <textarea rows={4} value={prescriptionNotes} onChange={(event) => setPrescriptionNotes(event.target.value)} placeholder="Prescription notes" />
-                  <button className="primary" onClick={() => void createPrescription()}>Create prescription</button>
-                </div>
-                <div className="stack">
-                  <input value={prescriptionId} onChange={(event) => setPrescriptionId(event.target.value)} placeholder="Prescription ID" />
-                  <input value={medicationName} onChange={(event) => setMedicationName(event.target.value)} placeholder="Medicine name" />
-                  <input value={dosage} onChange={(event) => setDosage(event.target.value)} placeholder="Dosage" />
-                  <input value={duration} onChange={(event) => setDuration(event.target.value)} placeholder="Duration" />
-                  <input value={frequency} onChange={(event) => setFrequency(event.target.value)} placeholder="Frequency" />
-                  <div className="row">
-                    <button className="primary" onClick={() => void addMedication()}>Add item</button>
-                    <button className="secondary" onClick={() => void runRisk()}>Run risk check</button>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Reminders</div>
-                  <h2>Follow-up tasks</h2>
-                </div>
-              </div>
-              <div className="stack compact">
-                <input value={reminderUserId} onChange={(event) => setReminderUserId(event.target.value)} placeholder="User ID" />
-                <input value={reminderTime} onChange={(event) => setReminderTime(event.target.value)} type="datetime-local" />
-                <textarea rows={3} value={reminderMessage} onChange={(event) => setReminderMessage(event.target.value)} placeholder="Reminder message" />
-                <button className="primary" onClick={() => void createReminder()}>Create reminder</button>
-              </div>
-              <div className="stack compact" style={{ marginTop: 12 }}>
-                {reminders.map((reminder) => (
-                  <div key={reminder.id} className={`reminder-row ${reminder.is_completed ? 'done' : ''}`}>
-                    <div>
-                      <strong>{reminder.message}</strong>
-                      <span>{new Date(reminder.time).toLocaleString()}</span>
-                    </div>
-                    <div className="row">
-                      <button className="secondary" onClick={() => void completeReminder(reminder.id)} disabled={reminder.is_completed}>
-                        {reminder.is_completed ? 'Completed' : 'Complete'}
-                      </button>
-                      <button className="ghost" onClick={() => void removeReminder(reminder.id)}>Delete</button>
-                    </div>
-                  </div>
-                ))}
-                {!reminders.length && <div className="empty">No reminders for this user yet.</div>}
-              </div>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Feedback</div>
-                  <h2>Visit rating</h2>
-                </div>
-              </div>
-              <div className="stack compact">
-                <input value={selectedVisit?.visit_id || ''} readOnly placeholder="Selected visit ID" />
-                <input value={feedbackRating} onChange={(event) => setFeedbackRating(event.target.value)} type="number" min="1" max="5" />
-                <textarea rows={4} value={feedbackComments} onChange={(event) => setFeedbackComments(event.target.value)} placeholder="Comments" />
-                <button className="primary" onClick={() => void submitFeedback()}>Submit feedback</button>
-              </div>
-              <pre className="code-block" style={{ minHeight: 160 }}>{feedbackSnapshot || 'No feedback loaded yet.'}</pre>
-            </article>
-
-            <article className="panel">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Risk</div>
-                  <h2>Therapy interactions</h2>
-                </div>
-              </div>
-              <pre className="code-block">{riskResult || 'No risk check yet.'}</pre>
-              <button className="secondary" onClick={() => void refreshVisitRisk()}>Load saved risk record</button>
-              <pre className="code-block" style={{ minHeight: 140 }}>{visitRiskSnapshot || 'No saved risk record loaded.'}</pre>
-            </article>
-
-            <article className="panel wide">
-              <div className="panel-head">
-                <div>
-                  <div className="eyebrow">Selected</div>
-                  <h2>Current visit details</h2>
-                </div>
-                {selectedVisit && (
-                  <button className="secondary" onClick={() => void api.getVisit(selectedVisit.visit_id, authToken).then(setSelectedVisit).catch((error) => setFlash(error instanceof Error ? error.message : 'Could not load visit'))}>Load full record</button>
-                )}
-              </div>
-              <pre className="code-block">{formatJson(selectedVisit)}</pre>
-              <pre className="code-block" style={{ minHeight: 180 }}>{prescriptionSnapshot || 'No prescription loaded yet.'}</pre>
-            </article>
+            </div>
+            <div className="stack compact">
+              <input type="file" onChange={(event) => setReportFile(event.target.files?.[0] || null)} />
+              <button className="secondary" onClick={() => void uploadPatientReport()} disabled={!reportFile}>Upload report</button>
+              {patientReports.map((report) => (
+                <a className="link-row" key={report.id} href={report.file_url} target="_blank" rel="noreferrer">{report.file_url}</a>
+              ))}
+              {!patientReports.length && <div className="empty">No reports uploaded yet.</div>}
+            </div>
           </section>
-        )}
-      </main>
+
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Prescriptions</div>
+                <h2>All prescriptions</h2>
+              </div>
+            </div>
+            <div className="stack compact">
+              {patientPrescriptions.map((prescription) => (
+                <div className="record-card" key={prescription.id}>
+                  <strong>{prescription.notes || 'Prescription'}</strong>
+                  <span>{formatDate(prescription.created_at)}</span>
+                  {prescription.items.map((item) => (
+                    <span key={item.id}>{item.medicine_name} - {item.dosage} - {item.frequency} - {item.duration}</span>
+                  ))}
+                </div>
+              ))}
+              {!patientPrescriptions.length && <div className="empty">No prescriptions yet.</div>}
+            </div>
+          </section>
+
+          <section className="panel wide">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Profile</div>
+                <h2>Lookup and edit details</h2>
+              </div>
+              <span className="pill">{patientProfile?.allergies ? 'Allergies recorded' : 'No allergy details'}</span>
+            </div>
+            <form className="profile-grid" onSubmit={saveProfile}>
+              <input value={profileForm.name} onChange={(event) => setProfileForm({ ...profileForm, name: event.target.value })} placeholder="Name" />
+              <input value={profileForm.email} onChange={(event) => setProfileForm({ ...profileForm, email: event.target.value })} placeholder="Email" />
+              <input value={profileForm.phone} onChange={(event) => setProfileForm({ ...profileForm, phone: event.target.value })} placeholder="Phone" />
+              <input value={profileForm.age} onChange={(event) => setProfileForm({ ...profileForm, age: event.target.value })} placeholder="Age" />
+              <input value={profileForm.gender} onChange={(event) => setProfileForm({ ...profileForm, gender: event.target.value })} placeholder="Gender" />
+              <textarea rows={3} value={profileForm.allergies} onChange={(event) => setProfileForm({ ...profileForm, allergies: event.target.value })} placeholder="Allergies" />
+              <textarea rows={3} value={profileForm.chronic_conditions} onChange={(event) => setProfileForm({ ...profileForm, chronic_conditions: event.target.value })} placeholder="Chronic conditions" />
+              <button className="primary" type="submit">Save profile</button>
+            </form>
+          </section>
+        </main>
+      ) : (
+        <main className="grid doctor-grid">
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Patients</div>
+                <h2>Select patient</h2>
+              </div>
+            </div>
+            <div className="table-list">
+              {patients.map((patient) => (
+                <button
+                  key={patient.patient_id}
+                  className={`list-row ${selectedPatientId === patient.patient_id ? 'active' : ''}`}
+                  onClick={() => setSelectedPatientId(patient.patient_id)}
+                >
+                  <strong>{patient.patient_name}</strong>
+                  <span>{patient.patient_email}</span>
+                  <span>{patient.visit_count} visits</span>
+                </button>
+              ))}
+              {!patients.length && <div className="empty">No patients yet. Completed patient visits will appear here.</div>}
+            </div>
+          </section>
+
+          <section className="hero-card">
+            <div className="hero-head">
+              <div>
+                <div className="eyebrow">Selected patient</div>
+                <h2>{selectedPatient?.patient_name || 'No patient selected'}</h2>
+                <p>{selectedPatient ? `${selectedPatient.patient_email} - ${selectedPatient.visit_count} visits` : 'Choose a patient to load timeline and SOAP summaries.'}</p>
+              </div>
+              <span className="pill">{selectedVisit?.status || 'No visit'}</span>
+            </div>
+            <div className="stats">
+              <div className="stat"><span>Visits</span><strong>{doctorHistory.length}</strong></div>
+              <div className="stat"><span>Red flags</span><strong>{sessionSnapshot?.status === 'urgent' ? 1 : 0}</strong></div>
+              <div className="stat"><span>Messages</span><strong>{sessionSnapshot?.messages.length || 0}</strong></div>
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Timeline</div>
+                <h2>Visit timeline</h2>
+              </div>
+            </div>
+            <div className="stack compact">
+              {doctorHistory.map((visit) => (
+                <button
+                  key={visit.visit_id}
+                  className={`timeline-item ${selectedVisit?.visit_id === visit.visit_id ? 'active' : ''}`}
+                  onClick={() => setSelectedVisit(visit)}
+                >
+                  <strong>{visit.doctor_name}</strong>
+                  <span>{visit.status} - {formatDate(visit.created_at)}</span>
+                </button>
+              ))}
+              {!doctorHistory.length && <div className="empty">No visit history for this patient.</div>}
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Urgent red flags</div>
+                <h2>Triage state</h2>
+              </div>
+            </div>
+            <div className={`alert-card ${sessionSnapshot?.status === 'urgent' ? 'urgent' : ''}`}>
+              <strong>{sessionSnapshot?.status || 'No session loaded'}</strong>
+              <span>{sessionSnapshot?.status === 'urgent' ? 'Immediate medical evaluation recommended.' : 'No urgent state returned for this visit.'}</span>
+            </div>
+          </section>
+
+          <section className="panel wide">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">SOAP</div>
+                <h2>Summary for selected visit</h2>
+              </div>
+            </div>
+            <pre className="code-block">{formatSummary(doctorSummary)}</pre>
+          </section>
+
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Follow-up</div>
+                <h2>Schedule reminder</h2>
+              </div>
+            </div>
+            <div className="stack compact">
+              <input type="datetime-local" value={doctorReminderTime} onChange={(event) => setDoctorReminderTime(event.target.value)} />
+              <textarea rows={3} value={doctorReminderMessage} onChange={(event) => setDoctorReminderMessage(event.target.value)} />
+              <button className="primary" onClick={() => void scheduleFollowUp()} disabled={!selectedPatientId}>Schedule follow-up</button>
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Prescription</div>
+                <h2>Write prescription</h2>
+              </div>
+            </div>
+            <div className="stack compact">
+              <textarea rows={3} value={prescriptionNotes} onChange={(event) => setPrescriptionNotes(event.target.value)} />
+              <button className="secondary" onClick={() => void createPrescription()} disabled={!selectedVisit}>Create prescription</button>
+              <input value={prescriptionId} onChange={(event) => setPrescriptionId(event.target.value)} placeholder="Prescription ID after creation" />
+              <input value={medicationName} onChange={(event) => setMedicationName(event.target.value)} placeholder="Medicine" />
+              <input value={dosage} onChange={(event) => setDosage(event.target.value)} placeholder="Dosage" />
+              <input value={frequency} onChange={(event) => setFrequency(event.target.value)} placeholder="Frequency" />
+              <input value={duration} onChange={(event) => setDuration(event.target.value)} placeholder="Duration" />
+              <button className="primary" onClick={() => void addMedication()} disabled={!prescriptionId}>Add medication</button>
+            </div>
+          </section>
+
+          <section className="panel wide">
+            <div className="panel-head">
+              <div>
+                <div className="eyebrow">Profile</div>
+                <h2>Doctor profile</h2>
+              </div>
+            </div>
+            <div className="record-card">
+              <strong>{user.name}</strong>
+              <span>{user.email}</span>
+              <span>{user.phone || 'No phone number added'}</span>
+            </div>
+          </section>
+        </main>
+      )}
     </div>
   );
 }

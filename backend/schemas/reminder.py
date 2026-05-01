@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 
 class ReminderCreate(BaseModel):
-    user_id: str
+    user_id: str | None = None
     message: str
 
     time: datetime
