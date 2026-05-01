@@ -12,8 +12,6 @@ import {
   EmergencyHospital,
   Notification,
   PatientProfile,
-  PatientPublicProfile,
-  DoctorProfile,
   Prescription,
   PrescriptionItem,
   Reminder,
@@ -113,7 +111,7 @@ function openStatus(hospital: EmergencyHospital) {
   return hospital.opening_hours ? `Hours: ${hospital.opening_hours}` : 'Open status not listed';
 }
 
-function PublicProfileView({ profile, loading }: { profile: PatientPublicProfile | null, loading: boolean }) {
+function PublicProfileView({ profile, loading }: { profile: PublicProfile | null, loading: boolean }) {
   if (loading) return <div className="auth-loading panel">Loading profile...</div>;
   if (!profile) return <div className="auth-loading panel">Profile not found or link expired.</div>;
 
@@ -167,25 +165,26 @@ function PublicProfileView({ profile, loading }: { profile: PatientPublicProfile
 
 function App() {
   const isPublicRoute = window.location.pathname.startsWith('/public-profile/');
-  const publicProfileId = isPublicRoute ? window.location.pathname.split('/').pop() : null;
+  const routeProfileId = isPublicRoute ? window.location.pathname.split('/').pop() : null;
 
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
   const [doctorProfile, setDoctorProfile] = useState<DoctorProfile | null>(null);
 
-  const [publicProfile, setPublicProfile] = useState<PatientPublicProfile | null>(null);
+  const [publicProfileId, setPublicProfileId] = useState<string | null>(null);
+  const [publicProfile, setPublicProfile] = useState<PublicProfile | null>(null);
   const [publicLoading, setPublicLoading] = useState(isPublicRoute);
   const [showQR, setShowQR] = useState(false);
 
   useEffect(() => {
-    if (isPublicRoute && publicProfileId) {
-      api.getPublicProfile(publicProfileId)
+    if (isPublicRoute && routeProfileId) {
+      api.getPublicProfile(routeProfileId)
         .then(setPublicProfile)
         .catch((err) => setFlash(err.message))
         .finally(() => setPublicLoading(false));
     }
-  }, [isPublicRoute, publicProfileId]);
+  }, [isPublicRoute, routeProfileId]);
 
   if (isPublicRoute) {
     return <PublicProfileView profile={publicProfile} loading={publicLoading} />;
@@ -267,9 +266,6 @@ function App() {
     return value.toISOString().slice(0, 16);
   });
   const [doctorReminderMessage, setDoctorReminderMessage] = useState('Doctor visit in 2 days');
-  const [showQR, setShowQR] = useState(false);
-  const [publicProfileId, setPublicProfileId] = useState<string | null>(null);
-  const [publicProfile, setPublicProfile] = useState<PublicProfile | null>(null);
 
   const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
   const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
