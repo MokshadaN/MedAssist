@@ -11,6 +11,7 @@ from core.dependencies import get_current_user, require_roles
 from models.report import Report
 from schemas.report import ReportOut
 from services import report_service
+from services.report_analyzer_service import analyze_report_image, serialize_report_analysis
 from core.database import SessionLocal
 
 UPLOAD_DIR = Path(__file__).resolve().parents[4] / "uploads" / "reports"
@@ -46,13 +47,20 @@ def upload_report(
             shutil.copyfileobj(file.file, buffer)
 
         file_url = f"/api/v1/reports/download/{safe_name}"
-        
+
+        parsed_data = None
+        if file.content_type and file.content_type.lower().startswith("image/"):
+            analysis = analyze_report_image(disk_path)
+            parsed_data = serialize_report_analysis(analysis)
+        else:
+            parsed_data = "Uploaded file is not an image; report analysis skipped."
+
         # Save report record in database via service
         report = report_service.save_report(
             db, 
             patient_id=patient_id, 
             file_url=file_url,
-            parsed_data="Sample parsed data from report" # Placeholder for OCR/AI processing
+            parsed_data=parsed_data
         )
         return report
     except HTTPException:
@@ -99,3 +107,28 @@ def get_reports(patient_id: str, db: Session = Depends(get_db)):
     """
     reports = report_service.get_reports(db, patient_id=patient_id)
     return reports
+
+
+@router.delete("/{report_id}")
+def delete_report(
+    report_id: str,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    report = db.query(Report).filter(Report.id == report_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    if current_user.role == "patient" and report.patient_id != current_user.id:
+        raise HTTPException(status_code=403, detail="You can only delete your own reports")
+
+    if current_user.role not in {"patient", "doctor"}:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    disk_name = Path(report.file_url).name
+    disk_path = UPLOAD_DIR / disk_name
+    if disk_path.exists():
+        disk_path.unlink()
+
+    report_service.delete_report(db, report)
+    return {"status": "deleted", "report_id": report_id}

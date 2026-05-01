@@ -16,6 +16,7 @@ export type PatientProfile = {
   gender?: string | null;
   allergies?: string | null;
   chronic_conditions?: string | null;
+  address?: string | null;
 };
 
 export type DoctorProfile = {
@@ -43,10 +44,9 @@ export type ProfileUpdate = {
   gender?: string;
   allergies?: string;
   chronic_conditions?: string;
+  address?: string;
   specialization?: string;
-  license_number?: string;
-  experience_years?: number;
-  hospital_affiliation?: string;
+
 };
 
 export type DoctorDirectoryItem = {
@@ -88,6 +88,15 @@ export type IntakeStart = {
   initial_question?: string | null;
 };
 
+export type EmergencyHospital = {
+  name: string;
+  phone?: string | null;
+  address?: string | null;
+  distance_meters?: number | null;
+  opening_hours?: string | null;
+  is_open?: boolean | null;
+};
+
 export type IntakeResponse = {
   session_id: string;
   status: string;
@@ -100,6 +109,8 @@ export type IntakeResponse = {
   comparison?: Record<string, unknown> | null;
   summary_id?: string | null;
   matched_terms?: string[];
+  nearest_hospitals?: EmergencyHospital[];
+  emergency_message?: string | null;
 };
 
 export type AISummary = {
@@ -115,6 +126,7 @@ export type AISummary = {
 export type ReportOut = {
   id: string;
   file_url: string;
+  parsed_data?: string | null;
 };
 
 export type SessionState = {
@@ -173,21 +185,6 @@ export type Reminder = {
   is_completed: boolean;
   created_at: string;
   updated_at: string;
-};
-
-export type PublicProfile = {
-  name: string;
-  age?: number | null;
-  gender?: string | null;
-  allergies?: string | null;
-  chronic_conditions?: string | null;
-  medications: Array<{
-    medicine_name: string;
-    dosage: string;
-    duration: string;
-    frequency: string;
-    prescribed_on: string;
-  }>;
 };
 
 type RequestOptions = RequestInit & {
@@ -274,6 +271,7 @@ export const api = {
     gender?: string;
     allergies?: string;
     chronic_conditions?: string;
+    address?: string;
   }) {
     return request<AuthContext>(`/auth/register/patient`, {
       method: 'POST',
@@ -342,6 +340,12 @@ export const api = {
       method: 'POST',
       token,
       body: form,
+    });
+  },
+  deleteReport(reportId: string, token: string) {
+    return request<{ status: string; report_id: string }>(`/reports/${encodeURIComponent(reportId)}`, {
+      method: 'DELETE',
+      token,
     });
   },
   createVisit(patientId: string, sessionId: string, token: string) {
@@ -438,9 +442,6 @@ export const api = {
     return request<{ status: string }>(`/reminders/${encodeURIComponent(reminderId)}`, {
       method: 'DELETE',
     });
-  },
-  getPublicProfile(patientId: string) {
-    return request<PublicProfile>(`/patient/public-profile/${patientId}`);
   },
 };
 

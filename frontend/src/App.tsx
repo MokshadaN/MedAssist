@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
-import { QRCodeCanvas } from 'qrcode.react';
 import {
   api,
   AISummary,
@@ -8,18 +7,20 @@ import {
   DoctorDirectoryItem,
   DoctorPatient,
   DoctorVisit,
+  DoctorProfile,
+  EmergencyHospital,
   Notification,
   PatientProfile,
-  DoctorProfile,
   Prescription,
+  PrescriptionItem,
   Reminder,
   SessionState,
   API_BASE,
-  PublicProfile,
 } from './api';
 
 type AuthMode = 'login' | 'register-doctor' | 'register-patient';
 type ChatMessage = { role: 'assistant' | 'user'; text: string };
+type FrequencyOption = 'once' | 'twice' | 'thrice';
 
 const emptyProfile: PatientProfile = {
   id: '',
@@ -28,6 +29,7 @@ const emptyProfile: PatientProfile = {
   gender: '',
   allergies: '',
   chronic_conditions: '',
+  address: '',
 };
 
 function formatDate(value?: string | null) {
@@ -43,6 +45,35 @@ function formatSummary(summary?: AISummary | null) {
     `Assessment: ${summary.assessment || 'Not documented'}`,
     `Plan: ${summary.plan || 'Not documented'}`,
   ].join('\n\n');
+}
+
+function formatReportAnalysis(parsedData?: string | null) {
+  if (!parsedData) return '';
+
+  try {
+    const data = JSON.parse(parsedData) as Record<string, unknown>;
+    const metadata = (data.report_metadata && typeof data.report_metadata === 'object')
+      ? (data.report_metadata as Record<string, unknown>)
+      : {};
+    const summary = (data.clinical_summary && typeof data.clinical_summary === 'object')
+      ? (data.clinical_summary as Record<string, unknown>)
+      : {};
+    const metrics = Array.isArray(data.detailed_metrics) ? data.detailed_metrics : [];
+    const reportType = typeof metadata.report_type === 'string' ? metadata.report_type : 'unknown';
+    const reportDate = typeof metadata.date_of_report === 'string' ? metadata.date_of_report : 'unknown';
+    const abnormal = Array.isArray(summary.abnormal_parameters) ? summary.abnormal_parameters : [];
+    const snapshot = typeof summary.overall_clinical_snapshot === 'string' ? summary.overall_clinical_snapshot : '';
+
+    return [
+      `Report type: ${reportType}`,
+      `Date: ${reportDate}`,
+      abnormal.length ? `Abnormal parameters: ${abnormal.join(', ')}` : 'Abnormal parameters: none',
+      metrics.length ? `Metrics extracted: ${metrics.length}` : 'Metrics extracted: 0',
+      snapshot ? `Snapshot: ${snapshot}` : '',
+    ].join('\n');
+  } catch {
+    return parsedData;
+  }
 }
 
 function reminderLabel(reminder: Reminder) {
@@ -63,6 +94,18 @@ function isUrgent(reminder: Reminder) {
   return text.includes('urgent') || reminderLabel(reminder) === 'Overdue' || reminderLabel(reminder) === 'Due today';
 }
 
+function formatDistance(meters?: number | null) {
+  if (!meters && meters !== 0) return 'Distance unavailable';
+  if (meters >= 1000) return `${(meters / 1000).toFixed(1)} km away`;
+  return `${Math.round(meters)} m away`;
+}
+
+function openStatus(hospital: EmergencyHospital) {
+  if (hospital.is_open === true) return 'Open now';
+  if (hospital.is_open === false) return 'May be closed';
+  return hospital.opening_hours ? `Hours: ${hospital.opening_hours}` : 'Open status not listed';
+}
+
 function App() {
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -77,7 +120,7 @@ function App() {
   const [doctors, setDoctors] = useState<DoctorDirectoryItem[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
   const [patientVisits, setPatientVisits] = useState<DoctorVisit[]>([]);
-  const [patientReports, setPatientReports] = useState<Array<{ id: string; file_url: string }>>([]);
+  const [patientReports, setPatientReports] = useState<Array<{ id: string; file_url: string; parsed_data?: string | null }>>([]);
   const [patientPrescriptions, setPatientPrescriptions] = useState<Prescription[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [patientReminders, setPatientReminders] = useState<Reminder[]>([]);
@@ -99,7 +142,10 @@ function App() {
   const recordingBaseTextRef = useRef('');
   const [structuredData, setStructuredData] = useState<Record<string, unknown> | null>(null);
   const [lastSummary, setLastSummary] = useState<AISummary | null>(null);
+  const [emergencyHospitals, setEmergencyHospitals] = useState<EmergencyHospital[]>([]);
+  const [emergencyMessage, setEmergencyMessage] = useState('');
   const [isSendingIntake, setIsSendingIntake] = useState(false);
+
 
   const [profileForm, setProfileForm] = useState({
     name: '',
@@ -109,16 +155,15 @@ function App() {
     gender: '',
     allergies: '',
     chronic_conditions: '',
+    address: '',
     specialization: '',
-    license_number: '',
-    experience_years: '',
-    hospital_affiliation: '',
+
   });
 
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
   const [doctorHistory, setDoctorHistory] = useState<DoctorVisit[]>([]);
-  const [doctorReports, setDoctorReports] = useState<Array<{ id: string; file_url: string }>>([]);
+  const [doctorReports, setDoctorReports] = useState<Array<{ id: string; file_url: string; parsed_data?: string | null }>>([]);
   const [doctorReminders, setDoctorReminders] = useState<Reminder[]>([]);
   const [doctorReminderStatus, setDoctorReminderStatus] = useState('');
   const [selectedVisit, setSelectedVisit] = useState<DoctorVisit | null>(null);
@@ -127,18 +172,20 @@ function App() {
   const [prescriptionNotes, setPrescriptionNotes] = useState('Continue current therapy and monitor response.');
   const [prescriptionId, setPrescriptionId] = useState('');
   const [medicationName, setMedicationName] = useState('');
+  const [medicineType, setMedicineType] = useState<'tablet' | 'syrup'>('tablet');
   const [dosage, setDosage] = useState('');
+  const [syrupQuantity, setSyrupQuantity] = useState('');
   const [duration, setDuration] = useState('');
-  const [frequency, setFrequency] = useState('');
+  const [frequency, setFrequency] = useState<FrequencyOption>('once');
+  const [customInstructions, setCustomInstructions] = useState('');
+  const [prescriptionDraftStatus, setPrescriptionDraftStatus] = useState('');
+  const [currentPrescriptionItems, setCurrentPrescriptionItems] = useState<PrescriptionItem[]>([]);
   const [doctorReminderTime, setDoctorReminderTime] = useState(() => {
     const value = new Date();
     value.setDate(value.getDate() + 2);
     return value.toISOString().slice(0, 16);
   });
   const [doctorReminderMessage, setDoctorReminderMessage] = useState('Doctor visit in 2 days');
-  const [showQR, setShowQR] = useState(false);
-  const [publicProfileId, setPublicProfileId] = useState<string | null>(null);
-  const [publicProfile, setPublicProfile] = useState<PublicProfile | null>(null);
 
   const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
   const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
@@ -165,10 +212,9 @@ function App() {
       gender: context.patient_profile?.gender || '',
       allergies: context.patient_profile?.allergies || '',
       chronic_conditions: context.patient_profile?.chronic_conditions || '',
+      address: context.patient_profile?.address || '',
       specialization: context.doctor_profile?.specialization || '',
-      license_number: context.doctor_profile?.license_number || '',
-      experience_years: String(context.doctor_profile?.experience_years || ''),
-      hospital_affiliation: context.doctor_profile?.hospital_affiliation || '',
+
     });
   };
 
@@ -198,17 +244,6 @@ function App() {
       active = false;
     };
   }, [authToken]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const profileId = params.get('profile');
-    if (profileId) {
-      setPublicProfileId(profileId);
-      api.getPublicProfile(profileId)
-        .then(setPublicProfile)
-        .catch((err) => setFlash(`Error loading profile: ${err.message}`));
-    }
-  }, []);
 
   const refreshNotifications = async () => {
     if (!authToken) return;
@@ -356,6 +391,7 @@ function App() {
           gender: String(data.get('gender') || ''),
           allergies: String(data.get('allergies') || ''),
           chronic_conditions: String(data.get('chronic_conditions') || ''),
+          address: String(data.get('address') || ''),
         });
       }
 
@@ -384,6 +420,7 @@ function App() {
     setMedicationStatus('');
     setNotificationStatus('');
     setDoctorReminderStatus('');
+    setPrescriptionDraftStatus('');
   };
 
   const startPatientVisit = async () => {
@@ -395,6 +432,8 @@ function App() {
       setIntakeMessages(started.initial_question ? [{ role: 'assistant', text: started.initial_question }] : []);
       setStructuredData(null);
       setLastSummary(null);
+      setEmergencyHospitals([]);
+      setEmergencyMessage('');
       setIntakeOpen(true);
       setIntakeStatus('Intake started');
     } catch (error) {
@@ -494,6 +533,10 @@ function App() {
       setIntakeText('');
       setIsVoiceInput(false);
       if (response.structured_data) setStructuredData(response.structured_data);
+      if (response.status === 'urgent') {
+        setEmergencyHospitals(response.nearest_hospitals || []);
+        setEmergencyMessage(response.emergency_message || response.message);
+      }
 
       if (response.status === 'complete') {
         const visit = await api.createPatientVisit(selectedDoctorId, response.session_id, authToken);
@@ -514,32 +557,24 @@ function App() {
 
   const saveProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!authToken || !user) return;
+    if (!authToken) return;
     setBusy('Saving profile');
     try {
-      const payload: ProfileUpdate = {
-        name: profileForm.name || undefined,
-        email: profileForm.email || undefined,
-        phone: profileForm.phone || undefined,
-      };
+      const context = await api.updateMe(
+        {
+          name: profileForm.name,
+          email: profileForm.email,
+          phone: profileForm.phone,
+          age: Number(profileForm.age || 0) || undefined,
+          gender: profileForm.gender,
+          allergies: profileForm.allergies,
+          chronic_conditions: profileForm.chronic_conditions,
+          address: profileForm.address,
+          specialization: profileForm.specialization,
 
-      if (user.role === 'patient') {
-        Object.assign(payload, {
-          age: profileForm.age ? Number(profileForm.age) : undefined,
-          gender: profileForm.gender || undefined,
-          allergies: profileForm.allergies || undefined,
-          chronic_conditions: profileForm.chronic_conditions || undefined,
-        });
-      } else if (user.role === 'doctor') {
-        Object.assign(payload, {
-          specialization: profileForm.specialization || undefined,
-          license_number: profileForm.license_number || undefined,
-          experience_years: profileForm.experience_years ? Number(profileForm.experience_years) : undefined,
-          hospital_affiliation: profileForm.hospital_affiliation || undefined,
-        });
-      }
-
-      const context = await api.updateMe(payload, authToken);
+        },
+        authToken,
+      );
       setAuthContext(context);
       setProfileStatus('Profile updated');
     } catch (error) {
@@ -553,12 +588,32 @@ function App() {
     if (!authToken || !user || !reportFile) return;
     setBusy('Uploading report');
     try {
-      await api.uploadReport(user.id, reportFile, authToken);
+      const uploaded = await api.uploadReport(user.id, reportFile, authToken);
       setPatientReports(await api.listReports(user.id, authToken));
       setReportFile(null);
-      setReportStatus('Report uploaded');
+      const analysisSummary = formatReportAnalysis(uploaded.parsed_data);
+      setReportStatus(analysisSummary ? `Report uploaded. ${analysisSummary.split('\n')[0]}` : 'Report uploaded');
     } catch (error) {
       setReportStatus(error instanceof Error ? error.message : 'Upload failed');
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const deleteReport = async (reportId: string) => {
+    if (!authToken || !user) return;
+    if (!window.confirm('Delete this uploaded report?')) return;
+    setBusy('Deleting report');
+    try {
+      await api.deleteReport(reportId, authToken);
+      if (user.role === 'doctor' && selectedPatientId) {
+        setDoctorReports(await api.listPatientReports(selectedPatientId, authToken));
+      } else {
+        setPatientReports(await api.listReports(user.id, authToken));
+      }
+      setReportStatus('Report deleted');
+    } catch (error) {
+      setReportStatus(error instanceof Error ? error.message : 'Delete failed');
     } finally {
       setBusy('');
     }
@@ -647,6 +702,7 @@ function App() {
     try {
       const prescription = await api.createPrescription(selectedVisit.visit_id, prescriptionNotes, authToken);
       setPrescriptionId(prescription.id);
+      setCurrentPrescriptionItems(prescription.items || []);
       setPrescriptionStatus('Prescription created');
     } catch (error) {
       setPrescriptionStatus(error instanceof Error ? error.message : 'Could not create prescription');
@@ -659,15 +715,30 @@ function App() {
     if (!authToken || !prescriptionId) return;
     setBusy('Adding medication');
     try {
-      await api.addPrescriptionItem(
+      const dosageValue =
+        medicineType === 'syrup'
+          ? `${syrupQuantity.trim() || 'Quantity not specified'}`
+          : dosage.trim();
+      const medicineLabel = customInstructions.trim()
+        ? `${medicationName} (${customInstructions.trim()})`
+        : medicationName;
+      const newItem = await api.addPrescriptionItem(
         prescriptionId,
-        { medicine_name: medicationName, dosage, duration, frequency },
+        {
+          medicine_name: medicineLabel,
+          dosage: dosageValue,
+          duration,
+          frequency: frequency === 'once' ? '1 time/day' : frequency === 'twice' ? '2 times/day' : '3 times/day',
+        },
         authToken,
       );
+      setCurrentPrescriptionItems((current) => [...current, newItem]);
       setMedicationName('');
       setDosage('');
+      setSyrupQuantity('');
       setDuration('');
-      setFrequency('');
+      setFrequency('once');
+      setCustomInstructions('');
       setMedicationStatus('Medication added');
     } catch (error) {
       setMedicationStatus(error instanceof Error ? error.message : 'Could not add medication');
@@ -690,69 +761,6 @@ function App() {
       setDoctorReminderStatus(error instanceof Error ? error.message : 'Could not schedule follow-up');
     }
   };
-
-  if (publicProfileId) {
-    return (
-      <main className="auth-shell public-profile-view">
-        <section className="panel wide profile-card">
-          <div className="panel-head">
-            <div>
-              <div className="eyebrow">Medical Profile</div>
-              <h2>{publicProfile?.name || 'Loading profile...'}</h2>
-            </div>
-            <button className="ghost" onClick={() => (window.location.href = '/')}>Close</button>
-          </div>
-
-          {!publicProfile ? (
-            <div className="empty">Fetching patient information...</div>
-          ) : (
-            <div className="grid grid-2" style={{ marginTop: '1.5rem' }}>
-              <div className="stack">
-                <div className="eyebrow">Personal Details</div>
-                <div className="record-card">
-                  <div className="stat-mini"><span>Age</span><strong>{publicProfile.age || '--'}</strong></div>
-                  <div className="stat-mini"><span>Gender</span><strong>{publicProfile.gender || '--'}</strong></div>
-                </div>
-
-                <div className="eyebrow" style={{ marginTop: '1.5rem' }}>Medical Alerts</div>
-                <div className="alert-card urgent">
-                  <strong>Allergies</strong>
-                  <p>{publicProfile.allergies || 'No known allergies reported.'}</p>
-                </div>
-                <div className="alert-card" style={{ marginTop: '1rem' }}>
-                  <strong>Chronic Conditions</strong>
-                  <p>{publicProfile.chronic_conditions || 'No chronic conditions reported.'}</p>
-                </div>
-              </div>
-
-              <div className="stack">
-                <div className="eyebrow">Current Medications</div>
-                <div className="medication-list-public">
-                  {publicProfile.medications.map((med, i) => (
-                    <div key={i} className="record-card" style={{ marginBottom: '0.75rem' }}>
-                      <strong style={{ color: '#fff' }}>{med.medicine_name}</strong>
-                      <div className="pill-group" style={{ marginTop: '0.25rem' }}>
-                        <span className="pill">{med.dosage}</span>
-                        <span className="pill">{med.frequency}</span>
-                        <span className="pill">{med.duration}</span>
-                      </div>
-                      <small style={{ display: 'block', marginTop: '0.5rem', opacity: 0.7 }}>
-                        Prescribed: {new Date(med.prescribed_on).toLocaleDateString()}
-                      </small>
-                    </div>
-                  ))}
-                  {!publicProfile.medications.length && <div className="empty">No active medications found.</div>}
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
-        <footer style={{ marginTop: '2rem', textAlign: 'center', opacity: 0.6 }}>
-          <p>MedAssist Secure Patient Sharing • {new Date().getFullYear()}</p>
-        </footer>
-      </main>
-    );
-  }
 
   if (!authReady) {
     return <div className="auth-loading panel">Loading MedAssist...</div>;
@@ -791,6 +799,7 @@ function App() {
             {authMode !== 'login' && <input name="phone" placeholder="Phone number" />}
             {authMode === 'register-patient' && (
               <>
+                <input name="address" placeholder="Address" required />
                 <input name="age" type="number" placeholder="Age" />
                 <input name="gender" placeholder="Gender" />
                 <input name="allergies" placeholder="Allergies" />
@@ -893,6 +902,10 @@ function App() {
                     <input value={profileForm.gender} onChange={(e) => setProfileForm({ ...profileForm, gender: e.target.value })} placeholder="Enter gender" />
                   </label>
                   <label className="field">
+                    <span>Address</span>
+                    <textarea rows={2} value={profileForm.address} onChange={(e) => setProfileForm({ ...profileForm, address: e.target.value })} placeholder="Enter your full address" />
+                  </label>
+                  <label className="field">
                     <span>Allergies</span>
                     <textarea rows={2} value={profileForm.allergies} onChange={(e) => setProfileForm({ ...profileForm, allergies: e.target.value })} placeholder="Example: Penicillin" />
                   </label>
@@ -900,23 +913,9 @@ function App() {
                     <span>Chronic Conditions</span>
                     <textarea rows={2} value={profileForm.chronic_conditions} onChange={(e) => setProfileForm({ ...profileForm, chronic_conditions: e.target.value })} placeholder="Example: Diabetes" />
                   </label>
+
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
                   {profileStatus && <div className="flash subtle">{profileStatus}</div>}
-
-                  <button className="secondary" type="button" style={{ width: '100%', marginTop: '1rem' }} onClick={() => setShowQR(!showQR)}>
-                    {showQR ? 'Hide QR Profile' : 'Show QR Profile'}
-                  </button>
-
-                  {showQR && patientProfile && (
-                    <div className="qr-container animate-in" style={{ marginTop: '1rem', background: '#fff', padding: '1.25rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}>
-                      <QRCodeCanvas
-                        value={`${window.location.origin}${window.location.pathname}?profile=${patientProfile.id}`}
-                        size={160}
-                        style={{ borderRadius: '8px' }}
-                      />
-                      <p style={{ color: '#1a1a1a', fontSize: '0.85rem', fontWeight: 600, marginTop: '0.75rem', textAlign: 'center' }}>Scan to share summary</p>
-                    </div>
-                  )}
                 </form>
               </div>
             </div>
@@ -1001,6 +1000,38 @@ function App() {
                     <pre className="code-block">{formatSummary(lastSummary)}</pre>
                   </div>
                 </div>
+                {emergencyMessage && (
+                  <div className="emergency-panel">
+                    <div>
+                      <div className="eyebrow">Emergency detected</div>
+                      <h2>{emergencyMessage}</h2>
+                    </div>
+                    <div className="stack compact">
+                      {emergencyHospitals.map((hospital, index) => (
+                        <div className="hospital-card" key={`${hospital.name}-${index}`}>
+                          <div>
+                            <strong>{hospital.name}</strong>
+                            <span>{hospital.address || 'Address unavailable'}</span>
+                            <span>{formatDistance(hospital.distance_meters)} - {openStatus(hospital)}</span>
+                          </div>
+                          {hospital.phone ? (
+                            <a className="dial-button" href={`tel:${hospital.phone.replace(/[^\d+]/g, '')}`}>
+                              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.24.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" />
+                              </svg>
+                              <span>{hospital.phone}</span>
+                            </a>
+                          ) : (
+                            <span className="phone-missing">Phone unavailable</span>
+                          )}
+                        </div>
+                      ))}
+                      {!emergencyHospitals.length && (
+                        <div className="empty">No nearby hospital phone number returned. Call local emergency services immediately.</div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </section>
             )}
 
@@ -1069,10 +1100,18 @@ function App() {
                 {reportStatus && <div className="flash subtle">{reportStatus}</div>}
                 <div className="reports-list" style={{ marginTop: '0.5rem' }}>
                   {patientReports.map((report) => (
-                    <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto', alignItems: 'center', gap: '0.75rem' }}>
-                      <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                    <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                      <div className="stack compact" style={{ gap: '0.25rem' }}>
+                        <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                        {report.parsed_data && (
+                          <pre className="code-block" style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                            {formatReportAnalysis(report.parsed_data)}
+                          </pre>
+                        )}
+                      </div>
                       <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                       <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
+                      <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
                     </div>
                   ))}
                   {!patientReports.length && <div className="empty">No reports uploaded.</div>}
@@ -1234,10 +1273,18 @@ function App() {
               </div>
               <div className="stack compact">
                 {doctorReports.map((report) => (
-                  <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto', alignItems: 'center', gap: '0.75rem' }}>
-                    <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                  <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
+                    <div className="stack compact" style={{ gap: '0.25rem' }}>
+                      <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                      {report.parsed_data && (
+                        <pre className="code-block" style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                          {formatReportAnalysis(report.parsed_data)}
+                        </pre>
+                      )}
+                    </div>
                     <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                     <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
+                    <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
                   </div>
                 ))}
                 {!doctorReports.length && <div className="empty">No reports uploaded for this patient.</div>}
@@ -1325,14 +1372,83 @@ function App() {
 
                 {prescriptionId && (
                   <div className="panel animate-in" style={{ background: 'var(--surface-soft)', padding: '1rem', border: '1px dashed var(--border)' }}>
-                    <div className="eyebrow">Add Medication</div>
-                    <div className="grid grid-2" style={{ marginTop: '0.5rem' }}>
-                      <input value={medicationName} onChange={(e) => setMedicationName(e.target.value)} placeholder="Medicine name" />
-                      <input value={dosage} onChange={(e) => setDosage(e.target.value)} placeholder="Dosage (e.g. 500mg)" />
-                      <input value={frequency} onChange={(e) => setFrequency(e.target.value)} placeholder="Frequency (e.g. 1-0-1)" />
-                      <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Duration (e.g. 5 days)" />
+                    {currentPrescriptionItems.length > 0 && (
+                      <div style={{ marginBottom: '1.5rem' }}>
+                        <div className="eyebrow">Added Items</div>
+                        <div className="stack compact" style={{ marginTop: '0.5rem' }}>
+                          {currentPrescriptionItems.map((item) => (
+                            <div key={item.id} className="record-card" style={{ padding: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <div>
+                                <strong style={{ color: '#fff' }}>{item.medicine_name}</strong>
+                                <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
+                                  {item.dosage || 'No dosage'} • {item.frequency} • {item.duration}
+                                </div>
+                              </div>
+                              <span className="pill">Added</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    <div className="eyebrow">Add Items</div>
+                    <div className="stack compact" style={{ marginTop: '0.5rem' }}>
+                      <label className="field">
+                        <span>Medicine Name</span>
+                        <input value={medicationName} onChange={(e) => setMedicationName(e.target.value)} placeholder="Medicine name" />
+                      </label>
+                      <div className="row" style={{ gap: '0.75rem' }}>
+                        <label className={`pill ${medicineType === 'tablet' ? 'active-pill' : ''}`} style={{ cursor: 'pointer' }}>
+                          <input type="radio" name="medicineType" checked={medicineType === 'tablet'} onChange={() => setMedicineType('tablet')} style={{ marginRight: '0.5rem' }} />
+                          Tablet
+                        </label>
+                        <label className={`pill ${medicineType === 'syrup' ? 'active-pill' : ''}`} style={{ cursor: 'pointer' }}>
+                          <input type="radio" name="medicineType" checked={medicineType === 'syrup'} onChange={() => setMedicineType('syrup')} style={{ marginRight: '0.5rem' }} />
+                          Syrup
+                        </label>
+                      </div>
+                      {medicineType === 'tablet' ? (
+                        <label className="field">
+                          <span>Dosage</span>
+                          <input value={dosage} onChange={(e) => setDosage(e.target.value)} placeholder="Dosage (e.g. 500mg)" />
+                        </label>
+                      ) : (
+                        <label className="field">
+                          <span>Quantity</span>
+                          <input value={syrupQuantity} onChange={(e) => setSyrupQuantity(e.target.value)} placeholder="Quantity (e.g. 5 ml)" />
+                        </label>
+                      )}
+                      <div className="field">
+                        <span>Frequency</span>
+                        <div className="row" style={{ gap: '0.75rem' }}>
+                          {([
+                            ['once', 'Once a day'],
+                            ['twice', 'Twice a day'],
+                            ['thrice', 'Thrice a day'],
+                          ] as Array<[FrequencyOption, string]>).map(([value, label]) => (
+                            <label key={value} className={`pill ${frequency === value ? 'active-pill' : ''}`} style={{ cursor: 'pointer' }}>
+                              <input type="radio" name="frequency" checked={frequency === value} onChange={() => setFrequency(value)} style={{ marginRight: '0.5rem' }} />
+                              {label}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                      <label className="field">
+                        <span>Duration</span>
+                        <input value={duration} onChange={(e) => setDuration(e.target.value)} placeholder="Duration (e.g. 5 days)" />
+                      </label>
+                      <label className="field">
+                        <span>Custom Instructions</span>
+                        <textarea rows={2} value={customInstructions} onChange={(e) => setCustomInstructions(e.target.value)} placeholder="Add special instructions or notes" />
+                      </label>
                     </div>
-                    <button className="primary" style={{ marginTop: '1rem', width: '100%' }} onClick={() => void addMedication()}>Add Item</button>
+                    <button
+                      className="primary"
+                      style={{ marginTop: '1rem', width: '100%' }}
+                      onClick={() => void addMedication()}
+                      disabled={!medicationName || !duration}
+                    >
+                      Add Item
+                    </button>
                     {medicationStatus && <div className="flash subtle" style={{ marginTop: '0.75rem' }}>{medicationStatus}</div>}
                   </div>
                 )}

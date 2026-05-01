@@ -1,48 +1,50 @@
 """Patient endpoints."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from core.dependencies import get_db
-from models.patient import PatientProfile
-from models.user import User
-from services.prescription_service import get_patient_prescriptions
+from core.dependencies import get_current_user, get_db
+from schemas.patient import PatientProfileCreate, PatientProfileOut, PatientProfileUpdate
+from services.patient_service import (
+    create_patient_profile,
+    get_patient_profile,
+    update_patient_profile,
+    get_patient_by_user_id
+)
 
 router = APIRouter(tags=["patient"])
 
 
-@router.get("/public-profile/{patient_id}")
-def get_public_profile(patient_id: str, db: Session = Depends(get_db)):
-    """Fetch public patient info for QR scanning."""
-    # patient_id is the UUID from PatientProfile
-    profile = db.query(PatientProfile).filter(PatientProfile.id == patient_id).first()
+@router.post("/profile", response_model=PatientProfileOut)
+def create_profile(
+    profile: PatientProfileCreate,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a patient profile."""
+    return create_patient_profile(db, profile, current_user.id)
+
+
+@router.get("/profile", response_model=PatientProfileOut)
+def get_profile(
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get current user's patient profile."""
+    profile = get_patient_by_user_id(db, current_user.id)
     if not profile:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient profile not found")
+        raise HTTPException(status_code=404, detail="Patient profile not found")
+    return profile
 
-    user = db.query(User).filter(User.id == profile.user_id).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    # Get all prescriptions
-    prescriptions = get_patient_prescriptions(db, user.id)
-    
-    # Flatten medications for easier display
-    medications = []
-    for p in prescriptions:
-        for item in p.get("items", []):
-            medications.append({
-                "medicine_name": item["medicine_name"],
-                "dosage": item["dosage"],
-                "duration": item["duration"],
-                "frequency": item["frequency"],
-                "prescribed_on": p["created_at"]
-            })
-
-    return {
-        "name": user.name,
-        "age": profile.age,
-        "gender": profile.gender,
-        "allergies": profile.allergies,
-        "chronic_conditions": profile.chronic_conditions,
-        "medications": medications
-    }
+@router.put("/profile", response_model=PatientProfileOut)
+def update_profile(
+    profile: PatientProfileUpdate,
+    current_user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update patient profile."""
+    updated_profile = update_patient_profile(db, current_user.id, profile)
+    if not updated_profile:
+        raise HTTPException(status_code=404, detail="Patient profile not found")
+    return updated_profile
