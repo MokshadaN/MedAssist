@@ -292,20 +292,6 @@ def analyze_patient_transcript(transcript: str) -> dict:
         "structured_data": data.model_dump()
     }
 
-
-def generate_ai_reply(message: str) -> str:
-    """Generate a short assistant reply for chat messages."""
-    prompt = f"""
-You are a medical intake assistant.
-Reply briefly and clearly to the patient's message below.
-Do not diagnose. Do not give emergency instructions unless the message clearly mentions danger.
-
-Patient message:
-{message}
-"""
-
-    try:
-        reply = safe_generate_content(prompt)
-        return reply if isinstance(reply, str) else str(reply)
-    except RuntimeError:
-        return "I have recorded your message. AI responses are unavailable until GOOGLE_API_KEY is configured."
+def generate_ai_reply(user_message: str):
+    # simple placeholder logic
+    return f"AI says: I understand '{user_message}'"
