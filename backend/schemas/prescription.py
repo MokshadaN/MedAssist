@@ -2,9 +2,11 @@
 
 from pydantic import BaseModel
 
+
 class PrescriptionCreate(BaseModel):
     visit_id: str
     notes: str
+
 
 class PrescriptionItemCreate(BaseModel):
     medicine_name: str
