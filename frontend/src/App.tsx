@@ -1,5 +1,40 @@
 import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
 import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
+import { 
+  Heart, 
+  User, 
+  Stethoscope, 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  LogOut, 
+  Menu, 
+  X, 
+  ChevronRight, 
+  ChevronDown, 
+  Bell, 
+  Search, 
+  Plus, 
+  Activity, 
+  ShieldAlert, 
+  Send, 
+  Mic, 
+  Video, 
+  FileText, 
+  Upload, 
+  Check, 
+  History, 
+  TrendingUp, 
+  Trash2, 
+  MessageCircle, 
+  Camera, 
+  Microscope, 
+  Star, 
+  ThumbsUp, 
+  Smartphone, 
+  AlertTriangle 
+} from 'lucide-react';
+import HealthMetricsChart from './components/HealthMetricsChart';
 import {
   api,
   AISummary,
@@ -53,30 +88,19 @@ function formatReportAnalysis(parsedData?: string | null) {
   if (!parsedData) return '';
 
   try {
-    const data = JSON.parse(parsedData) as Record<string, unknown>;
-    const metadata = (data.report_metadata && typeof data.report_metadata === 'object')
-      ? (data.report_metadata as Record<string, unknown>)
-      : {};
-    const summary = (data.clinical_summary && typeof data.clinical_summary === 'object')
-      ? (data.clinical_summary as Record<string, unknown>)
-      : {};
-    const metrics = Array.isArray(data.detailed_metrics) ? data.detailed_metrics : [];
-    const reportType = typeof metadata.report_type === 'string' ? metadata.report_type : 'unknown';
-    const reportDate = typeof metadata.date_of_report === 'string' ? metadata.date_of_report : 'unknown';
-    const abnormal = Array.isArray(summary.abnormal_parameters) ? summary.abnormal_parameters : [];
-    const snapshot = typeof summary.overall_clinical_snapshot === 'string' ? summary.overall_clinical_snapshot : '';
-    const readable = typeof data.physician_readable === 'string' ? data.physician_readable : '';
+    const data = JSON.parse(parsedData) as Record<string, any>;
+    // The Gemini JSON is nested under the 'analysis' key
+    const analysis = data.analysis || data;
+    const summary = analysis.clinical_summary || {};
+    
+    // Show only the overall clinical snapshot
+    const snapshot = typeof summary.overall_clinical_snapshot === 'string' 
+      ? summary.overall_clinical_snapshot 
+      : '';
 
-    return [
-      `Report type: ${reportType}`,
-      `Date: ${reportDate}`,
-      abnormal.length ? `Abnormal parameters: ${abnormal.join(', ')}` : 'Abnormal parameters: none',
-      metrics.length ? `Metrics extracted: ${metrics.length}` : 'Metrics extracted: 0',
-      snapshot ? `Snapshot: ${snapshot}` : '',
-      readable ? `\nPhysician-readable report:\n${readable}` : '',
-    ].join('\n');
+    return snapshot || 'Analysis complete. No summary found.';
   } catch {
-    return parsedData;
+    return parsedData || '';
   }
 }
 
@@ -193,7 +217,7 @@ function PublicProfileView({ profile, loading }: { profile: PublicProfile | null
 
 function App() {
   const isPublicRoute = window.location.pathname.startsWith('/public-profile/');
-  const routePublicProfileId = isPublicRoute ? window.location.pathname.split('/').pop() : null;
+  const routeProfileId = isPublicRoute ? window.location.pathname.split('/').pop() || null : null;
 
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -203,19 +227,19 @@ function App() {
   const [publicProfile, setPublicProfile] = useState<PublicProfile | null>(null);
   const [publicLoading, setPublicLoading] = useState(isPublicRoute);
   const [showQR, setShowQR] = useState(false);
-  const [publicProfileId, setPublicProfileId] = useState<string | null>(routePublicProfileId);
+  const [publicProfileId, setPublicProfileId] = useState<string | null>(routeProfileId);
 
   const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
   const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
 
   useEffect(() => {
-    if (isPublicRoute && publicProfileId) {
-      api.getPublicProfile(publicProfileId)
+    if (isPublicRoute && routeProfileId) {
+      api.getPublicProfile(routeProfileId)
         .then(setPublicProfile)
-        .catch((err) => setFlash(err.message))
+        .catch((err: Error) => setFlash(err.message))
         .finally(() => setPublicLoading(false));
     }
-  }, [isPublicRoute, publicProfileId]);
+  }, [isPublicRoute, routeProfileId]);
 
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [authReady, setAuthReady] = useState(!localStorage.getItem('medassist_token'));
@@ -237,6 +261,7 @@ function App() {
   const [prescriptionStatus, setPrescriptionStatus] = useState('');
   const [medicationStatus, setMedicationStatus] = useState('');
   const [notificationStatus, setNotificationStatus] = useState('');
+  const [analyzingId, setAnalyzingId] = useState<string | null>(null);
 
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState('');
@@ -410,7 +435,7 @@ function App() {
       setPublicProfileId(profileId);
       api.getPublicProfile(profileId)
         .then(setPublicProfile)
-        .catch((err) => setFlash(`Error loading profile: ${err.message}`));
+        .catch((err: Error) => setFlash(`Error loading profile: ${err.message}`));
     }
   }, []);
 
@@ -772,6 +797,7 @@ function App() {
 
   const analyzeReport = async (reportId: string) => {
     if (!authToken || !user) return;
+    setAnalyzingId(reportId);
     setBusy('Analyzing report');
     try {
       if (user.role === 'doctor' && selectedPatientId) {
@@ -786,6 +812,7 @@ function App() {
       setReportStatus(error instanceof Error ? error.message : 'Analysis failed');
     } finally {
       setBusy('');
+      setAnalyzingId(null);
     }
   };
 
@@ -951,6 +978,68 @@ function App() {
     }
   };
 
+  if (publicProfileId) {
+    return (
+      <main className="auth-shell public-profile-view">
+        <section className="panel wide profile-card">
+          <div className="panel-head">
+            <div>
+              <div className="eyebrow">Medical Profile</div>
+              <h2>{publicProfile?.name || 'Loading profile...'}</h2>
+            </div>
+            <button className="ghost" onClick={() => (window.location.href = '/')}>Close</button>
+          </div>
+
+          {!publicProfile ? (
+            <div className="empty">Fetching patient information...</div>
+          ) : (
+            <div className="grid grid-2" style={{ marginTop: '1.5rem' }}>
+              <div className="stack">
+                <div className="eyebrow">Personal Details</div>
+                <div className="record-card">
+                  <div className="stat-mini"><span>Age</span><strong>{publicProfile.age || '--'}</strong></div>
+                  <div className="stat-mini"><span>Gender</span><strong>{publicProfile.gender || '--'}</strong></div>
+                </div>
+
+                <div className="eyebrow" style={{ marginTop: '1.5rem' }}>Medical Alerts</div>
+                <div className="alert-card urgent">
+                  <strong>Allergies</strong>
+                  <p>{publicProfile.allergies || 'No known allergies reported.'}</p>
+                </div>
+                <div className="alert-card" style={{ marginTop: '1rem' }}>
+                  <strong>Chronic Conditions</strong>
+                  <p>{publicProfile.chronic_conditions || 'No chronic conditions reported.'}</p>
+                </div>
+              </div>
+
+              <div className="stack">
+                <div className="eyebrow">Current Medications</div>
+                <div className="medication-list-public">
+                  {publicProfile.medications.map((med: any, i: number) => (
+                    <div key={i} className="record-card" style={{ marginBottom: '0.75rem' }}>
+                      <strong style={{ color: '#fff' }}>{med.medicine_name}</strong>
+                      <div className="pill-group" style={{ marginTop: '0.25rem' }}>
+                        <span className="pill">{med.dosage}</span>
+                        <span className="pill">{med.frequency}</span>
+                        <span className="pill">{med.duration}</span>
+                      </div>
+                      <small style={{ display: 'block', marginTop: '0.5rem', opacity: 0.7 }}>
+                        Prescribed: {new Date(med.prescribed_on).toLocaleDateString()}
+                      </small>
+                    </div>
+                  ))}
+                  {!publicProfile.medications.length && <div className="empty">No active medications found.</div>}
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+        <footer style={{ marginTop: '2rem', textAlign: 'center', opacity: 0.6 }}>
+          <p>MedAssist Secure Patient Sharing • {new Date().getFullYear()}</p>
+        </footer>
+      </main>
+    );
+  }
 
   if (!authReady) {
     return <div className="auth-loading panel">Loading MedAssist...</div>;
@@ -1320,7 +1409,14 @@ function App() {
                           </pre>
                         )}
                       </div>
-                      <button className="secondary" type="button" onClick={() => void analyzeReport(report.id)}>Analyze</button>
+                     <button 
+                      className="secondary" 
+                      type="button" 
+                      onClick={() => void analyzeReport(report.id)}
+                      disabled={analyzingId === report.id}
+                    >
+                      {analyzingId === report.id ? 'Analyzing...' : 'Analyze'}
+                    </button>
                       <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                       <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
                       <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
@@ -1376,6 +1472,8 @@ function App() {
                 </div>
               )}
             </section>
+            
+            <HealthMetricsChart patientId={user.id} token={authToken} refreshTrigger={patientReports} />
           </div>
         </main>
       ) : (
@@ -1476,6 +1574,8 @@ function App() {
               </section>
             </div>
 
+            {selectedPatientId && <HealthMetricsChart patientId={selectedPatientId} token={authToken} key={selectedPatientId} refreshTrigger={doctorReports} />}
+
             <section className="panel wide">
               <div className="panel-head">
                 <div>
@@ -1494,7 +1594,14 @@ function App() {
                         </pre>
                       )}
                     </div>
-                    <button className="secondary" type="button" onClick={() => void analyzeReport(report.id)}>Analyze</button>
+                    <button 
+                      className="secondary" 
+                      type="button" 
+                      onClick={() => void analyzeReport(report.id)}
+                      disabled={analyzingId === report.id}
+                    >
+                      {analyzingId === report.id ? 'Analyzing...' : 'Analyze'}
+                    </button>
                     <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                     <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
                     <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>

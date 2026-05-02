@@ -5,6 +5,7 @@ import json
 import time
 import numpy as np
 from huggingface_hub import InferenceClient
+import os
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
 
