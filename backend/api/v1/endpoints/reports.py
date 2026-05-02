@@ -12,6 +12,7 @@ from models.report import Report
 from schemas.report import ReportOut
 from services import report_service
 from services.report_analyzer_service import analyze_report_image, serialize_report_analysis
+from schemas.metric import MedicalMetricOut
 from core.database import SessionLocal
 
 UPLOAD_DIR = Path(__file__).resolve().parents[4] / "uploads" / "reports"
@@ -152,3 +153,20 @@ def analyze_report(
     parsed_data = serialize_report_analysis(analysis)
     updated = report_service.update_report_analysis(db, report, parsed_data)
     return updated
+
+
+@router.get("/{patient_id}/metrics", response_model=List[MedicalMetricOut])
+def get_patient_metrics(
+    patient_id: str,
+    parameter: str = None,
+    current_user=Depends(require_roles("patient", "doctor")),
+    db: Session = Depends(get_db),
+):
+    """
+    Retrieve historical medical metrics for a patient.
+    Optionally filter by parameter (e.g. 'Hemoglobin').
+    """
+    if current_user.role == "patient" and current_user.id != patient_id:
+        raise HTTPException(status_code=403, detail="You can only view your own metrics")
+
+    return report_service.get_patient_metrics(db, patient_id=patient_id, parameter=parameter)
