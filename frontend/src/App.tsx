@@ -1216,6 +1216,11 @@ function App() {
 
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
                   {profileStatus && <div className="flash subtle">{profileStatus}</div>}
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 1374d16537da2bf53e7401ba508b1ba35c19aaee
                 </form>
               </div>
             </div>
