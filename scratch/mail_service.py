@@ -7,8 +7,8 @@ class EmailService:
     def __init__(self):
         self.smtp_host = "smtp.gmail.com"
         self.smtp_port = 587
-        self.smtp_user = "meratera12177946@gmail.com"
-        self.smtp_pass = "vcejxcnbnoaaisgn"
+        self.smtp_user = "your_email@gmail.com"
+        self.smtp_pass = "your_app_password"
 
     def send_email(self, to_email: str, subject: str, body: str):
         try:
