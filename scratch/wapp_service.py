@@ -1,12 +1,17 @@
 from twilio.rest import Client
 
 
+import os
+from twilio.rest import Client
+from dotenv import load_dotenv
+
+load_dotenv()
+
 class WhatsAppService:
     def __init__(self):
-        self.account_sid = "your_twilio_sid"
-        self.auth_token = "your_twilio_auth_token"
-
-        self.from_number = "whatsapp:+14155238886"  # sandbox
+        self.account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+        self.auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+        self.from_number = os.getenv("TWILIO_FROM", "whatsapp:+14155238886")
 
         self.client = Client(self.account_sid, self.auth_token)
 
