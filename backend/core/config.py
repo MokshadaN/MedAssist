@@ -16,6 +16,16 @@ class Settings(BaseSettings):
     database_url: str = f"sqlite:///{(BASE_DIR / 'medassist.db').as_posix()}"
     hf_token: str = ""
 
+    # MailHog / SMTP settings
+    smtp_host: str = "localhost"
+    smtp_port: int = 1025
+    smtp_from: str = "noreply@medassist.local"
+
+    # Twilio WhatsApp settings (optional — falls back to console logging)
+    twilio_account_sid: str = ""
+    twilio_auth_token: str = ""
+    twilio_whatsapp_from: str = ""  # e.g. "whatsapp:+14155238886"
+
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
