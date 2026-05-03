@@ -21,6 +21,8 @@ def create_reminder(db: Session, user_id: str, message: str, time: datetime) -> 
     if reminder:
         reminder.message = message
         reminder.time = time
+        reminder.email_sent_24h = False
+        reminder.email_sent_1h = False
         db.commit()
         db.refresh(reminder)
     else:
@@ -28,16 +30,6 @@ def create_reminder(db: Session, user_id: str, message: str, time: datetime) -> 
         db.add(reminder)
         db.commit()
         db.refresh(reminder)
-
-    # Send follow-up email to the patient
-    user = db.query(User).filter(User.id == user_id).first()
-    if user and user.email:
-        send_followup_email(
-            to_email=user.email,
-            patient_name=user.name or "Patient",
-            message=message,
-            followup_time=time.isoformat() if isinstance(time, datetime) else str(time),
-        )
 
     return reminder
 

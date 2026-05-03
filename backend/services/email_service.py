@@ -112,6 +112,10 @@ def send_followup_email(to_email: str, patient_name: str, message: str, followup
         msg.attach(MIMEText(html, "html"))
 
         with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
+            if getattr(settings, "smtp_tls", False):
+                server.starttls()
+            if getattr(settings, "smtp_user", None) and getattr(settings, "smtp_password", None):
+                server.login(settings.smtp_user, settings.smtp_password)
             server.sendmail(settings.smtp_from, to_email, msg.as_string())
 
         logger.info("Follow-up email sent to %s (%s)", patient_name, to_email)

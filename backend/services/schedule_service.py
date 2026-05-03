@@ -13,13 +13,16 @@ from models.sent_reminder import SentReminder
 from models.user import User
 from services.whatsapp_service import send_whatsapp_reminder
 
+from models.reminder import Reminder
+from services.email_service import send_followup_email
+
 logger = logging.getLogger(__name__)
 
 # Default reminder times based on frequency
 REMINDER_TIMES = {
     1: ["09:00"],
-    2: ["09:00", "21:00"],
-    3: ["08:00", "14:00", "21:00"],
+    2: ["14:00", "20:00"],
+    3: ["08:00", "14:00", "20:00"],
 }
 
 
@@ -263,3 +266,60 @@ def process_due_reminders(db: Session) -> int:
         db.commit()
 
     return count
+
+
+def process_due_followups(db: Session) -> int:
+    """Process follow-up reminders: send emails 24h and 1h before the appointment.
+    
+    Returns the number of emails sent.
+    """
+    now = datetime.now()
+    
+    # Get all incomplete reminders
+    reminders = (
+        db.query(Reminder)
+        .filter(Reminder.is_completed == False)  # noqa: E712
+        .all()
+    )
+    
+    emails_sent = 0
+    for reminder in reminders:
+        time_diff = reminder.time - now
+        hours_diff = time_diff.total_seconds() / 3600.0
+        
+        should_update = False
+        
+        # Check 24-hour window (between 23.9 and 24.1 hours to allow for scheduler ticks)
+        if 23.9 <= hours_diff <= 24.1 and not reminder.email_sent_24h:
+            user = db.query(User).filter(User.id == reminder.user_id).first()
+            if user and user.email:
+                success = send_followup_email(
+                    to_email=user.email,
+                    patient_name=user.name or "Patient",
+                    message=f"[24H REMINDER] {reminder.message}",
+                    followup_time=reminder.time.isoformat()
+                )
+                if success:
+                    reminder.email_sent_24h = True
+                    should_update = True
+                    emails_sent += 1
+        
+        # Check 1-hour window (between 0.9 and 1.1 hours to allow for scheduler ticks)
+        elif 0.9 <= hours_diff <= 1.1 and not reminder.email_sent_1h:
+            user = db.query(User).filter(User.id == reminder.user_id).first()
+            if user and user.email:
+                success = send_followup_email(
+                    to_email=user.email,
+                    patient_name=user.name or "Patient",
+                    message=f"[1H URGENT REMINDER] {reminder.message}",
+                    followup_time=reminder.time.isoformat()
+                )
+                if success:
+                    reminder.email_sent_1h = True
+                    should_update = True
+                    emails_sent += 1
+                    
+        if should_update:
+            db.commit()
+            
+    return emails_sent

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BASE_DIR = Path(__file__).resolve().parents[2]
+BASE_DIR = Path(__file__).resolve().parents[1]
 
 
 class Settings(BaseSettings):
@@ -17,9 +17,12 @@ class Settings(BaseSettings):
     hf_token: str = ""
 
     # MailHog / SMTP settings
-    smtp_host: str = "localhost"
-    smtp_port: int = 1025
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
     smtp_from: str = "noreply@medassist.local"
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_tls: bool = True
 
     # Twilio WhatsApp settings (optional — falls back to console logging)
     twilio_account_sid: str = ""
@@ -27,7 +30,11 @@ class Settings(BaseSettings):
     twilio_whatsapp_from: str = ""  # e.g. "whatsapp:+14155238886"
 
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=str(BASE_DIR / ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
 
 
 @lru_cache

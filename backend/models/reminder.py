@@ -17,5 +17,7 @@ class Reminder(Base):
     time = Column(DateTime, nullable=False)
     is_completed = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    email_sent_24h = Column(Boolean, default=False, nullable=False)
+    email_sent_1h = Column(Boolean, default=False, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
