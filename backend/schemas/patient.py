@@ -28,12 +28,21 @@ class PatientProfileOut(PatientProfileBase):
         from_attributes = True
 
 
+class MedicationPublic(BaseModel):
+    medicine_name: str
+    dosage: str
+    duration: str
+    frequency: str
+    prescribed_on: str
+
+
 class PatientProfilePublic(BaseModel):
     name: str
     age: Optional[int]
     gender: Optional[str]
     allergies: Optional[str]
     chronic_conditions: Optional[str]
+    medications: list[MedicationPublic] = []
 
     class Config:
         from_attributes = True

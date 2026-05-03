@@ -3,6 +3,8 @@
 from sqlalchemy.orm import Session
 from models.patient import PatientProfile
 from models.user import User
+from models.visit import Visit
+from models.prescription import Prescription, PrescriptionItem
 from schemas.patient import PatientProfileCreate, PatientProfileUpdate
 
 
@@ -53,7 +55,9 @@ def get_all_patients(db: Session) -> list[PatientProfile]:
 
 def get_public_profile(db: Session, profile_id: str):
     """Get a public summary of a patient profile."""
-    result = db.query(
+    # Get profile and user info
+    profile_data = db.query(
+        User.id.label("user_id"),
         User.name,
         PatientProfile.age,
         PatientProfile.gender,
@@ -61,13 +65,34 @@ def get_public_profile(db: Session, profile_id: str):
         PatientProfile.chronic_conditions
     ).join(User, User.id == PatientProfile.user_id).filter(PatientProfile.id == profile_id).first()
     
-    if not result:
+    if not profile_data:
         return None
         
+    # Get active medications (items from all prescriptions for this patient)
+    medications = db.query(
+        PrescriptionItem.medicine_name,
+        PrescriptionItem.dosage,
+        PrescriptionItem.duration,
+        PrescriptionItem.frequency,
+        Prescription.created_at.label("prescribed_on")
+    ).join(Prescription, Prescription.id == PrescriptionItem.prescription_id)\
+     .join(Visit, Visit.id == Prescription.visit_id)\
+     .filter(Visit.patient_id == profile_data.user_id)\
+     .order_by(Prescription.created_at.desc()).all()
+
     return {
-        "name": result.name,
-        "age": result.age,
-        "gender": result.gender,
-        "allergies": result.allergies,
-        "chronic_conditions": result.chronic_conditions
+        "name": profile_data.name,
+        "age": profile_data.age,
+        "gender": profile_data.gender,
+        "allergies": profile_data.allergies,
+        "chronic_conditions": profile_data.chronic_conditions,
+        "medications": [
+            {
+                "medicine_name": m.medicine_name,
+                "dosage": m.dosage,
+                "duration": m.duration,
+                "frequency": m.frequency,
+                "prescribed_on": m.prescribed_on.isoformat() if m.prescribed_on else ""
+            } for m in medications
+        ]
     }

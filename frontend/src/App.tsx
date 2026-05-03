@@ -55,7 +55,6 @@ import {
   API_BASE,
   PublicProfile,
 } from './api';
-import { QRCodeSVG } from 'qrcode.react';
 
 type AuthMode = 'login' | 'register-doctor' | 'register-patient';
 type ChatMessage = { role: 'assistant' | 'user'; text: string };
@@ -263,46 +262,75 @@ function PublicProfileView({ profile, loading }: { profile: PublicProfile | null
   if (!profile) return <div className="auth-loading panel">Profile not found or link expired.</div>;
 
   return (
-    <main className="auth-shell" style={{ justifyContent: 'center' }}>
-      <section className="panel auth-card" style={{ maxWidth: '500px', width: '100%', padding: '2rem' }}>
-        <div className="brand" style={{ marginBottom: '2rem', justifyContent: 'center' }}>
-          <div className="brand-badge">M</div>
-          <div style={{ textAlign: 'center' }}>
-            <div className="eyebrow">MedAssist Emergency</div>
-            <h1>Medical Summary</h1>
+    <main className="auth-shell public-profile-view">
+      <section className="panel wide auth-card" style={{ maxWidth: '800px', width: '100%', padding: '2rem' }}>
+        <div className="panel-head">
+          <div className="brand">
+            <div className="brand-badge">M</div>
+            <div>
+              <div className="eyebrow">MedAssist Emergency</div>
+              <h1>Medical Summary</h1>
+            </div>
           </div>
+          <button className="ghost" onClick={() => (window.location.href = '/')}>Close</button>
         </div>
 
-        <div className="stack" style={{ gap: '1.5rem' }}>
+        <div className="stack" style={{ gap: '1.5rem', marginTop: '1.5rem' }}>
           <div className="profile-header" style={{ alignItems: 'center' }}>
             <div className="profile-avatar" style={{ width: '80px', height: '80px', fontSize: '2rem' }}>{profile.name.charAt(0)}</div>
             <h2 style={{ fontSize: '1.75rem', marginTop: '1rem' }}>{profile.name}</h2>
             <span className="pill urgent" style={{ marginTop: '0.5rem' }}>Emergency Information</span>
           </div>
 
-          <div className="grid grid-2" style={{ gap: '1rem' }}>
-            <div className="stat-card" style={{ background: 'var(--surface-soft)', padding: '1rem', borderRadius: '12px' }}>
-              <div className="eyebrow">Age</div>
-              <strong style={{ fontSize: '1.25rem' }}>{profile.age || 'Not listed'}</strong>
+          <div className="grid grid-2" style={{ gap: '1.5rem' }}>
+            <div className="stack" style={{ gap: '1rem' }}>
+              <div className="eyebrow">Personal Details</div>
+              <div className="grid grid-2" style={{ gap: '1rem' }}>
+                <div className="stat-card" style={{ background: 'var(--surface-soft)', padding: '1rem', borderRadius: '12px' }}>
+                  <div className="eyebrow">Age</div>
+                  <strong style={{ fontSize: '1.25rem' }}>{profile.age || '--'}</strong>
+                </div>
+                <div className="stat-card" style={{ background: 'var(--surface-soft)', padding: '1rem', borderRadius: '12px' }}>
+                  <div className="eyebrow">Gender</div>
+                  <strong style={{ fontSize: '1.25rem' }}>{profile.gender || '--'}</strong>
+                </div>
+              </div>
+
+              <div className="eyebrow" style={{ marginTop: '1rem' }}>Medical Alerts</div>
+              <div className="panel" style={{ background: 'rgba(255, 71, 87, 0.1)', borderColor: 'rgba(255, 71, 87, 0.3)' }}>
+                <div className="eyebrow" style={{ color: '#ff4757' }}>Allergies</div>
+                <p style={{ marginTop: '0.5rem', fontWeight: '600' }}>{profile.allergies || 'None reported'}</p>
+              </div>
+
+              <div className="panel">
+                <div className="eyebrow">Chronic Conditions</div>
+                <p style={{ marginTop: '0.5rem' }}>{profile.chronic_conditions || 'None reported'}</p>
+              </div>
             </div>
-            <div className="stat-card" style={{ background: 'var(--surface-soft)', padding: '1rem', borderRadius: '12px' }}>
-              <div className="eyebrow">Gender</div>
-              <strong style={{ fontSize: '1.25rem' }}>{profile.gender || 'Not listed'}</strong>
+
+            <div className="stack" style={{ gap: '1rem' }}>
+              <div className="eyebrow">Current Medications</div>
+              <div className="medication-list-public">
+                {profile.medications.map((med, i) => (
+                  <div key={i} className="record-card" style={{ marginBottom: '0.75rem' }}>
+                    <strong style={{ color: '#fff' }}>{med.medicine_name}</strong>
+                    <div className="pill-group" style={{ marginTop: '0.25rem' }}>
+                      <span className="pill">{med.dosage}</span>
+                      <span className="pill">{med.frequency}</span>
+                      <span className="pill">{med.duration}</span>
+                    </div>
+                    <small style={{ display: 'block', marginTop: '0.5rem', opacity: 0.7 }}>
+                      Prescribed: {new Date(med.prescribed_on).toLocaleDateString()}
+                    </small>
+                  </div>
+                ))}
+                {!profile.medications.length && <div className="empty">No active medications found.</div>}
+              </div>
             </div>
           </div>
 
-          <div className="panel" style={{ background: 'rgba(255, 71, 87, 0.1)', borderColor: 'rgba(255, 71, 87, 0.3)' }}>
-            <div className="eyebrow" style={{ color: '#ff4757' }}>Allergies</div>
-            <p style={{ marginTop: '0.5rem', fontWeight: '600' }}>{profile.allergies || 'None reported'}</p>
-          </div>
-
-          <div className="panel">
-            <div className="eyebrow">Chronic Conditions</div>
-            <p style={{ marginTop: '0.5rem' }}>{profile.chronic_conditions || 'None reported'}</p>
-          </div>
-
-          <div style={{ textAlign: 'center', opacity: 0.6, fontSize: '0.85rem' }}>
-            This information is provided for emergency medical purposes only.
+          <div style={{ textAlign: 'center', opacity: 0.6, fontSize: '0.85rem', marginTop: '1rem' }}>
+            This information is provided for emergency medical purposes only. MedAssist Secure Patient Sharing • {new Date().getFullYear()}
           </div>
         </div>
       </section>
@@ -312,17 +340,20 @@ function PublicProfileView({ profile, loading }: { profile: PublicProfile | null
 
 function App() {
   const isPublicRoute = window.location.pathname.startsWith('/public-profile/');
-  const routeProfileId = isPublicRoute ? window.location.pathname.split('/').pop() : null;
+  const routeProfileId = isPublicRoute ? window.location.pathname.split('/').pop() || null : null;
 
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
   const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
   const [doctorProfile, setDoctorProfile] = useState<DoctorProfile | null>(null);
 
-  const [publicProfileId, setPublicProfileId] = useState<string | null>(null);
   const [publicProfile, setPublicProfile] = useState<PublicProfile | null>(null);
   const [publicLoading, setPublicLoading] = useState(isPublicRoute);
   const [showQR, setShowQR] = useState(false);
+  const [publicProfileId, setPublicProfileId] = useState<string | null>(routeProfileId);
+
+  const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
+  const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
 
   useEffect(() => {
     if (isPublicRoute && routeProfileId) {
@@ -333,9 +364,6 @@ function App() {
     }
   }, [isPublicRoute, routeProfileId]);
 
-  if (isPublicRoute) {
-    return <PublicProfileView profile={publicProfile} loading={publicLoading} />;
-  }
   const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [authReady, setAuthReady] = useState(!localStorage.getItem('medassist_token'));
   const [busy, setBusy] = useState('');
@@ -374,7 +402,6 @@ function App() {
   const [emergencyHospitals, setEmergencyHospitals] = useState<EmergencyHospital[]>([]);
   const [emergencyMessage, setEmergencyMessage] = useState('');
   const [isSendingIntake, setIsSendingIntake] = useState(false);
-
 
   const [profileForm, setProfileForm] = useState({
     name: '',
@@ -418,8 +445,9 @@ function App() {
   });
   const [doctorReminderMessage, setDoctorReminderMessage] = useState('Doctor visit in 2 days');
 
-  const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
-  const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
+  if (isPublicRoute) {
+    return <PublicProfileView profile={publicProfile} loading={publicLoading} />;
+  }
 
   const clearUserData = () => {
     setPatientProfile(null);
@@ -1421,13 +1449,15 @@ function App() {
                       Emergency responders can scan this to see your vital medical details instantly.
                     </p>
 
-                    {showQR ? (
-                      <div style={{ background: '#fff', padding: '1rem', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <QRCodeSVG
-                          value={`${window.location.origin}/public-profile/${patientProfile?.id}`}
-                          size={150}
+                    {showQR && patientProfile ? (
+                      <div className="qr-container animate-in" style={{ background: '#fff', padding: '1.25rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}>
+                        <QRCodeCanvas
+                          value={`${window.location.origin}/public-profile/${patientProfile.id}`}
+                          size={160}
+                          style={{ borderRadius: '8px' }}
                         />
-                        <button type="button" className="ghost" style={{ marginTop: '0.5rem', color: '#000' }} onClick={() => setShowQR(false)}>Hide QR</button>
+                        <p style={{ color: '#1a1a1a', fontSize: '0.85rem', fontWeight: 600, marginTop: '0.75rem', textAlign: 'center' }}>Scan to share summary</p>
+                        <button type="button" className="ghost" style={{ marginTop: '0.5rem', color: '#1a1a1a' }} onClick={() => setShowQR(false)}>Hide QR</button>
                       </div>
                     ) : (
                       <button type="button" className="secondary" style={{ width: '100%' }} onClick={() => setShowQR(true)}>Show Emergency QR</button>
@@ -1436,8 +1466,6 @@ function App() {
 
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
                   {profileStatus && <div className="flash subtle">{profileStatus}</div>}
-
-
                 </form>
               </div>
             </div>
