@@ -1,0 +1,470 @@
+LLM -Based Clinical Intake SystemIndian Institute of Information Technology, Pune
+SUPERVISOR: DR. SANJEEV SHARMA
+PRESENTED BY:
+SHREYA PANDEY(112316046)   SHRAVANI PATWARDHAN (112315179)   MUSKAN GUPTA (112315112)
+MOKSHADA NEHETE (112315117)   TEJAL CHAUDHARI (112315198)C O N T E N T
+0 1 0 5
+0 2 0 6
+0 3 0 7INTRODUCTION OBJECTIVE
+MOTIVATION METHODOLOGY
+RESEARCH GAPSEXPECTED OUTCOMES
+0 4 0 8LITERATURE REVIEW
+REFERENCES
+I N T R O D U C T I O N
+1.Manual intake and scattered data slow down
+diagnosis and care delivery.
+2.AI-driven interaction captures patient
+symptoms quickly and efficiently.
+3.Automated SOAP notes give doctors concise,
+actionable insights.
+4.The platform integrates emergency support,
+medication safety checks, and report analysis
+to deliver a comprehensive, end-to-end
+healthcare solution.M O T I V A T I O N
+SCOPE OF THE STUDY RELEVANCE OF THE STUDY RESEARCH QUESTION0 30 2 0 1
+Patients struggle to clearly
+communicate symptoms, due
+to standard checkboxes and
+scalesDoctors have multiple
+patients, delaying possible
+quicker diagnoses
+Lack of a standardized
+doctor-patient platform, with
+fragmented report analysis
+and lack of medication safety0 4
+Emergency responders do
+not have access to critical
+patient detailsLITERATURE REVIEW
+Author &
+YearTitle Method/Model Learning Key Contributions Limitations
+Laurent Boyer et.
+al, 2025 [1]Reimagining patient
+reported outcomes in the
+age of generative AIProposes integration of
+Large Language Models
+(LLMs) with traditional
+psychometric models like IRT
+and CAT for AI-driven PRO
+assessment.Uses Generative AI (LLMs)
+based on deep learning and
+NLP for conversational and
+narrative understanding.Introduces a shift from static
+questionnaire based PROs to
+adaptive, narrative based AI
+systems for personalized patient
+symptom extraction and
+analysis.Lacks established validation
+frameworks, psychometric
+reliability proof, and safeguards
+against bias and hallucinations in
+clinical deployment.
+Mukul Bedwa et. al,
+2025 [2]Optimizing RAG-based
+LLMs for healthcare
+question answering tasksApplies Large Language
+Models (LLMs) for structured
+and unstructured healthcare
+data analysis.Uses Transformer based
+deep learning with
+pretraining and fine tuning
+on medical datasets.Demonstrates how LLMs can
+extract, summarize, and interpret
+clinical information to support
+automated medical decision
+systems.Highlights concerns regarding data
+privacy, model bias,
+hallucinations, and limited clinical
+validation.
+Tsai-Ling Liu et. al,
+2026 [3]AI Powered Clinical
+Documentation and
+Clinicians’ Electronic
+Health Record ExperienceEvaluated an AI powered
+clinical documentation
+system integrated with
+Electronic Health Records
+(EHRs) in a real clinical
+setting.Uses NLP based AI models
+(likely LLM assisted
+documentation support) for
+automated clinical note
+generation.Demonstrates that AI assisted
+documentation can reduce
+clinician burden and improve EHR
+experience, supporting real world
+clinical AI deployment.Nonrandomized design with
+potential selection bias and
+limited generalizability across
+diverse healthcare settings.LITERATURE REVIEW
+Author &
+YearTitle Method/Model Learning Key Contributions Limitations
+Isabella Joy De Vere
+Hunt et. al, 2025 [4]A framework for
+considering the use of
+generative AI for healthProvides a conceptual,
+expert-informed framework
+outlining principles and risks
+for evaluating generative AI
+(mainly LLMs) applications
+in healthcare.Framework built from expert
+interviews and roundtable
+deliberations rather than
+empirical model training.Highlights principles for safe,
+equitable, and impactful
+integration of AI in health,
+including aligning use cases to AI
+strengths and robust evaluation
+practices.Lacks empirical tests or
+quantitative validation of the
+proposed framework in real
+healthcare deployments.
+Elias Hussain et. a l,
+2023 [5 ]Natural Language
+Processing in  Electronic
+Health Records in  relation
+to healthcare decision-
+making: A  systematic
+reviewComprehensively reviews
+ML, D L, a nd traditional NLP
+techniques applied to
+unstructured EHR text for
+tasks like classification,
+entity recognition, a nd
+information extraction. Covers studies using a range
+of m achine learning and
+deep learning approaches
+(e.g., S VM, LSTM, C NN) for
+clinical text analysis in  EHRsHighlights how NLP m ethods can
+transform unstructured clinical
+notes in to structured in sights to
+support healthcare decision-
+making workflows. Identifies m ajor challenges
+including lack of annotated data,
+inadequate m odel evaluation, a nd
+data im balance issues across
+existing NLP-EHR studies.
+Xuexing Luo et. a l,
+2025 [6 ]AI in  M edical
+Questionnaires: S coping
+ReviewSurveys existing literature
+on AI-enabled questionnaire
+methods, in cluding rule-
+based algorithms, classical
+NLP, a nd early generative
+models for patient-reported
+data capture.Focuses on m achine learning
+and natural language
+processing approaches used
+to in terpret, a dapt, a nd
+automate responses in
+medical questionnaires.Shows how AI can im prove the
+accuracy, e fficiency, a nd
+personalization of m edical
+questionnaires, e nabling better
+data capture for clinical decision
+support.Highlights gaps like lim ited clinical
+validation, h eterogeneity of
+methods, a nd lack of standardized
+evaluation m etrics across studies.RESEARCH GAPS
+No reliable safeguards to prevent harmful AI errors in medical outputs.
+Lack of tools to generate concise SOAP summaries for clinical assistance.
+No unified system linking patient check-ins with long-term health tracking.
+No automated system to ensure treatment adherence and continuity of care.
+AI outputs are not validated against trusted medical databases.
+No secure way to share critical patient data with first responders.
+Clinical triage is not integrated with real-time hospital discovery and routing.OBJECTIVES01
+02To develop an AI-driven system that automates
+patient intake and accurately captures symptoms
+through natural interaction
+To generate structured clinical summaries (SOAP
+notes) that assist doctors in faster and more
+informed decision-making.
+03To provide emergency support via QR-based
+medical profiles and real-time nearby hospital
+detection.
+To enhance medication safety by analyzing drug
+information, side effects, and potential interactions using
+AI.
+ 04
+PATIENT ENTRY FLOW AND AI PATIENT INTAKE SYSTEM1. Auth + session init
+2. Multimodal symptom intake
+Text / voice → cleaned + buffered
+3. LLM conversational reasoning
+Symptom expansion + context inference
+4. BERT + LLM hybrid layer
+PubMedBERT embeddings
+symptom vectorsSemantic matching
+vs diseases / drugs
+LLM overlay → ranked conditions + risk score
+5. SOAP note generation
+S / O / A / P structured output
+6. Real-time risk detection
+risk_score > threshold → emergency flag
+High
+risk?Yes7. Emergency
+Nearby hospitals
+8. QR profile
+Public snapshotNo
+9. Medicine intelligence
+BERT drug match + LLM explanation
+10. Report analysis engine
+OCR → values → LLM insights
+11. Reminder system (Celery)M E T H O D O L O G Y
+User Authentication: Secure login/signup using JWT-based
+authentication.
+Profile Creation: Basic details: age, gender, blood group
+Medical history: allergies, chronic conditions, medications
+Multimodal Symptom Intake:Chat-based conversational interface
+and Voice-to-text input (Web Speech API)
+Dynamic Questionnaire: AI adapts follow-up questions based on
+responses
+Output: Structured symptom dataset for downstream AI processingAI PROCESSING LAYER & EMERGENCY HANDLING 1. Auth + session init
+2. Multimodal symptom intake
+Text / voice → cleaned + buffered
+3. LLM conversational reasoning
+Symptom expansion + context inference
+4. BERT + LLM hybrid layer
+PubMedBERT embeddings
+symptom vectorsSemantic matching
+vs diseases / drugs
+LLM overlay → ranked conditions + risk score
+5. SOAP note generation
+S / O / A / P structured output
+6. Real-time risk detection
+risk_score > threshold → emergency flag
+High
+risk?Yes7. Emergency
+Nearby hospitals
+8. QR profile
+Public snapshotNo
+9. Medicine intelligence
+BERT drug match + LLM explanation
+10. Report analysis engine
+OCR → values → LLM insights
+11. Reminder system (Celery)M E T H O D O L O G Y
+LLM-Based Analysis (Groq/Gemini):  Interprets symptoms and
+medical history.
+Hybrid Intelligence Layer: PubMedBERT embeddings + semantic
+matching + LLM reasoning for ranking conditions and interactions.
+SOAP Note Generation: Structured output: Subjective, Objective,
+Assessment, Plan.
+Real-Time Risk Detection: Assigns risk levels (low / medium / high).
+Emergency Protocol (High Risk): Triggers alerts, suggests nearby
+hospitals (OpenStreetMap API), and activates emergency mode.
+QR Emergency Profile: Shareable snapshot with critical data
+(allergies, medications, blood group).M E T H O D O L O G Y
+MEDICINE INTELLIGENCE & SAFETY LAYER
+ MEDICAL REPORT ANALYSIS ENGINE
+Report Upload: Supports PDFs and images
+OCR + AI Parsing: Extracts lab values and key indicators
+Insight Generation: Converts raw data →  simplified explanations
+Trend Tracking: Compares historical reports over timeAI Medicine Assistant: Uses NLP + PubMedBERT to understand drugs
+and patient context.
+Medicine Info Box: Context-aware UI shown during symptom analysis,
+prescriptions, and search.
+ Displays: benefits, side effects, interactions, contraindications, and
+usage guidance.
+Semantic Risk Check: Matches symptoms with side effects and
+checks new drugs against existing medications.
+AI Alerts: Flags adverse reactions, allergy conflicts, and unsafe
+combinations.1. Auth + session init
+2. Multimodal symptom intake
+Text / voice → cleaned + buffered
+3. LLM conversational reasoning
+Symptom expansion + context inference
+4. BERT + LLM hybrid layer
+PubMedBERT embeddings
+symptom vectorsSemantic matching
+vs diseases / drugs
+LLM overlay → ranked conditions + risk score
+5. SOAP note generation
+S / O / A / P structured output
+6. Real-time risk detection
+risk_score > threshold → emergency flag
+High
+risk?Yes7. Emergency
+Nearby hospitals
+8. QR profile
+Public snapshotNo
+9. Medicine intelligence
+BERT drug match + LLM explanation
+10. Report analysis engine
+OCR → values → LLM insights
+11. Reminder system (Celery)M E T H O D O L O G Y
+ MEDICAL REPORT ANALYSIS ENGINE
+PATIENT DASHBOARD
+Health Visualization: Charts (Recharts) for vitals & lab metrics
+Medication Management: 
+Reminders (scheduled + urgent alerts)
+Integrated Medicine Info Box for each drug
+Appointments Tracking: Upcoming consultations & follow-ups1. Auth + session init
+2. Multimodal symptom intake
+Text / voice → cleaned + buffered
+3. LLM conversational reasoning
+Symptom expansion + context inference
+4. BERT + LLM hybrid layer
+PubMedBERT embeddings
+symptom vectorsSemantic matching
+vs diseases / drugs
+LLM overlay → ranked conditions + risk score
+5. SOAP note generation
+S / O / A / P structured output
+6. Real-time risk detection
+risk_score > threshold → emergency flag
+High
+risk?Yes7. Emergency
+Nearby hospitals
+8. QR profile
+Public snapshotNo
+9. Medicine intelligence
+BERT drug match + LLM explanation
+10. Report analysis engine
+OCR → values → LLM insights
+11. Reminder system (Celery)Report Upload: Supports PDFs and images
+OCR + AI Parsing: Extracts lab values and key indicators
+Insight Generation: Converts raw data →  simplified explanations
+Trend Tracking: Compares historical reports over timeDOCTOR LOGIN & DASHBOARD
+AI CLINICAL SUMMARY
+DECISION SUPPORT SYSTEM1. Login + dashboard aggregation
+2. AI-processed case intake
+SOAP note, risk score, flags
+3. AI-assisted clinical reasoning
+LLM summary + BERT similarity scores
+4. BERT + LLM risk validation
+Drug-symptom matching
+(BERT embeddings)LLM reasoning layer
+suggests alternatives
+Contraindication + interaction detection
+5. Semantic risk alerts
+Drug interactions, allergies, flags
+6. Prescription studio
+Structured output, AI-validated
+7. Longitudinal patient analysis
+Past visits, reports, trends via LLM
+8. Feedback loop
+Doctor confirms → updates LLM + thresholdsimproves
+future AIAuto-generated SOAP notes from patient input
+Saves consultation time
+Structured clinical view:
+Subjective
+Objective
+Assessment
+PlanM E T H O D O L O G Y
+Secure authentication
+Access to patient queue
+Real-time case updates
+Semantic Risk Check (PubMedBERT)
+Flags:
+Drug side effects vs symptoms
+Potential adverse reactionsPRESCRIPTION STUDIO
+ PATIENT MONITORING
+EMERGENCY ACCESS VIA QR1. Login + dashboard aggregation
+2. AI-processed case intake
+SOAP note, risk score, flags
+3. AI-assisted clinical reasoning
+LLM summary + BERT similarity scores
+4. BERT + LLM risk validation
+Drug-symptom matching
+(BERT embeddings)LLM reasoning layer
+suggests alternatives
+Contraindication + interaction detection
+5. Semantic risk alerts
+Drug interactions, allergies, flags
+6. Prescription studio
+Structured output, AI-validated
+7. Longitudinal patient analysis
+Past visits, reports, trends via LLM
+8. Feedback loop
+Doctor confirms → updates LLM + thresholdsimproves
+future AI
+Access patient history and view:
+Uploaded reports
+Trends in vitals
+Continuous care supportM E T H O D O L O G Y
+Digital prescription generation
+Features:
+Dosage control
+Frequency selection
+Custom instructions
+Scan patient QR code and get instant:
+Allergies
+Blood group
+Medications Single dashboard view
+displaying Current State,
+History, and Changes —
+reducing consultation time
+and cognitive load.
+Automatic comparison
+between current and
+previous visits showing
+improvements or worsening
+conditions.EXPECTED OUTCOMES
+ Uploaded reports are
+summarized into concise
+historical medical
+information for quick
+review.
+ System converts
+free-text patient
+narrative into clear
+structured data
+Structured Patient
+Summary
+Medical History
+Snapshot
+Visit Change
+Detection Report
+Doctor-Ready
+Clinical ViewFUTURE SCOPE
+ AI processes complex
+medical imaging like X-rays
+and sonography to instantly
+detect subtle anomalies
+and highlight critical areas
+of concern. This intelligent
+screening provides doctors
+with rapid, data-driven
+insights to confidently
+accelerate their diagnostic
+workflows.
+AI uses vector
+embeddings to analyze
+similar patient cases and
+suggest commonly
+recommended tests or
+next diagnostic steps.
+ It acts as a smart
+second opinion, helping
+doctors reduce oversight
+and make faster, data-
+driven clinical decisions.
+Clinical Decision
+Support: "Similar Cases" Automated Imaging
+Insights
+AI securely transcribes live
+audio conversations between
+doctors and patients to
+automatically generate
+accurate, structured clinical
+notes. These summaries are
+instantly saved to the
+patient's visit history,
+eliminating manual
+documentation and allowing
+physicians to focus entirely on
+patient care.Automated Clinical Scribing
+Description:R E F E R E N C E S
+[1] Boyer, L., Fernandes, S., Auquier, P., Falissard, B., & Panch, T. (2025).      Reimagining patient-
+reported outcomes in the age of generative AI. npj Digital Medicine, 8(1), 624.
+[2] Bedwa, M., Hooda, N., & Kumar, V. (2026). Optimizing RAG-based LLMs for healthcare
+question answering tasks: M. Bedwa et al. Knowledge and Information Systems, 68(1), 26.
+[3] Liu, T. L., Hetherington, T. C., Stephens, C., McWilliams, A., Dharod, A., Carroll, T., &
+Cleveland, J. A. (2024). AI-powered clinical documentation and clinicians’ electronic health record
+experience: a nonrandomized clinical trial. JAMA Network Open, 7(9), e2432460.
+[4] de Vere Hunt, I. J., Jin, K. X., & Linos, E. (2025). A framework for considering the use of
+generative AI for health. npj Digital Medicine, 8(1), 297.
+[5] Hossain, E., Rana, R., Higgins, N., Soar, J., Barua, P. D., Pisani, A. R., & Turner, K. (2023).
+Natural language processing in electronic health records in relation to healthcare decision-
+making: a systematic review. Computers in biology and medicine, 155, 106649.
+[6] Luo, X., Li, Y., Xu, J., Zheng, Z., Ying, F., & Huang, G. (2025). AI in Medical Questionnaires:
+Scoping Review. Journal of Medical Internet Research, 27, e72398.THANK YOU
