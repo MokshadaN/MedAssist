@@ -17,7 +17,7 @@ from core.database import Base, engine
 import models  # noqa: F401
 
 # Import schemas so the package modules load cleanly.
-from schemas import ai, auth, feedback, message, patient, prescription, reminder, report, risk, session, triage, visit  # noqa: F401
+from schemas import ai, auth, feedback, message, patient, prescription, reminder, report, risk, session, triage, visit, schedule  # noqa: F401
 
 from api.v1.router import api_router
 
@@ -53,3 +53,13 @@ def startup_event():
         if "address" not in columns:
             with engine.begin() as connection:
                 connection.execute(text("ALTER TABLE patient_profiles ADD COLUMN address VARCHAR"))
+
+    # Start the medicine reminder background scheduler
+    from core.scheduler import start_scheduler
+    start_scheduler()
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    from core.scheduler import stop_scheduler
+    stop_scheduler()

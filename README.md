@@ -21,6 +21,7 @@ MedAssist is a comprehensive, full-stack medical assistance platform designed to
     - **Benefits:** How the medication helps manage specific conditions.
     - **Side Effects:** Common and rare side effects to watch for.
     - **Interactions:** AI-driven warnings based on the patient's existing health profile.
+- **Medicine Info Box:** A dedicated in-app card that surfaces medicine details at a glance, including usage guidance, safety notes, and key side effects.
 - **Prescription Studio:** A specialized tool for doctors to create digital prescriptions with precise dosage, frequency (e.g., Once/Twice/Thrice daily), and custom instructions.
 - **Semantic Risk Check:** Advanced NLP (using PubMedBERT) matches patient-reported symptoms against prescribed medicine side effects to alert doctors of potential adverse reactions.
 

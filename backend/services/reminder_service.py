@@ -6,6 +6,8 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from models.reminder import Reminder
+from models.user import User
+from services.email_service import send_followup_email
 
 
 def create_reminder(db: Session, user_id: str, message: str, time: datetime) -> Reminder:
@@ -21,12 +23,22 @@ def create_reminder(db: Session, user_id: str, message: str, time: datetime) -> 
         reminder.time = time
         db.commit()
         db.refresh(reminder)
-        return reminder
+    else:
+        reminder = Reminder(user_id=user_id, message=message, time=time)
+        db.add(reminder)
+        db.commit()
+        db.refresh(reminder)
 
-    reminder = Reminder(user_id=user_id, message=message, time=time)
-    db.add(reminder)
-    db.commit()
-    db.refresh(reminder)
+    # Send follow-up email to the patient
+    user = db.query(User).filter(User.id == user_id).first()
+    if user and user.email:
+        send_followup_email(
+            to_email=user.email,
+            patient_name=user.name or "Patient",
+            message=message,
+            followup_time=time.isoformat() if isinstance(time, datetime) else str(time),
+        )
+
     return reminder
 
 
@@ -53,4 +65,3 @@ def mark_reminder_completed(db: Session, reminder: Reminder, is_completed: bool 
 def delete_reminder(db: Session, reminder: Reminder) -> None:
     db.delete(reminder)
     db.commit()
-
