@@ -1,38 +1,39 @@
 import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
-import { QRCodeCanvas, QRCodeSVG } from 'qrcode.react';
-import { 
-  Heart, 
-  User, 
-  Stethoscope, 
-  Calendar, 
-  Clock, 
-  MapPin, 
-  LogOut, 
-  Menu, 
-  X, 
-  ChevronRight, 
-  ChevronDown, 
-  Bell, 
-  Search, 
-  Plus, 
-  Activity, 
-  ShieldAlert, 
-  Send, 
-  Mic, 
-  Video, 
-  FileText, 
-  Upload, 
-  Check, 
-  History, 
-  TrendingUp, 
-  Trash2, 
-  MessageCircle, 
-  Camera, 
-  Microscope, 
-  Star, 
-  ThumbsUp, 
-  Smartphone, 
-  AlertTriangle 
+import { QRCodeCanvas } from 'qrcode.react';
+import {
+  Heart,
+  User,
+  Stethoscope,
+  Calendar,
+  Clock,
+  MapPin,
+  LogOut,
+  Menu,
+  X,
+  ChevronRight,
+  ChevronDown,
+  Bell,
+  Search,
+  Plus,
+  Activity,
+  ShieldAlert,
+  Send,
+  Mic,
+  Video,
+  FileText,
+  Upload,
+  Check,
+  History,
+  TrendingUp,
+  Trash2,
+  MessageCircle,
+  Camera,
+  Microscope,
+  Star,
+  ThumbsUp,
+  Smartphone,
+  AlertTriangle,
+  Pill
 } from 'lucide-react';
 import HealthMetricsChart from './components/HealthMetricsChart';
 import {
@@ -58,6 +59,128 @@ import {
 type AuthMode = 'login' | 'register-doctor' | 'register-patient';
 type ChatMessage = { role: 'assistant' | 'user'; text: string };
 type FrequencyOption = 'once' | 'twice' | 'thrice';
+
+interface MedicineInfo {
+  name: string;
+  generic?: string;
+  purpose: string;
+  sideEffects: string;
+  usage: string;
+  category: string;
+  warnings?: string;
+}
+
+const MEDICINE_DB: MedicineInfo[] = [
+  // ── Analgesics & Antipyretics ──
+  { name: 'Paracetamol (Crocin)', generic: 'Acetaminophen', purpose: 'Fever and mild-to-moderate pain relief', sideEffects: 'Liver damage in overdose; rare rash', usage: 'Do not exceed 4 g/day; avoid alcohol', category: 'Analgesic / Antipyretic', warnings: 'Overdose can cause fatal liver failure' },
+  { name: 'Ibuprofen (Brufen)', generic: 'Ibuprofen', purpose: 'Pain, fever, and inflammation', sideEffects: 'GI irritation, ulcers, raised BP, kidney stress', usage: 'Take with food; use lowest effective dose', category: 'NSAID', warnings: 'Avoid in kidney disease, 3rd-trimester pregnancy, and heart failure' },
+  { name: 'Diclofenac (Voveran)', generic: 'Diclofenac sodium', purpose: 'Joint pain, muscle pain, post-op analgesia', sideEffects: 'Stomach pain, ulcers, elevated liver enzymes', usage: 'Take after meals; do not crush SR tablets', category: 'NSAID', warnings: 'Increases cardiovascular event risk with long-term use' },
+  { name: 'Aspirin (Ecosprin)', generic: 'Acetylsalicylic Acid', purpose: 'Platelet aggregation inhibitor; anti-clot after heart attack/stroke', sideEffects: 'GI bleeding, tinnitus', usage: 'Take after food; low-dose (75 mg) for cardiac use', category: 'Antiplatelet / NSAID', warnings: "Avoid in children < 16 (Reye's syndrome risk)" },
+  { name: 'Tramadol (Ultracet)', generic: 'Tramadol HCl', purpose: 'Moderate-to-severe pain', sideEffects: 'Nausea, dizziness, constipation, dependence', usage: 'Take every 4–6 h as needed; avoid alcohol', category: 'Opioid Analgesic', warnings: 'Seizure risk; do not use with MAOIs' },
+  { name: 'Nimesulide (Nimulid)', generic: 'Nimesulide', purpose: 'Fever, musculoskeletal pain, dysmenorrhoea', sideEffects: 'GI upset, liver toxicity (rare)', usage: 'Take after meals; max 15 days', category: 'NSAID (COX-2 preferential)', warnings: 'Banned in several countries for children; watch liver function' },
+  { name: 'Aceclofenac (Hifenac)', generic: 'Aceclofenac', purpose: 'Osteoarthritis, rheumatoid arthritis, ankylosing spondylitis', sideEffects: 'Dyspepsia, nausea, dizziness', usage: 'Take with food twice daily', category: 'NSAID', warnings: 'Avoid in peptic ulcer and severe renal impairment' },
+  // ── Antibiotics ──
+  { name: 'Amoxicillin (Mox)', generic: 'Amoxicillin trihydrate', purpose: 'Throat, ear, chest, UTI bacterial infections', sideEffects: 'Diarrhoea, rash, nausea', usage: 'Complete the full course', category: 'Antibiotic (Penicillin)', warnings: 'Inform doctor of penicillin allergy' },
+  { name: 'Azithromycin (Zithromax)', generic: 'Azithromycin', purpose: 'Respiratory, skin, STI bacterial infections', sideEffects: 'Nausea, diarrhoea, QT prolongation', usage: 'Take 1 h before or 2 h after food', category: 'Antibiotic (Macrolide)' },
+  { name: 'Ciprofloxacin (Ciplox)', generic: 'Ciprofloxacin HCl', purpose: 'UTI, typhoid, diarrhoea, respiratory infections', sideEffects: 'Nausea, headache, tendon rupture (rare)', usage: 'Take with plenty of water; avoid antacids within 2 h', category: 'Antibiotic (Fluoroquinolone)', warnings: 'Avoid in children; photosensitivity possible' },
+  { name: 'Amoxicillin-Clavulanate (Augmentin)', generic: 'Amoxicillin + Clavulanate', purpose: 'Beta-lactamase-producing bacterial infections', sideEffects: 'Diarrhoea, nausea, rash', usage: 'Take at the start of a meal', category: 'Antibiotic (Penicillin + BLI)' },
+  { name: 'Doxycycline (Doxy-1)', generic: 'Doxycycline hyclate', purpose: 'Acne, malaria prophylaxis, bacterial infections', sideEffects: 'Photosensitivity, oesophageal irritation, nausea', usage: 'Take upright with full glass of water; avoid lying down 30 min after', category: 'Antibiotic (Tetracycline)', warnings: 'Avoid sun exposure; not for < 8 years or pregnancy' },
+  { name: 'Metronidazole (Flagyl)', generic: 'Metronidazole', purpose: 'Anaerobic bacterial/protozoal infections, giardiasis, H. pylori', sideEffects: 'Metallic taste, nausea, dark urine', usage: 'Take with or after food; complete course', category: 'Antibiotic / Antiprotozoal', warnings: 'Strictly avoid alcohol — severe reaction' },
+  { name: 'Cephalexin (Sporidex)', generic: 'Cefalexin', purpose: 'Skin, respiratory, and UTI infections', sideEffects: 'Diarrhoea, nausea, rash', usage: 'Take 4 times daily; complete the course', category: 'Antibiotic (Cephalosporin)' },
+  { name: 'Cefixime (Suprax)', generic: 'Cefixime trihydrate', purpose: 'Typhoid, UTI, pharyngitis, gonorrhoea', sideEffects: 'Diarrhoea, abdominal pain, headache', usage: 'Can be taken with or without food', category: 'Antibiotic (Cephalosporin)' },
+  { name: 'Levofloxacin (Levaquin)', generic: 'Levofloxacin', purpose: 'Pneumonia, UTI, sinusitis, typhoid', sideEffects: 'Nausea, headache, tendinitis, dizziness', usage: 'Take with plenty of water; avoid antacids', category: 'Antibiotic (Fluoroquinolone)', warnings: 'Avoid prolonged use; tendon rupture possible in elderly' },
+  { name: 'Clarithromycin (Klaricid)', generic: 'Clarithromycin', purpose: 'Respiratory infections, H. pylori eradication', sideEffects: 'Metallic taste, nausea, QT prolongation', usage: 'Take with or without food; complete course', category: 'Antibiotic (Macrolide)' },
+  { name: 'Clindamycin (Dalacin)', generic: 'Clindamycin HCl', purpose: 'Severe skin, bone, dental, abdominal infections', sideEffects: 'Diarrhoea (including C. difficile), GI upset', usage: 'Take with a full glass of water', category: 'Antibiotic (Lincosamide)', warnings: 'Stop immediately if severe diarrhoea develops' },
+  // ── Antidiabetics ──
+  { name: 'Metformin (Glycomet)', generic: 'Metformin HCl', purpose: 'Type 2 diabetes blood-sugar control', sideEffects: 'Nausea, diarrhoea, stomach upset', usage: 'Take with or after meals', category: 'Antidiabetic (Biguanide)', warnings: 'Stop before contrast imaging; avoid in severe renal impairment' },
+  { name: 'Glibenclamide (Daonil)', generic: 'Glibenclamide', purpose: 'Type 2 diabetes blood-sugar lowering', sideEffects: 'Hypoglycaemia, weight gain, nausea', usage: 'Take with or just before meals', category: 'Antidiabetic (Sulfonylurea)', warnings: 'Do not skip meals — risk of low blood sugar' },
+  { name: 'Glimepiride (Amaryl)', generic: 'Glimepiride', purpose: 'Type 2 diabetes', sideEffects: 'Hypoglycaemia, dizziness, weight gain', usage: 'Take before the first main meal of the day', category: 'Antidiabetic (Sulfonylurea)' },
+  { name: 'Voglibose (Volix)', generic: 'Voglibose', purpose: 'Post-meal blood sugar spikes in Type 2 Diabetes', sideEffects: 'Flatulence, abdominal bloating, diarrhoea', usage: 'Take just before meals — must eat immediately after', category: 'Antidiabetic (Alpha-glucosidase inhibitor)' },
+  { name: 'Sitagliptin (Januvia)', generic: 'Sitagliptin phosphate', purpose: 'Type 2 diabetes (adjunct to diet & exercise)', sideEffects: 'Nasopharyngitis, headache, joint pain', usage: 'Take once daily with or without food', category: 'Antidiabetic (DPP-4 Inhibitor)' },
+  { name: 'Dapagliflozin (Forxiga)', generic: 'Dapagliflozin', purpose: 'Type 2 diabetes; heart failure; chronic kidney disease', sideEffects: 'UTI, genital fungal infections, polyuria', usage: 'Take once daily in the morning', category: 'Antidiabetic (SGLT-2 Inhibitor)', warnings: 'Increased risk of DKA; stay well hydrated' },
+  { name: 'Insulin Glargine (Lantus)', generic: 'Insulin glargine', purpose: 'Long-acting basal insulin for Type 1 & 2 Diabetes', sideEffects: 'Hypoglycaemia, injection site reactions', usage: 'Inject subcutaneously once daily at the same time', category: 'Insulin (Long-acting)', warnings: 'Never mix or dilute; store unused pens in refrigerator' },
+  // ── Cardiovascular ──
+  { name: 'Amlodipine (Amlip)', generic: 'Amlodipine besylate', purpose: 'Hypertension and stable angina', sideEffects: 'Ankle oedema, flushing, dizziness', usage: 'Take once daily, with or without food', category: 'Calcium Channel Blocker' },
+  { name: 'Atenolol (Tenormin)', generic: 'Atenolol', purpose: 'Hypertension, angina, post-MI heart rate control', sideEffects: 'Bradycardia, fatigue, cold extremities', usage: 'Take once or twice daily; do not skip doses', category: 'Beta Blocker', warnings: 'Never stop abruptly — can precipitate MI' },
+  { name: 'Metoprolol (Betaloc)', generic: 'Metoprolol succinate', purpose: 'Hypertension, heart failure, arrhythmia, angina', sideEffects: 'Fatigue, dizziness, bradycardia', usage: 'Take with or after food; do not crush SR tablets', category: 'Beta Blocker', warnings: 'Taper dose before stopping' },
+  { name: 'Enalapril (Enam)', generic: 'Enalapril maleate', purpose: 'Hypertension, heart failure', sideEffects: 'Dry cough, hypotension, high potassium', usage: 'Take once or twice daily with or without food', category: 'ACE Inhibitor', warnings: 'Avoid in pregnancy; stop if angioedema occurs' },
+  { name: 'Ramipril (Cardace)', generic: 'Ramipril', purpose: 'Hypertension, heart failure, stroke/MI prevention', sideEffects: 'Dry cough, dizziness, elevated potassium', usage: 'Take once daily; swallow whole', category: 'ACE Inhibitor', warnings: 'Avoid in pregnancy and bilateral renal artery stenosis' },
+  { name: 'Losartan (Losar)', generic: 'Losartan potassium', purpose: 'Hypertension, diabetic nephropathy', sideEffects: 'Dizziness, high potassium, back pain', usage: 'Take once daily with or without food', category: 'ARB', warnings: 'Contraindicated in pregnancy' },
+  { name: 'Telmisartan (Telma)', generic: 'Telmisartan', purpose: 'Hypertension, cardiovascular risk reduction', sideEffects: 'Dizziness, back pain, sinusitis', usage: 'Take once daily at the same time each day', category: 'ARB', warnings: 'Avoid in pregnancy' },
+  { name: 'Atorvastatin (Lipitor)', generic: 'Atorvastatin calcium', purpose: 'High cholesterol, cardiovascular risk reduction', sideEffects: 'Muscle pain, liver enzyme rise, GI upset', usage: 'Take once daily; grapefruit juice reduces effect', category: 'Statin', warnings: 'Report unexplained muscle pain immediately' },
+  { name: 'Rosuvastatin (Crestor)', generic: 'Rosuvastatin calcium', purpose: 'High cholesterol and cardiovascular risk', sideEffects: 'Muscle pain, headache, abdominal pain', usage: 'Take once daily, any time of day', category: 'Statin', warnings: 'Avoid high doses in Asian patients; check liver function' },
+  { name: 'Clopidogrel (Plavix)', generic: 'Clopidogrel bisulfate', purpose: 'Prevention of blood clots after MI or stroke', sideEffects: 'Bleeding, bruising, GI upset', usage: 'Take once daily with or without food', category: 'Antiplatelet', warnings: 'Do not stop without doctor guidance; interacts with PPIs' },
+  { name: 'Furosemide (Lasix)', generic: 'Furosemide', purpose: 'Oedema in heart failure, kidney/liver disease; hypertension', sideEffects: 'Increased urination, low potassium, dehydration', usage: 'Take in the morning to avoid nocturia', category: 'Loop Diuretic', warnings: 'Monitor potassium; can worsen gout and diabetes' },
+  { name: 'Digoxin (Lanoxin)', generic: 'Digoxin', purpose: 'Heart failure and atrial fibrillation rate control', sideEffects: 'Nausea, yellow-green visual halos, arrhythmia (toxicity)', usage: 'Take at same time daily; regular blood-level checks', category: 'Cardiac Glycoside', warnings: 'Very narrow therapeutic window — toxicity is dangerous' },
+  { name: 'Isosorbide Mononitrate (Imdur)', generic: 'Isosorbide-5-mononitrate', purpose: 'Angina prevention', sideEffects: 'Headache, dizziness, hypotension', usage: 'Take in morning; allow nitrate-free interval to prevent tolerance', category: 'Nitrate', warnings: 'Never combine with PDE5 inhibitors (sildenafil etc.)' },
+  // ── Gastrointestinal ──
+  { name: 'Omeprazole (Omez)', generic: 'Omeprazole', purpose: 'GERD, peptic ulcers, Zollinger-Ellison syndrome', sideEffects: 'Headache, nausea, diarrhoea, B12 deficiency (long-term)', usage: 'Take 30 min before first meal of the day', category: 'Proton Pump Inhibitor' },
+  { name: 'Pantoprazole (Pan)', generic: 'Pantoprazole sodium', purpose: 'Acid-related diseases, H. pylori eradication', sideEffects: 'Headache, diarrhoea, abdominal pain', usage: 'Take 30–60 min before meals; swallow whole', category: 'Proton Pump Inhibitor' },
+  { name: 'Rabeprazole (Razo)', generic: 'Rabeprazole sodium', purpose: 'GERD, duodenal ulcer, H. pylori', sideEffects: 'Headache, nausea, flatulence', usage: 'Take before meals; do not crush', category: 'Proton Pump Inhibitor' },
+  { name: 'Domperidone (Domstal)', generic: 'Domperidone', purpose: 'Nausea, vomiting, gastric motility disorders', sideEffects: 'Dry mouth, headache, raised prolactin', usage: 'Take 15–30 min before meals', category: 'Prokinetic / Antiemetic', warnings: 'Cardiac arrhythmia risk at high doses; use lowest effective dose' },
+  { name: 'Ondansetron (Emeset)', generic: 'Ondansetron HCl', purpose: 'Nausea and vomiting (chemo, surgery, pregnancy)', sideEffects: 'Headache, constipation, QT prolongation', usage: 'Take 30 min before event likely to cause nausea', category: 'Antiemetic (5-HT3 Antagonist)' },
+  { name: 'Metoclopramide (Perinorm)', generic: 'Metoclopramide HCl', purpose: 'Nausea, vomiting, gastroparesis, GERD', sideEffects: 'Drowsiness, restlessness, tardive dyskinesia (long-term)', usage: 'Take 30 min before meals', category: 'Prokinetic / Antiemetic', warnings: 'Do not use > 12 weeks — tardive dyskinesia risk' },
+  { name: 'Loperamide (Imodium)', generic: 'Loperamide HCl', purpose: 'Acute and chronic diarrhoea', sideEffects: 'Constipation, abdominal cramps, dizziness', usage: 'Take after each loose stool; do not exceed daily limit', category: 'Antidiarrheal', warnings: 'Do not use with fever or bloody stools' },
+  { name: 'ORS (Electral)', generic: 'Oral Rehydration Salts', purpose: 'Dehydration due to diarrhoea and vomiting', sideEffects: 'Very rare; hypernatraemia if misused', usage: 'Dissolve sachet in 1 litre of clean water; sip frequently', category: 'Rehydration Salt' },
+  { name: 'Lactulose (Duphalac)', generic: 'Lactulose', purpose: 'Constipation, hepatic encephalopathy', sideEffects: 'Flatulence, bloating, diarrhoea at high doses', usage: 'Take with water or juice; may take up to 48 h for effect', category: 'Osmotic Laxative' },
+  { name: 'Activated Charcoal (Carbomix)', generic: 'Activated charcoal', purpose: 'Drug overdose/poisoning; bloating and gas', sideEffects: 'Black stools, constipation, vomiting', usage: 'Take as directed by physician or poison control immediately', category: 'Adsorbent / Antidote', warnings: 'Not effective for all poisons; seek emergency care' },
+  // ── Respiratory ──
+  { name: 'Salbutamol (Asthalin)', generic: 'Albuterol', purpose: 'Acute bronchospasm relief in asthma and COPD', sideEffects: 'Tremor, palpitations, headache, anxiety', usage: 'Inhale 1–2 puffs as needed; wait 1 min between puffs', category: 'Bronchodilator (SABA)' },
+  { name: 'Montelukast (Singulair)', generic: 'Montelukast sodium', purpose: 'Asthma prevention, allergic rhinitis', sideEffects: 'Headache, stomach pain, mood changes (rare)', usage: 'Take once daily in the evening', category: 'Leukotriene Receptor Antagonist', warnings: 'Monitor for mood/behavioural changes' },
+  { name: 'Budesonide Inhaler (Budecort)', generic: 'Budesonide', purpose: 'Maintenance treatment of asthma and COPD', sideEffects: 'Oral candidiasis, hoarseness, sore throat', usage: 'Rinse mouth with water after each use', category: 'Inhaled Corticosteroid' },
+  { name: 'Theophylline (Deriphyllin)', generic: 'Theophylline + Etofylline', purpose: 'Asthma and COPD bronchospasm', sideEffects: 'Nausea, headache, palpitations, insomnia', usage: 'Take with food; avoid caffeine', category: 'Xanthine Bronchodilator', warnings: 'Narrow therapeutic index; many drug interactions' },
+  { name: 'N-Acetylcysteine (Mucomyst)', generic: 'N-Acetylcysteine', purpose: 'Mucolytic for respiratory secretions; paracetamol overdose antidote', sideEffects: 'Nausea, vomiting, rash', usage: 'Dissolve effervescent tablet in water; take after meals', category: 'Mucolytic / Antidote' },
+  // ── Allergy & Dermatology ──
+  { name: 'Cetirizine (Cetzine)', generic: 'Cetirizine HCl', purpose: 'Allergic rhinitis, urticaria, hay fever', sideEffects: 'Mild drowsiness, dry mouth, headache', usage: 'Take once daily, preferably at night', category: 'Antihistamine (2nd gen)' },
+  { name: 'Fexofenadine (Allegra)', generic: 'Fexofenadine HCl', purpose: 'Allergic rhinitis and chronic urticaria', sideEffects: 'Headache, nausea, dizziness — non-sedating', usage: 'Take with water; avoid fruit juices within 4 h', category: 'Antihistamine (2nd gen)' },
+  { name: 'Chlorpheniramine (Piriton)', generic: 'Chlorpheniramine maleate', purpose: 'Allergy, common cold, insect bites', sideEffects: 'Drowsiness, dry mouth, urinary retention', usage: 'Take with food; avoid driving', category: 'Antihistamine (1st gen)' },
+  { name: 'Betamethasone cream (Betnovate)', generic: 'Betamethasone valerate', purpose: 'Eczema, psoriasis, allergic dermatitis', sideEffects: 'Skin thinning, stretch marks, fungal superinfection with prolonged use', usage: 'Apply thin layer to affected area; do not occlude face or genital area', category: 'Topical Corticosteroid', warnings: 'Do not use on face long-term; avoid in skin infections' },
+  { name: 'Clotrimazole cream (Canesten)', generic: 'Clotrimazole', purpose: 'Fungal skin infections: ringworm, athlete\'s foot, candidiasis', sideEffects: 'Mild burning, itching, redness', usage: 'Apply 2–3 times daily; continue for 2 weeks after symptoms clear', category: 'Antifungal (Topical)' },
+  { name: 'Fluconazole (Fluconac)', generic: 'Fluconazole', purpose: 'Systemic and mucosal fungal infections, vaginal candidiasis', sideEffects: 'Nausea, headache, rash, liver toxicity', usage: 'Take with or without food; single dose for vaginal thrush', category: 'Antifungal (Systemic)', warnings: 'Many drug interactions; check liver function in prolonged use' },
+  // ── Thyroid ──
+  { name: 'Levothyroxine (Thyronorm)', generic: 'Levothyroxine sodium', purpose: 'Hypothyroidism replacement therapy', sideEffects: 'Palpitations, insomnia, weight loss (if over-dosed)', usage: 'Take on empty stomach 30–60 min before breakfast', category: 'Thyroid Hormone', warnings: 'Many drug interactions; regular TSH monitoring required' },
+  { name: 'Carbimazole (Neomercazole)', generic: 'Carbimazole', purpose: 'Hyperthyroidism (Graves disease, toxic goitre)', sideEffects: 'Rash, nausea, agranulocytosis (rare)', usage: 'Take at regular intervals with or without food', category: 'Antithyroid', warnings: 'Stop immediately and seek care if fever/sore throat develops' },
+  // ── Vitamins & Supplements ──
+  { name: 'Vitamin D3 (Calcirol)', generic: 'Cholecalciferol', purpose: 'Vitamin D deficiency, bone health, immune support', sideEffects: 'Hypercalcaemia with very high doses', usage: 'Take with a fatty meal for best absorption', category: 'Vitamin / Supplement' },
+  { name: 'Calcium + Vit D3 (Shelcal)', generic: 'Calcium carbonate + Cholecalciferol', purpose: 'Calcium and Vitamin D deficiency, osteoporosis prevention', sideEffects: 'Constipation, bloating, hypercalcaemia', usage: 'Take with meals; space from iron supplements by 2 h', category: 'Vitamin / Supplement' },
+  { name: 'Folic Acid (Folvite)', generic: 'Folate', purpose: 'Neural tube defect prevention, folate-deficiency anaemia', sideEffects: 'Generally well tolerated; very rare allergic reactions', usage: 'Take once daily; start before conception in women planning pregnancy', category: 'Vitamin / Supplement' },
+  { name: 'Iron + Folic Acid (Ferrous Sulphate)', generic: 'Ferrous sulphate + Folic acid', purpose: 'Iron-deficiency anaemia; pregnancy anaemia', sideEffects: 'Constipation, dark stools, nausea', usage: 'Take on empty stomach; space from antacids and tea by 2 h', category: 'Haematinic', warnings: 'Dark stools are normal; overdose is dangerous in children' },
+  { name: 'Vitamin B12 (Methylcobalamin)', generic: 'Methylcobalamin', purpose: 'Vitamin B12 deficiency, neuropathy, anaemia', sideEffects: 'Generally safe; occasional nausea', usage: 'Take with or without food', category: 'Vitamin / Supplement' },
+  // ── Neurological & Psychiatric ──
+  { name: 'Sertraline (Zoloft)', generic: 'Sertraline HCl', purpose: 'Depression, anxiety, OCD, PTSD', sideEffects: 'Nausea, insomnia, dry mouth, sexual dysfunction', usage: 'Take once daily; allow 4–6 weeks for full effect', category: 'SSRI Antidepressant', warnings: 'Do not stop abruptly; monitor for suicidality early in treatment' },
+  { name: 'Escitalopram (Nexito)', generic: 'Escitalopram oxalate', purpose: 'Depression and generalised anxiety disorder', sideEffects: 'Nausea, insomnia, sweating, headache', usage: 'Take once daily; morning or evening', category: 'SSRI Antidepressant', warnings: 'Avoid abrupt withdrawal; QT prolongation at high doses' },
+  { name: 'Alprazolam (Restyl)', generic: 'Alprazolam', purpose: 'Anxiety disorders, panic disorder', sideEffects: 'Sedation, dependence, cognitive impairment', usage: 'Take as prescribed; do not drive', category: 'Benzodiazepine', warnings: 'High dependence potential; do not combine with alcohol or opioids' },
+  { name: 'Diazepam (Calmpose)', generic: 'Diazepam', purpose: 'Anxiety, muscle spasms, alcohol withdrawal, seizures', sideEffects: 'Drowsiness, confusion, dependence', usage: 'Take exactly as prescribed; do not drive', category: 'Benzodiazepine', warnings: 'Serious dependence risk; avoid with alcohol' },
+  { name: 'Phenytoin (Eptoin)', generic: 'Phenytoin sodium', purpose: 'Epilepsy (grand mal, focal seizures)', sideEffects: 'Gum overgrowth, nystagmus, rash, folate deficiency', usage: 'Take with or after meals; do not skip doses', category: 'Anticonvulsant', warnings: 'Narrow therapeutic index; monitor blood levels regularly' },
+  { name: 'Levetiracetam (Levroxa)', generic: 'Levetiracetam', purpose: 'Partial and generalised seizures', sideEffects: 'Drowsiness, irritability, headache', usage: 'Take twice daily with or without food; do not stop abruptly', category: 'Anticonvulsant' },
+  { name: 'Pregabalin (Lyrica)', generic: 'Pregabalin', purpose: 'Neuropathic pain, fibromyalgia, partial seizures, anxiety', sideEffects: 'Dizziness, drowsiness, weight gain, peripheral oedema', usage: 'Take 2–3 times daily; do not stop abruptly', category: 'Gabapentinoid', warnings: 'Dependence potential; avoid with alcohol' },
+  { name: 'Gabapentin (Gabantin)', generic: 'Gabapentin', purpose: 'Neuropathic pain, partial seizures', sideEffects: 'Dizziness, somnolence, ataxia', usage: 'Take 3 times daily; can be taken with food', category: 'Gabapentinoid', warnings: 'Do not stop abruptly' },
+  // ── Antimalarials & Antiparasitals ──
+  { name: 'Chloroquine (Lariago)', generic: 'Chloroquine phosphate', purpose: 'Malaria treatment and prophylaxis; autoimmune conditions', sideEffects: 'Nausea, retinal toxicity (long-term), headache', usage: 'Take with food; eye exams needed with long-term use', category: 'Antimalarial', warnings: 'Retinal toxicity with prolonged use; check G6PD deficiency' },
+  { name: 'Hydroxychloroquine (HCQS)', generic: 'Hydroxychloroquine sulphate', purpose: 'Rheumatoid arthritis, lupus, malaria', sideEffects: 'Nausea, retinal toxicity, QT prolongation', usage: 'Take with food or milk', category: 'Antimalarial / DMARD', warnings: 'Annual eye screening required for long-term use' },
+  { name: 'Albendazole (Zentel)', generic: 'Albendazole', purpose: 'Worm infestations (roundworm, tapeworm, hookworm)', sideEffects: 'Nausea, headache, raised liver enzymes', usage: 'Take with a fatty meal; single dose for most worm infections', category: 'Anthelmintic' },
+  { name: 'Ivermectin (Ivermectol)', generic: 'Ivermectin', purpose: 'Scabies, filariasis, strongyloides, head lice', sideEffects: 'Dizziness, nausea, Mazzotti reaction (in filariasis)', usage: 'Take on empty stomach with water; single dose', category: 'Antiparasitic' },
+  // ── Bone & Joints ──
+  { name: 'Calcium + Vitamin D (Shelcal HD)', generic: 'Calcium carbonate + Vit D3', purpose: 'Osteoporosis prevention and treatment', sideEffects: 'Constipation, kidney stones with excess use', usage: 'Take with meals for best absorption', category: 'Bone Health Supplement' },
+  { name: 'Alendronate (Osteofos)', generic: 'Alendronic acid', purpose: 'Osteoporosis treatment and prevention', sideEffects: 'Oesophageal irritation, bone/joint pain, hypocalcaemia', usage: 'Take on empty stomach with 200 mL water; stay upright for 30 min', category: 'Bisphosphonate', warnings: 'Never lie down after taking; jaw osteonecrosis with long-term use' },
+  { name: 'Methotrexate (Folitrax)', generic: 'Methotrexate', purpose: 'Rheumatoid arthritis, psoriasis, certain cancers', sideEffects: 'Mouth ulcers, nausea, liver toxicity, bone marrow suppression', usage: 'Take once weekly — NOT daily; take folic acid same week', category: 'DMARD / Antimetabolite', warnings: 'Teratogenic; strict contraception required; regular blood monitoring essential' },
+  // ── Women\'s Health ──
+  { name: 'Norethisterone (Primolut N)', generic: 'Norethisterone', purpose: 'Menstrual irregularities, endometriosis, postponing menstruation', sideEffects: 'Nausea, bloating, headache, breakthrough bleeding', usage: 'Take as directed by gynaecologist; do not self-prescribe', category: 'Progestogen' },
+  { name: 'Mifepristone + Misoprostol (MTP Kit)', generic: 'Mifepristone + Misoprostol', purpose: 'Medical termination of pregnancy up to 9 weeks', sideEffects: 'Cramping, heavy bleeding, nausea', usage: 'Strictly under medical supervision only', category: 'Abortifacient', warnings: 'For use only under physician guidance; ectopic pregnancy must be excluded' },
+  { name: 'Clomiphene (Siphene)', generic: 'Clomiphene citrate', purpose: 'Ovulation induction in infertility', sideEffects: 'Hot flushes, mood swings, ovarian enlargement, multiple pregnancies', usage: 'Take as prescribed; monitor ovulation with ultrasound', category: 'Fertility Drug', warnings: 'Multiple pregnancy risk; ovarian hyperstimulation syndrome possible' },
+  // ── Miscellaneous & Common OTC ──
+  { name: 'Antacid (Digene / Gelusil)', generic: 'Magnesium hydroxide + Aluminium hydroxide', purpose: 'Heartburn, acidity, gastric discomfort', sideEffects: 'Constipation (Al salts), diarrhoea (Mg salts)', usage: 'Chew tablet or take liquid 1 h after meals and at bedtime', category: 'Antacid', warnings: 'Reduces absorption of many drugs — space by at least 2 h' },
+  { name: 'Chlorhexidine Mouthwash (Hexidine)', generic: 'Chlorhexidine gluconate', purpose: 'Gingivitis, oral ulcers, post-dental infection antisepsis', sideEffects: 'Tooth staining, taste disturbance', usage: 'Rinse for 30 sec after brushing; do not swallow', category: 'Oral Antiseptic' },
+  { name: 'Povidone-Iodine (Betadine)', generic: 'Povidone-iodine', purpose: 'Wound cleaning, skin antisepsis, throat gargle', sideEffects: 'Skin irritation, iodine hypersensitivity', usage: 'Dilute before gargling; do not use on deep wounds long-term', category: 'Topical Antiseptic', warnings: 'Avoid in thyroid disease and pregnancy' },
+  { name: 'Warfarin (Warf)', generic: 'Warfarin sodium', purpose: 'DVT, pulmonary embolism, stroke prevention in AF', sideEffects: 'Bleeding, bruising, hair loss', usage: 'Take at the same time daily; regular INR monitoring essential', category: 'Anticoagulant', warnings: 'Many food/drug interactions; avoid NSAIDs and Vitamin K-rich foods in excess' },
+  { name: 'Heparin (Injection)', generic: 'Unfractionated Heparin', purpose: 'Deep vein thrombosis, pulmonary embolism treatment; anticoagulation during surgery', sideEffects: 'Bleeding, heparin-induced thrombocytopenia (HIT)', usage: 'Administered by healthcare professional only (IV/SC)', category: 'Anticoagulant (Parenteral)', warnings: 'Life-threatening bleeding risk; platelet monitoring required' },
+  { name: 'Zinc Supplements (Zincovit)', generic: 'Zinc sulphate / gluconate', purpose: 'Zinc deficiency, diarrhoea in children, wound healing support', sideEffects: 'Nausea, metallic taste, copper deficiency at high doses', usage: 'Take with or after food', category: 'Mineral Supplement' },
+  { name: 'Rabies Vaccine (Rabipur)', generic: 'Inactivated Rabies Virus', purpose: 'Post-exposure prophylaxis after animal bite', sideEffects: 'Injection site pain, redness, mild fever', usage: 'Follow the prescribed schedule; do not miss doses', category: 'Vaccine', warnings: 'Must be combined with Rabies Immunoglobulin for unvaccinated individuals' },
+  { name: 'Tetanus Toxoid (TT Vaccine)', generic: 'Tetanus Toxoid', purpose: 'Tetanus prevention after injury', sideEffects: 'Injection site soreness, mild fever', usage: 'Single IM injection; booster every 10 years', category: 'Vaccine' },
+  { name: 'Ranitidine (Zinetac)', generic: 'Ranitidine HCl', purpose: 'Peptic ulcer, GERD, heartburn', sideEffects: 'Headache, dizziness, constipation', usage: 'Take before meals or at bedtime', category: 'H2 Blocker' },
+  { name: 'Spironolactone (Aldactone)', generic: 'Spironolactone', purpose: 'Heart failure, oedema, hypertension, PCOS-related acne', sideEffects: 'High potassium, breast tenderness, irregular periods', usage: 'Take with food', category: 'Potassium-sparing Diuretic', warnings: 'Monitor potassium; avoid potassium supplements' },
+  { name: 'Prednisolone (Wysolone)', generic: 'Prednisolone', purpose: 'Asthma flares, allergic conditions, autoimmune disease', sideEffects: 'Weight gain, elevated blood sugar, mood changes, immune suppression', usage: 'Take with food in the morning; taper dose as directed', category: 'Corticosteroid', warnings: 'Never stop abruptly after prolonged use; increases infection risk' },
+];
 
 const emptyProfile: PatientProfile = {
   id: '',
@@ -92,10 +215,10 @@ function formatReportAnalysis(parsedData?: string | null) {
     // The Gemini JSON is nested under the 'analysis' key
     const analysis = data.analysis || data;
     const summary = analysis.clinical_summary || {};
-    
+
     // Show only the overall clinical snapshot
-    const snapshot = typeof summary.overall_clinical_snapshot === 'string' 
-      ? summary.overall_clinical_snapshot 
+    const snapshot = typeof summary.overall_clinical_snapshot === 'string'
+      ? summary.overall_clinical_snapshot
       : '';
 
     return snapshot || 'Analysis complete. No summary found.';
@@ -246,6 +369,9 @@ function App() {
   const [busy, setBusy] = useState('');
   const [flash, setFlash] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMedicineBox, setShowMedicineBox] = useState(false);
+  const [medicineQuery, setMedicineQuery] = useState('');
+  const [selectedMedicine, setSelectedMedicine] = useState<MedicineInfo | null>(null);
 
   const [doctors, setDoctors] = useState<DoctorDirectoryItem[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
@@ -329,7 +455,7 @@ function App() {
     setFlash('');
     setBusy('');
     setShowNotifications(false);
-    
+
     // Clear patient state
     setDoctors([]);
     setSelectedDoctorId('');
@@ -345,7 +471,7 @@ function App() {
     setPrescriptionStatus('');
     setMedicationStatus('');
     setNotificationStatus('');
-    
+
     // Clear intake/chat state
     setIntakeOpen(false);
     setActiveSessionId('');
@@ -1114,7 +1240,18 @@ function App() {
           </div>
         </div>
         <div className="topbar-actions">
-          <button className="secondary" onClick={() => setShowNotifications((value) => !value)}>
+          {user.role === 'patient' && (
+            <button
+              id="medicine-infobox-btn"
+              className={`secondary med-info-btn ${showMedicineBox ? 'active' : ''}`}
+              onClick={() => { setShowMedicineBox((v) => !v); setShowNotifications(false); }}
+              title="Medicine Information"
+            >
+              <Pill size={16} />
+              Medicine Info
+            </button>
+          )}
+          <button className="secondary" onClick={() => { setShowNotifications((value) => !value); setShowMedicineBox(false); }}>
             Notifications ({notifications.filter((item) => !item.is_read).length})
           </button>
           <button className="ghost" onClick={signOut}>Sign out</button>
@@ -1146,6 +1283,119 @@ function App() {
             ))}
             {!notifications.length && <div className="empty">No notifications yet.</div>}
           </div>
+        </section>
+      )}
+
+      {showMedicineBox && (
+        <section className="panel medicine-box-panel animate-in" id="medicine-infobox-panel">
+          <div className="panel-head">
+            <div>
+              <div className="eyebrow">Drug Reference</div>
+              <h2>Medicine Info</h2>
+            </div>
+            <button className="ghost" onClick={() => { setShowMedicineBox(false); setSelectedMedicine(null); setMedicineQuery(''); }}>
+              <X size={18} />
+            </button>
+          </div>
+
+          <div className="medicine-search-row">
+            <div className="medicine-search-input-wrap">
+              <Search size={16} className="medicine-search-icon" />
+              <input
+                id="medicine-search-input"
+                className="medicine-search-input"
+                type="text"
+                placeholder="Search medication name e.g. Metformin..."
+                value={medicineQuery}
+                onChange={(e) => { setMedicineQuery(e.target.value); setSelectedMedicine(null); }}
+                autoFocus
+              />
+              {medicineQuery && (
+                <button className="ghost medicine-clear-btn" onClick={() => { setMedicineQuery(''); setSelectedMedicine(null); }}>
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {!medicineQuery && !selectedMedicine && (
+            <div className="medicine-categories">
+              <div className="eyebrow" style={{ marginBottom: '0.75rem' }}>Browse by category</div>
+              <div className="medicine-cat-chips">
+                {Array.from(new Set(MEDICINE_DB.map((m) => m.category.split(' ')[0]))).map((cat) => (
+                  <button key={cat} className="pill medicine-cat-chip" onClick={() => setMedicineQuery(cat)}>{cat}</button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {medicineQuery && !selectedMedicine && (() => {
+            const results = MEDICINE_DB.filter(
+              (m) =>
+                m.name.toLowerCase().includes(medicineQuery.toLowerCase()) ||
+                (m.generic || '').toLowerCase().includes(medicineQuery.toLowerCase()) ||
+                m.purpose.toLowerCase().includes(medicineQuery.toLowerCase()) ||
+                m.category.toLowerCase().includes(medicineQuery.toLowerCase())
+            );
+            return results.length > 0 ? (
+              <div className="medicine-results stack compact">
+                {results.map((med) => (
+                  <button
+                    key={med.name}
+                    className="medicine-result-item"
+                    onClick={() => setSelectedMedicine(med)}
+                  >
+                    <div className="medicine-result-name">{med.name}</div>
+                    {med.generic && <div className="medicine-result-generic">{med.generic}</div>}
+                    <div className="medicine-result-category">{med.category}</div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="medicine-no-result">
+                <div className="medicine-no-result-icon">💊</div>
+                <strong>No results for "{medicineQuery}"</strong>
+                <p>Try a different name or browse by category above.</p>
+              </div>
+            );
+          })()}
+
+          {selectedMedicine && (
+            <div className="medicine-detail animate-in">
+              <button className="ghost medicine-back-btn" onClick={() => setSelectedMedicine(null)}>
+                ← Back to results
+              </button>
+              <div className="medicine-detail-header">
+                <div className="medicine-detail-icon"><Pill size={24} /></div>
+                <div>
+                  <h3 className="medicine-detail-name">{selectedMedicine.name}</h3>
+                  {selectedMedicine.generic && <div className="medicine-detail-generic">Generic: {selectedMedicine.generic}</div>}
+                  <span className="pill" style={{ marginTop: '0.35rem', display: 'inline-flex' }}>{selectedMedicine.category}</span>
+                </div>
+              </div>
+              <div className="medicine-info-grid">
+                <div className="medicine-info-card purpose">
+                  <div className="medicine-info-label">Purpose</div>
+                  <div className="medicine-info-value">{selectedMedicine.purpose}</div>
+                </div>
+                <div className="medicine-info-card usage">
+                  <div className="medicine-info-label">How to Take</div>
+                  <div className="medicine-info-value">{selectedMedicine.usage}</div>
+                </div>
+                <div className="medicine-info-card side-effects">
+                  <div className="medicine-info-label">Common Side Effects</div>
+                  <div className="medicine-info-value">{selectedMedicine.sideEffects}</div>
+                </div>
+                {selectedMedicine.warnings && (
+                  <div className="medicine-info-card warnings">
+                    <div className="medicine-info-label">⚠ Important Warnings</div>
+                    <div className="medicine-info-value">{selectedMedicine.warnings}</div>
+                  </div>
+                )}
+              </div>
+              <p className="medicine-disclaimer">This information is for general reference only. Always follow your doctor's instructions.</p>
+            </div>
+          )}
         </section>
       )}
 
@@ -1198,7 +1448,7 @@ function App() {
                     <p style={{ fontSize: '0.8rem', opacity: 0.8, marginBottom: '1rem' }}>
                       Emergency responders can scan this to see your vital medical details instantly.
                     </p>
-                    
+
                     {showQR && patientProfile ? (
                       <div className="qr-container animate-in" style={{ background: '#fff', padding: '1.25rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 8px 30px rgba(0,0,0,0.12)' }}>
                         <QRCodeCanvas
@@ -1216,11 +1466,6 @@ function App() {
 
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
                   {profileStatus && <div className="flash subtle">{profileStatus}</div>}
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 1374d16537da2bf53e7401ba508b1ba35c19aaee
                 </form>
               </div>
             </div>
@@ -1414,14 +1659,14 @@ function App() {
                           </pre>
                         )}
                       </div>
-                     <button 
-                      className="secondary" 
-                      type="button" 
-                      onClick={() => void analyzeReport(report.id)}
-                      disabled={analyzingId === report.id}
-                    >
-                      {analyzingId === report.id ? 'Analyzing...' : 'Analyze'}
-                    </button>
+                      <button
+                        className="secondary"
+                        type="button"
+                        onClick={() => void analyzeReport(report.id)}
+                        disabled={analyzingId === report.id}
+                      >
+                        {analyzingId === report.id ? 'Analyzing...' : 'Analyze'}
+                      </button>
                       <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                       <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
                       <button className="secondary" type="button" onClick={() => void deleteReport(report.id)}>Delete</button>
@@ -1477,7 +1722,7 @@ function App() {
                 </div>
               )}
             </section>
-            
+
             <HealthMetricsChart patientId={user.id} token={authToken} refreshTrigger={patientReports} />
           </div>
         </main>
@@ -1599,9 +1844,9 @@ function App() {
                         </pre>
                       )}
                     </div>
-                    <button 
-                      className="secondary" 
-                      type="button" 
+                    <button
+                      className="secondary"
+                      type="button"
                       onClick={() => void analyzeReport(report.id)}
                       disabled={analyzingId === report.id}
                     >
