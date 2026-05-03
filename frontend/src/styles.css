@@ -862,3 +862,283 @@ input:focus, textarea:focus, select:focus {
   border-radius: 2rem;
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
+
+/* ========================================
+   MEDICINE INFO-BOX
+   ======================================== */
+
+.med-info-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--accent);
+  border-color: rgba(56,189,248,0.3);
+}
+
+.med-info-btn.active,
+.med-info-btn:hover:not(:disabled) {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.medicine-box-panel {
+  position: fixed;
+  top: 80px;
+  right: 1.5rem;
+  width: min(480px, calc(100vw - 3rem));
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  z-index: 101;
+  display: grid;
+  gap: 1rem;
+}
+
+/* Search row */
+.medicine-search-row {
+  position: relative;
+}
+
+.medicine-search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.medicine-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--text-secondary);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.medicine-search-input {
+  width: 100%;
+  padding-left: 2.5rem !important;
+  padding-right: 2.5rem !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: var(--border-strong) !important;
+  font-size: 0.95rem;
+}
+
+.medicine-search-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-soft) !important;
+}
+
+.medicine-clear-btn {
+  position: absolute;
+  right: 0.5rem;
+  padding: 0.25rem;
+  line-height: 1;
+  color: var(--text-secondary);
+}
+
+/* Category chips */
+.medicine-categories {
+  padding: 0.25rem 0;
+}
+
+.medicine-cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.medicine-cat-chip {
+  cursor: pointer;
+  font-size: 0.75rem;
+  background: var(--surface-soft);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.2rem 0.6rem;
+  transition: all 0.15s;
+}
+
+.medicine-cat-chip:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Results list */
+.medicine-results {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.medicine-result-item {
+  display: grid;
+  gap: 0.2rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(0,0,0,0.2);
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.medicine-result-item:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.medicine-result-name {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.medicine-result-generic {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.medicine-result-category {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-top: 0.1rem;
+}
+
+/* No result state */
+.medicine-no-result {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-secondary);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.medicine-no-result-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.medicine-no-result strong {
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.medicine-no-result p {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* Detail view */
+.medicine-detail {
+  display: grid;
+  gap: 1rem;
+}
+
+.medicine-back-btn {
+  font-size: 0.82rem;
+  padding: 0.25rem 0;
+  color: var(--accent);
+  justify-self: start;
+}
+
+.medicine-detail-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, rgba(56,189,248,0.08), rgba(16,185,129,0.05));
+  border: 1px solid rgba(56,189,248,0.2);
+}
+
+.medicine-detail-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--success));
+  display: grid;
+  place-items: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.medicine-detail-name {
+  margin: 0 0 0.2rem;
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.medicine-detail-generic {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 0.25rem;
+}
+
+/* Info grid */
+.medicine-info-grid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.medicine-info-card {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+}
+
+.medicine-info-card.purpose {
+  border-left: 3px solid var(--success);
+  background: linear-gradient(90deg, var(--success-soft), rgba(0,0,0,0.15));
+}
+
+.medicine-info-card.usage {
+  border-left: 3px solid var(--accent);
+  background: linear-gradient(90deg, var(--accent-soft), rgba(0,0,0,0.15));
+}
+
+.medicine-info-card.side-effects {
+  border-left: 3px solid var(--warning);
+  background: linear-gradient(90deg, var(--warning-soft), rgba(0,0,0,0.15));
+}
+
+.medicine-info-card.warnings {
+  border-left: 3px solid var(--danger);
+  background: linear-gradient(90deg, var(--danger-soft), rgba(0,0,0,0.15));
+}
+
+.medicine-info-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.medicine-info-value {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.medicine-disclaimer {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-align: center;
+  margin: 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 600px) {
+  .medicine-box-panel {
+    right: 1rem;
+    width: calc(100vw - 2rem);
+  }
+}
