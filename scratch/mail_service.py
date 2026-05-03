@@ -1,14 +1,17 @@
+import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from dotenv import load_dotenv
 
+load_dotenv()
 
 class EmailService:
     def __init__(self):
-        self.smtp_host = "smtp.gmail.com"
-        self.smtp_port = 587
-        self.smtp_user = "your_email@gmail.com"
-        self.smtp_pass = "your_app_password"
+        self.smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
+        self.smtp_port = int(os.getenv("SMTP_PORT", 587))
+        self.smtp_user = os.getenv("SMTP_USER")
+        self.smtp_pass = os.getenv("SMTP_PASS")
 
     def send_email(self, to_email: str, subject: str, body: str):
         try:
