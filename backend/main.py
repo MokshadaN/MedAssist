@@ -54,6 +54,14 @@ def startup_event():
             with engine.begin() as connection:
                 connection.execute(text("ALTER TABLE patient_profiles ADD COLUMN address VARCHAR"))
 
+    if "reminders" in inspector.get_table_names():
+        columns = {column["name"] for column in inspector.get_columns("reminders")}
+        with engine.begin() as connection:
+            if "email_sent_24h" not in columns:
+                connection.execute(text("ALTER TABLE reminders ADD COLUMN email_sent_24h BOOLEAN NOT NULL DEFAULT 0"))
+            if "email_sent_1h" not in columns:
+                connection.execute(text("ALTER TABLE reminders ADD COLUMN email_sent_1h BOOLEAN NOT NULL DEFAULT 0"))
+
     # Start the medicine reminder background scheduler
     from core.scheduler import start_scheduler
     start_scheduler()

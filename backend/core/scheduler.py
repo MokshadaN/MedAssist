@@ -5,7 +5,7 @@ import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from core.database import SessionLocal
-from services.schedule_service import process_due_reminders
+from services.schedule_service import process_due_reminders, process_due_followups
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +19,10 @@ def _tick():
         count = process_due_reminders(db)
         if count:
             logger.info("Scheduler tick: processed %d reminder(s)", count)
+            
+        followups = process_due_followups(db)
+        if followups:
+            logger.info("Scheduler tick: processed %d follow-up email(s)", followups)
     except Exception as exc:
         logger.error("Scheduler tick error: %s", exc)
     finally:
