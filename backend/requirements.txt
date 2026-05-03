@@ -24,3 +24,5 @@ torchvision>=0.17,<1.0
 numpy>=1.26,<3.0
 huggingface_hub>=0.20.0,<1.0
 
+twilio>=9.0,<10.0
+apscheduler>=3.10,<4.0

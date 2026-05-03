@@ -197,6 +197,21 @@ export type Reminder = {
   updated_at: string;
 };
 
+export type MedicineSchedule = {
+  id: string;
+  prescription_item_id: string;
+  patient_id: string;
+  patient_phone?: string | null;
+  medicine_name: string;
+  dosage?: string | null;
+  frequency: string;
+  reminder_times: string;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+  created_at: string;
+};
+
 export type PublicProfile = {
   name: string;
   age?: number | null;
@@ -496,6 +511,18 @@ export const api = {
       ? `/reports/${encodeURIComponent(patientId)}/metrics?parameter=${encodeURIComponent(parameter)}`
       : `/reports/${encodeURIComponent(patientId)}/metrics`;
     return request<MedicalMetric[]>(path, { token });
+  },
+  getMySchedules(token: string) {
+    return request<MedicineSchedule[]>(`/schedules/me`, { token });
+  },
+  getPatientSchedules(patientId: string, token: string) {
+    return request<MedicineSchedule[]>(`/schedules/patient/${encodeURIComponent(patientId)}`, { token });
+  },
+  stopSchedule(scheduleId: string, token: string) {
+    return request<MedicineSchedule>(`/schedules/${encodeURIComponent(scheduleId)}`, {
+      method: 'DELETE',
+      token,
+    });
   },
 };
 

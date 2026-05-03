@@ -1,10 +1,16 @@
 """Prescription service."""
 
+import logging
+
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from models.prescription import Prescription, PrescriptionItem
+from models.user import User
 from models.visit import Visit
+from services.schedule_service import create_medicine_schedule
+
+logger = logging.getLogger(__name__)
 
 
 def _get_visit_or_404(db: Session, visit_id: str) -> Visit:
@@ -92,6 +98,30 @@ def add_item(db: Session, prescription_id: str, medicine_name: str, dosage: str,
     db.add(item)
     db.commit()
     db.refresh(item)
+
+    # Create a recurring WhatsApp reminder schedule for this medicine
+    try:
+        visit = db.query(Visit).filter(Visit.id == prescription.visit_id).first()
+        if visit:
+            patient = db.query(User).filter(User.id == visit.patient_id).first()
+            if patient:
+                create_medicine_schedule(
+                    db=db,
+                    prescription_item_id=item.id,
+                    patient_id=patient.id,
+                    patient_phone=patient.phone,
+                    medicine_name=medicine_name,
+                    dosage=dosage,
+                    frequency=frequency,
+                    duration=duration,
+                )
+                logger.info(
+                    "Created WhatsApp schedule for %s → %s (%s, %s)",
+                    patient.name, medicine_name, frequency, duration,
+                )
+    except Exception as exc:
+        logger.warning("Could not create medicine schedule: %s", exc)
+
     return {
         "id": item.id,
         "prescription_id": item.prescription_id,
@@ -133,4 +163,3 @@ def get_patient_prescriptions(db: Session, patient_id: str):
         .all()
     )
     return [_serialize_prescription(db, prescription) for prescription in prescriptions]
-
