@@ -1,7 +1,7 @@
 """API v1 router."""
 
 from fastapi import APIRouter
-from api.v1.endpoints import auth, sessions, messages, triage, reports, ai, doctor, prescriptions, visits, notifications, feedback, risk, reminders, places, patient
+from api.v1.endpoints import auth, sessions, messages, triage, reports, ai, doctor, prescriptions, visits, notifications, feedback, risk, reminders, places, patient, schedules
 
 api_router = APIRouter()
 
@@ -20,3 +20,4 @@ api_router.include_router(risk.router, prefix="/risk")
 api_router.include_router(reminders.router, prefix="/reminders")
 api_router.include_router(places.router, prefix="/places")
 api_router.include_router(patient.router, prefix="/patient")
+api_router.include_router(schedules.router, prefix="/schedules")

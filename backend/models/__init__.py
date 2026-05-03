@@ -14,4 +14,6 @@ from .feedback import Feedback
 from .notification import Notification
 from .reminder import Reminder
 from .metric import MedicalMetric
+from .medicine_schedule import MedicineSchedule
+from .sent_reminder import SentReminder
 
