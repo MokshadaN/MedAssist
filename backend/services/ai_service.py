@@ -73,7 +73,7 @@ def safe_generate_content(contents, schema=None):
 
         for attempt in range(MAX_RETRIES + 1):
             try:
-                print(f"\n🔹 Using model: {model_name} (Attempt {attempt + 1})")
+                print(f"\n[INFO] Using model: {model_name} (Attempt {attempt + 1})")
 
                 response = client.models.generate_content(
                     model=model_name,
@@ -87,14 +87,14 @@ def safe_generate_content(contents, schema=None):
                 return response.parsed if schema else response.text
 
             except errors.ClientError as e:
-                print(f"⚠ Error: {str(e)}")
+                print(f"[ERROR] Error: {str(e)}")
 
                 if attempt < MAX_RETRIES:
-                    print(f"⏳ Retrying in {wait_time}s...")
+                    print(f"[WAIT] Retrying in {wait_time}s...")
                     time.sleep(wait_time)
                     wait_time *= 2  # exponential backoff
                 else:
-                    print("❌ Max retries reached for this model.")
+                    print("[FAIL] Max retries reached for this model.")
                     break
 
     raise RuntimeError("All models failed after retries.")
