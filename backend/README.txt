@@ -42,5 +42,10 @@ Make sure to activate the virtual environment before running:
 (venv) PS> & .\venv\Scripts\Activate.ps1
 
 # Then run the server
-(venv) PS> uvicorn backend.main:app --reload
+cd backend
+.\venv\Scripts\python.exe -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+
+
+cd frontend
+npm run dev
 ```
