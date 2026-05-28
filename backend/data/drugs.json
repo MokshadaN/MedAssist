@@ -30,5 +30,9 @@
   {
     "name": "Omeprazole",
     "side_effects": ["headache", "abdominal pain", "nausea", "diarrhea", "flatulence"]
+  },
+  {
+    "name": "Simvastatin",
+    "side_effects": ["muscle pain", "constipation", "nausea", "headache", "dizziness"]
   }
 ]
