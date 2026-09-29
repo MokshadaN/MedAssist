@@ -38,3 +38,22 @@ class DoctorVisitOut(BaseModel):
 
 class DoctorVisitHistoryOut(DoctorVisitOut):
     pass
+
+
+class DoctorVerificationRequest(BaseModel):
+    license_number: str
+    state_council: Optional[str] = None
+
+
+class DoctorVerificationResponse(BaseModel):
+    is_verified: bool
+    registration_number: str
+    state_council: Optional[str] = None
+    council_code: Optional[str] = None
+    qualification: Optional[str] = None
+    registration_year: Optional[int] = None
+    verification_source: Optional[str] = None
+    status: Optional[str] = None
+    message: str
+    verified_at: Optional[datetime] = None
+

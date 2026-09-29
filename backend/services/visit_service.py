@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from models.ai_summary import AISummary
 from models.session import ChatSession
 from models.patient import PatientProfile
+from models.doctor import DoctorProfile
 from models.user import User
 from models.visit import Visit
 
@@ -85,15 +86,23 @@ def create_visit(db: Session, patient_id: str, doctor_id: str, session_id: str):
 
 def list_doctors(db: Session):
     doctors = db.query(User).filter(User.role == "doctor").order_by(User.name.asc()).all()
-    return [
-        {
+    result = []
+    for doctor in doctors:
+        profile = db.query(DoctorProfile).filter(DoctorProfile.user_id == doctor.id).first()
+        result.append({
             "id": doctor.id,
             "name": doctor.name,
             "email": doctor.email,
             "phone": doctor.phone,
-        }
-        for doctor in doctors
-    ]
+            "specialization": profile.specialization if profile else None,
+            "license_number": profile.license_number if profile else None,
+            "is_verified": profile.is_verified if profile else False,
+            "state_council": profile.state_council if profile else None,
+            "qualification": profile.qualification if profile else None,
+            "experience_years": profile.experience_years if profile else None,
+            "hospital_affiliation": profile.hospital_affiliation if profile else None,
+        })
+    return result
 
 
 def create_patient_visit(db: Session, patient_id: str, doctor_id: str, session_id: str):

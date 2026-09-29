@@ -101,10 +101,11 @@ def detect_urgent_red_flags(text: str, user_id: str | None = None, db: Session |
         result = _detect_urgent_red_flags_regex(text)
     else:
         try:
+            groq_model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
             @groq_breaker
             def _call():
                 return client.chat.completions.create(
-                    model="llama-3.1-8b-instant",
+                    model=groq_model,
                     messages=[
                         {"role": "system", "content": TRIAGE_SYSTEM_PROMPT},
                         {"role": "user", "content": triage_prompt(text)},

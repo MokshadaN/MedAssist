@@ -58,6 +58,9 @@ def _create_user(db: Session, *, name: str, email: str, password: str, role: str
 
 def register_doctor(db: Session, doctor_data: DoctorRegister):
     try:
+        from services.doctor_verification_service import parse_and_validate_indian_registration
+        import datetime
+        
         user = _create_user(
             db,
             name=doctor_data.name,
@@ -66,12 +69,23 @@ def register_doctor(db: Session, doctor_data: DoctorRegister):
             role="doctor",
             phone=doctor_data.phone,
         )
+        
+        norm_license = _normalize_text(doctor_data.license_number)
+        ver_result = parse_and_validate_indian_registration(norm_license) if norm_license else {}
+        is_ver = bool(ver_result.get("is_verified", False))
+
         profile = DoctorProfile(
             user_id=user.id,
             specialization=_normalize_text(doctor_data.specialization),
-            license_number=_normalize_text(doctor_data.license_number),
+            license_number=norm_license,
             experience_years=doctor_data.experience_years,
             hospital_affiliation=_normalize_text(doctor_data.hospital_affiliation),
+            is_verified=is_ver,
+            state_council=ver_result.get("state_council"),
+            qualification=ver_result.get("qualification"),
+            registration_year=ver_result.get("registration_year"),
+            verification_source=ver_result.get("verification_source"),
+            verified_at=datetime.datetime.utcnow() if is_ver else None,
         )
         db.add(profile)
         db.commit()

@@ -78,6 +78,12 @@ class DoctorProfileOut(BaseModel):
     license_number: Optional[str] = None
     experience_years: Optional[int] = None
     hospital_affiliation: Optional[str] = None
+    is_verified: bool = False
+    state_council: Optional[str] = None
+    qualification: Optional[str] = None
+    registration_year: Optional[int] = None
+    verification_source: Optional[str] = None
+    verified_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 
