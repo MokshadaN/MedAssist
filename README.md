@@ -123,3 +123,90 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 *Developed with ❤️ for a healthier future.*
+
+## 🚀 Running the Application
+
+MedAssist can be run in either Development mode (local SQLite, no Docker required) or Production mode (PostgreSQL + Redis + Celery via Docker Compose).
+
+### Option 1: Development Mode (Local Setup)
+
+This is the fastest way to get started and develop locally. It uses SQLite for the database.
+
+**1. Clone the repository**
+```bash
+git clone https://github.com/MokshadaN/MedAssist.git
+cd MedAssist
+```
+
+**2. Set up the backend**
+```bash
+cd backend
+python -m venv venv
+# On Windows: venv\Scripts\activate
+# On Mac/Linux: source venv/bin/activate
+
+pip install -r requirements.txt
+```
+
+**3. Configure Environment Variables**
+Copy the example config and fill in your API keys:
+```bash
+cp .env.example .env
+```
+_Make sure to add your `GOOGLE_API_KEY`, `GROQ_API_KEY`, and `HF_TOKEN` in the `.env` file._
+
+**4. Start the Backend Server**
+```bash
+uvicorn main:app --reload
+```
+The backend API will be available at `http://localhost:8000`. You can view the API documentation at `http://localhost:8000/docs`.
+
+**5. Start the Frontend (if applicable)**
+*(Assuming a standard React/Vite frontend exists in the `frontend` directory)*
+```bash
+cd ../frontend
+npm install
+npm run dev
+```
+
+---
+
+### Option 2: Production Mode (Docker Compose)
+
+The production stack sets up PostgreSQL, Redis, Celery Workers, Celery Beat, and the FastAPI application using Docker.
+
+**1. Clone and Configure**
+```bash
+git clone https://github.com/MokshadaN/MedAssist.git
+cd MedAssist
+cp backend/.env.example .env
+```
+
+**2. Configure Production Environment Variables**
+Edit the `.env` file and set the following (at minimum):
+```env
+ENVIRONMENT=production
+DB_PASSWORD=your_secure_db_password
+REDIS_PASSWORD=your_secure_redis_password
+SECRET_KEY=generate_a_secure_random_string
+GOOGLE_API_KEY=your_key
+GROQ_API_KEY=your_key
+HF_TOKEN=your_token
+```
+
+**3. Start the Stack**
+```bash
+docker compose up -d
+```
+
+**4. Check Logs**
+You can monitor the migrations and server startup by tailing the logs:
+```bash
+docker compose logs -f backend
+```
+The backend will automatically run Alembic migrations on startup and begin serving on port `8000`.
+
+**5. Tear Down**
+```bash
+docker compose down
+```
