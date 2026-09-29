@@ -6,6 +6,11 @@ from pydantic import BaseModel, Field
 
 class SessionCreate(BaseModel):
     patient_id: str
+    
+    model_config = {
+        "extra": "forbid",
+        "str_strip": True,
+    }
 
 class SessionOut(BaseModel):
     id: str
@@ -20,6 +25,11 @@ class IntakeAnswerCreate(BaseModel):
     message: str = Field(min_length=1)
     input_mode: Literal["text", "voice"] = "text"
     previous_structured: dict[str, Any] | None = None
+
+    model_config = {
+        "extra": "forbid",
+        "str_strip": True,
+    }
 
 
 class EmergencyHospital(BaseModel):

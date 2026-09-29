@@ -1,5 +1,6 @@
 """AI service."""
 
+import logging
 import os
 import time
 from pathlib import Path
@@ -11,6 +12,9 @@ from dotenv import load_dotenv
 
 from utils.prompts import ai_reply_prompt, follow_up_prompt, intake_summary_prompt
 from services.triage_service import detect_urgent_red_flags
+from core.circuit_breaker import gemini_breaker, CircuitBreakerError
+
+logger = logging.getLogger(__name__)
 
 
 # =====================================================
@@ -61,43 +65,58 @@ class IntakeOutput(BaseModel):
 # =====================================================
 
 def safe_generate_content(contents, schema=None):
+    """
+    Call Gemini with retry + model fallback.
+    Protected by a circuit breaker: after 5 consecutive failures the breaker
+    opens and subsequent calls fail immediately for 60s without hitting the API.
+    """
     client = _get_client()
     if client is None:
         raise RuntimeError("GOOGLE_API_KEY is not configured")
 
+    # Fail fast if circuit is open (Gemini is known to be down)
+    if gemini_breaker.opened:
+        raise RuntimeError("Gemini API circuit breaker is OPEN — service temporarily unavailable.")
+
     models_to_try = [PRIMARY_MODEL, BACKUP_MODEL]
 
     for model_name in models_to_try:
-
         wait_time = INITIAL_WAIT
 
         for attempt in range(MAX_RETRIES + 1):
             try:
-                print(f"\n[INFO] Using model: {model_name} (Attempt {attempt + 1})")
+                logger.info("Using model: %s (Attempt %d)", model_name, attempt + 1)
 
-                response = client.models.generate_content(
-                    model=model_name,
-                    contents=contents,
-                    config={
-                        "response_mime_type": "application/json",
-                        "response_schema": schema
-                    } if schema else None
-                )
+                @gemini_breaker
+                def _call():
+                    return client.models.generate_content(
+                        model=model_name,
+                        contents=contents,
+                        config={
+                            "response_mime_type": "application/json",
+                            "response_schema": schema
+                        } if schema else None
+                    )
 
+                response = _call()
                 return response.parsed if schema else response.text
 
+            except CircuitBreakerError:
+                logger.error("Gemini circuit breaker OPEN — aborting all model attempts.")
+                raise RuntimeError("Gemini API is currently unavailable (circuit breaker open).")
+
             except errors.ClientError as e:
-                print(f"[ERROR] Error: {str(e)}")
+                logger.warning("ClientError on model %s (attempt %d): %s", model_name, attempt + 1, e)
 
                 if attempt < MAX_RETRIES:
-                    print(f"[WAIT] Retrying in {wait_time}s...")
+                    logger.info("Retrying in %ds...", wait_time)
                     time.sleep(wait_time)
                     wait_time *= 2  # exponential backoff
                 else:
-                    print("[FAIL] Max retries reached for this model.")
+                    logger.error("Max retries reached for model %s — giving up.", model_name)
                     break
 
-    raise RuntimeError("All models failed after retries.")
+    raise RuntimeError("All Gemini models failed after retries.")
 
 
 # =====================================================

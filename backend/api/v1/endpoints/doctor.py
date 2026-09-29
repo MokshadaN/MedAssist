@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from core.dependencies import get_current_user, get_db, require_roles
+from fastapi_cache.decorator import cache
 from schemas.doctor import DoctorPatientOut, DoctorVisitHistoryOut, DoctorVisitOut
 from services.visit_service import get_doctor_patients, get_patient_history, get_visit_details, list_doctors
 
@@ -11,6 +12,7 @@ router = APIRouter(tags=["doctor"])
 
 
 @router.get("/directory")
+@cache(expire=3600)  # Cache for 1 hour
 def get_doctor_directory(
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db),

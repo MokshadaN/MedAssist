@@ -1,19 +1,20 @@
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Request
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import List
 from pathlib import Path
 import mimetypes
-import shutil
-import uuid
 
 from core.dependencies import get_current_user, require_roles
 from models.report import Report
 from schemas.report import ReportOut
 from services import report_service
-from services.report_analyzer_service import analyze_report_image, serialize_report_analysis
+from services.report_analyzer_service import serialize_report_analysis
 from schemas.metric import MedicalMetricOut
 from core.database import SessionLocal
+from core.limiter import limiter
+from utils.file_upload import validate_and_read_upload
+from workers.ai_tasks import analyze_report_async
 
 UPLOAD_DIR = Path(__file__).resolve().parents[4] / "uploads" / "reports"
 
@@ -28,39 +29,40 @@ def get_db():
 router = APIRouter()
 
 @router.post("/upload", response_model=ReportOut)
-def upload_report(
-    patient_id: str, 
-    file: UploadFile = File(...), 
+@limiter.limit("5/hour")
+async def upload_report(
+    request: Request,
+    patient_id: str,
+    file: UploadFile = File(...),
     current_user=Depends(require_roles("patient", "doctor")),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
-    """
-    Upload a patient report and save its metadata.
-    """
+    """Upload a patient report with full file validation."""
     try:
         if current_user.role == "patient" and current_user.id != patient_id:
             raise HTTPException(status_code=403, detail="You can only upload reports for your own profile")
 
+        # ── Validate: extension, size, magic bytes ─────────────────────────
+        content, safe_name = await validate_and_read_upload(file)
+
         UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-        safe_name = f"{uuid.uuid4()}_{Path(file.filename).name}"
         disk_path = UPLOAD_DIR / safe_name
-        with disk_path.open("wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        disk_path.write_bytes(content)
 
         file_url = f"/api/v1/reports/download/{safe_name}"
 
-        # Save report record in database via service
         report = report_service.save_report(
-            db, 
-            patient_id=patient_id, 
+            db,
+            patient_id=patient_id,
             file_url=file_url,
-            parsed_data=None
+            parsed_data=None,
         )
         return report
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to upload report: {str(e)}")
+
 
 @router.get("/download/{filename}")
 def download_report(
@@ -149,9 +151,13 @@ def analyze_report(
     if not disk_path.exists():
         raise HTTPException(status_code=404, detail="Report file not found on server")
 
-    analysis = analyze_report_image(disk_path)
-    parsed_data = serialize_report_analysis(analysis)
-    updated = report_service.update_report_analysis(db, report, parsed_data)
+    # Mark as processing
+    parsed_data_placeholder = '{"status": "processing", "message": "Report analysis queued in background"}'
+    updated = report_service.update_report_analysis(db, report, parsed_data_placeholder)
+    
+    # Fire and forget the background celery task
+    analyze_report_async.delay(report_id, str(disk_path))
+    
     return updated
 
 

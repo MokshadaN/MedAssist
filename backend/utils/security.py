@@ -1,4 +1,4 @@
-"""Security utilities."""
+"""Security utilities — JWT access & refresh tokens, password hashing."""
 
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
@@ -35,17 +35,58 @@ def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta]
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=settings.access_token_expire_minutes)
     )
-    to_encode.update({"exp": expire, "iat": datetime.now(timezone.utc)})
+    to_encode.update({
+        "exp": expire,
+        "iat": datetime.now(timezone.utc),
+        "type": "access",
+    })
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+
+
+def create_refresh_token(data: dict[str, Any]) -> str:
+    """Create a long-lived refresh token (default 7 days)."""
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(days=settings.refresh_token_expire_days)
+    to_encode.update({
+        "exp": expire,
+        "iat": datetime.now(timezone.utc),
+        "type": "refresh",
+    })
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
 def decode_access_token(token: str) -> dict[str, Any]:
     try:
-        return jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        if payload.get("type") != "access":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token type — expected access token.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        return payload
     except JWTError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
+
+
+def decode_refresh_token(token: str) -> dict[str, Any]:
+    """Validate a refresh token and return its payload."""
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
+        if payload.get("type") != "refresh":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token type — expected refresh token.",
+            )
+        return payload
+    except JWTError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token is invalid or expired.",
+        ) from exc
+
 
