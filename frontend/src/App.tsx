@@ -421,6 +421,12 @@ function App() {
   const [selectedTimelineVisit, setSelectedTimelineVisit] = useState<DoctorVisit | null>(null);
   const [timelineSummary, setTimelineSummary] = useState<AISummary | null>(null);
 
+  // Indian Doctor License Verification State
+  const [verifyLicenseNumber, setVerifyLicenseNumber] = useState('');
+  const [verifyStateCouncil, setVerifyStateCouncil] = useState('National Medical Commission (MCI)');
+  const [isVerifyingLicense, setIsVerifyingLicense] = useState(false);
+  const [verificationFeedback, setVerificationFeedback] = useState<{ message: string; success: boolean } | null>(null);
+
   const clearUserData = () => {
     setPatientProfile(null);
     setDoctorProfile(null);
@@ -1076,6 +1082,30 @@ function App() {
     }
   };
 
+  const handleVerifyDoctorLicense = async () => {
+    if (!authToken || !verifyLicenseNumber.trim()) return;
+    setIsVerifyingLicense(true);
+    setVerificationFeedback(null);
+    try {
+      const res = await api.verifyDoctorLicense(verifyLicenseNumber.trim(), verifyStateCouncil, authToken);
+      setDoctorProfile((prev) => prev ? {
+        ...prev,
+        is_verified: res.is_verified,
+        license_number: res.registration_number,
+        state_council: res.state_council,
+        qualification: res.qualification,
+        registration_year: res.registration_year,
+        verification_source: res.verification_source,
+        verified_at: res.verified_at,
+      } : prev);
+      setVerificationFeedback({ message: res.message || 'Medical registration verified successfully!', success: true });
+    } catch (err: any) {
+      setVerificationFeedback({ message: err.message || 'Verification failed. Please check registration number.', success: false });
+    } finally {
+      setIsVerifyingLicense(false);
+    }
+  };
+
   if (publicProfileId) {
     return (
       <main className="auth-shell public-profile-view">
@@ -1185,10 +1215,10 @@ function App() {
             )}
             {authMode === 'register-doctor' && (
               <>
-                <input name="specialization" placeholder="Specialization" required />
-                <input name="license_number" placeholder="License number" required />
+                <input name="specialization" placeholder="Specialization (e.g. Cardiology, General Medicine)" required />
+                <input name="license_number" placeholder="Medical Reg No (e.g. MCI-12345, MMC-2018/04/1234, DMC-54321)" required />
                 <input name="experience_years" type="number" placeholder="Years of experience" required />
-                <input name="hospital_affiliation" placeholder="Hospital affiliation" />
+                <input name="hospital_affiliation" placeholder="Hospital / Clinic affiliation" />
               </>
             )}
             <button className="primary" type="submit">{authMode === 'login' ? 'Sign in' : 'Create account'}</button>
@@ -1457,7 +1487,9 @@ function App() {
                   <select value={selectedDoctorId} onChange={(event) => setSelectedDoctorId(event.target.value)} style={{ minWidth: '200px' }}>
                     <option value="" disabled>Select a doctor...</option>
                     {doctors.map((doctor) => (
-                      <option key={doctor.id} value={doctor.id}>Dr. {doctor.name}</option>
+                      <option key={doctor.id} value={doctor.id}>
+                        Dr. {doctor.name} {doctor.specialization ? `(${doctor.specialization})` : ''} {doctor.is_verified ? '✓ NMC Verified' : ''}
+                      </option>
                     ))}
                   </select>
                   <button className="primary" onClick={() => void startPatientVisit()} disabled={!selectedDoctorId}>Begin Intake</button>
@@ -1727,6 +1759,75 @@ function App() {
                   <button className="primary" type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>Update Profile</button>
                   {profileStatus && <div className="flash subtle">{profileStatus}</div>}
                 </form>
+
+                {/* Indian Medical Council Verification Card */}
+                {doctorProfile?.is_verified ? (
+                  <div className="panel" style={{ marginTop: '1.25rem', background: 'rgba(16, 185, 129, 0.1)', borderColor: 'rgba(16, 185, 129, 0.3)', padding: '1rem', borderRadius: '12px' }}>
+                    <div className="row" style={{ alignItems: 'center', gap: '0.5rem', color: '#10B981', fontWeight: 600 }}>
+                      <Check size={18} />
+                      <span>NMC / Council Verified ✅</span>
+                    </div>
+                    <div className="stack compact" style={{ marginTop: '0.6rem', fontSize: '0.82rem', gap: '0.35rem' }}>
+                      <div><span style={{ opacity: 0.7 }}>Council:</span> <strong>{doctorProfile.state_council || 'National Medical Commission'}</strong></div>
+                      <div><span style={{ opacity: 0.7 }}>Reg No:</span> <strong>{doctorProfile.license_number}</strong></div>
+                      {doctorProfile.qualification && <div><span style={{ opacity: 0.7 }}>Qualification:</span> <strong>{doctorProfile.qualification}</strong></div>}
+                      {doctorProfile.registration_year && <div><span style={{ opacity: 0.7 }}>Reg Year:</span> <strong>{doctorProfile.registration_year}</strong></div>}
+                      <div style={{ marginTop: '0.25rem' }}>
+                        <span className="pill active-pill" style={{ fontSize: '0.7rem', padding: '2px 8px', background: 'rgba(16, 185, 129, 0.2)', color: '#10B981', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+                          Active Practice (RMP) 🇮🇳
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="panel" style={{ marginTop: '1.25rem', background: 'var(--surface-soft)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-strong)' }}>
+                    <div className="eyebrow" style={{ color: 'var(--accent)', fontWeight: 700 }}>Medical Registration Verification 🇮🇳</div>
+                    <p style={{ fontSize: '0.78rem', opacity: 0.8, marginTop: '0.25rem', marginBottom: '0.75rem' }}>
+                      Verify your Indian Medical Council registration with NMC or State Medical Councils.
+                    </p>
+                    <div className="stack compact">
+                      <label className="field">
+                        <span>State Medical Council</span>
+                        <select value={verifyStateCouncil} onChange={(e) => setVerifyStateCouncil(e.target.value)}>
+                          <option value="National Medical Commission (MCI)">National Medical Commission (NMC / MCI)</option>
+                          <option value="Maharashtra Medical Council">Maharashtra Medical Council (MMC)</option>
+                          <option value="Delhi Medical Council">Delhi Medical Council (DMC)</option>
+                          <option value="Karnataka Medical Council">Karnataka Medical Council (KMC)</option>
+                          <option value="Tamil Nadu Medical Council">Tamil Nadu Medical Council (TNMC)</option>
+                          <option value="Gujarat Medical Council">Gujarat Medical Council (GMC)</option>
+                          <option value="West Bengal Medical Council">West Bengal Medical Council (WBMC)</option>
+                          <option value="Uttar Pradesh Medical Council">Uttar Pradesh Medical Council (UPMC)</option>
+                          <option value="Kerala State Medical Council">Kerala State Medical Council (KSMC)</option>
+                          <option value="Andhra Pradesh Medical Council">Andhra Pradesh Medical Council (APMC)</option>
+                          <option value="Telangana State Medical Council">Telangana State Medical Council (TSMC)</option>
+                          <option value="Rajasthan Medical Council">Rajasthan Medical Council (RMC)</option>
+                        </select>
+                      </label>
+                      <label className="field">
+                        <span>Registration Number</span>
+                        <input
+                          value={verifyLicenseNumber}
+                          onChange={(e) => setVerifyLicenseNumber(e.target.value)}
+                          placeholder="e.g. MCI-12345, MMC-2018/04/1234"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="primary"
+                        onClick={() => void handleVerifyDoctorLicense()}
+                        disabled={isVerifyingLicense || !verifyLicenseNumber.trim()}
+                        style={{ marginTop: '0.4rem', width: '100%' }}
+                      >
+                        {isVerifyingLicense ? 'Verifying with NMC...' : 'Verify Doctor License 🇮🇳'}
+                      </button>
+                      {verificationFeedback && (
+                        <div className={`flash ${verificationFeedback.success ? 'subtle' : ''}`} style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: verificationFeedback.success ? '#10B981' : '#EF4444' }}>
+                          {verificationFeedback.message}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </aside>

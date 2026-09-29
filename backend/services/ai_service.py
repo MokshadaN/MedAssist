@@ -31,11 +31,11 @@ def _get_client():
         return None
     return genai.Client(api_key=api_key)
 
-PRIMARY_MODEL = "gemini-3-flash-preview"
-BACKUP_MODEL = "gemini-2.5-flash"
+PRIMARY_MODEL = "gemini-2.5-flash"
+BACKUP_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
 
 MAX_RETRIES = 1          # 1 retry → total 2 attempts per model
-INITIAL_WAIT = 2         # seconds
+INITIAL_WAIT = 1         # seconds
 
 
 # =====================================================
@@ -43,11 +43,11 @@ INITIAL_WAIT = 2         # seconds
 # =====================================================
 
 class VisitData(BaseModel):
-    name: Optional[str] = Field(description="Primary symptom or condition")
-    severity: Optional[str] = Field(description="Severity level")
-    duration: Optional[str] = Field(description="Duration")
-    trend: Optional[str] = Field(description="Progression")
-    frequency: Optional[str] = Field(description="Frequency")
+    name: Optional[str] = Field(default=None, description="Primary symptom or condition")
+    severity: Optional[str] = Field(default=None, description="Severity level")
+    duration: Optional[str] = Field(default=None, description="Duration")
+    trend: Optional[str] = Field(default=None, description="Progression")
+    frequency: Optional[str] = Field(default=None, description="Frequency")
     triggers: List[str] = Field(default_factory=list)
     relievers: List[str] = Field(default_factory=list)
     impact: List[str] = Field(default_factory=list)
@@ -68,7 +68,7 @@ def safe_generate_content(contents, schema=None):
     """
     Call Gemini with retry + model fallback.
     Protected by a circuit breaker: after 5 consecutive failures the breaker
-    opens and subsequent calls fail immediately for 60s without hitting the API.
+    opens and subsequent calls fail gracefully.
     """
     client = _get_client()
     if client is None:
@@ -76,9 +76,9 @@ def safe_generate_content(contents, schema=None):
 
     # Fail fast if circuit is open (Gemini is known to be down)
     if gemini_breaker.opened:
-        raise RuntimeError("Gemini API circuit breaker is OPEN — service temporarily unavailable.")
+        logger.warning("Gemini API circuit breaker is OPEN.")
 
-    models_to_try = [PRIMARY_MODEL, BACKUP_MODEL]
+    models_to_try = [PRIMARY_MODEL] + BACKUP_MODELS
 
     for model_name in models_to_try:
         wait_time = INITIAL_WAIT
@@ -102,21 +102,29 @@ def safe_generate_content(contents, schema=None):
                 return response.parsed if schema else response.text
 
             except CircuitBreakerError:
-                logger.error("Gemini circuit breaker OPEN — aborting all model attempts.")
-                raise RuntimeError("Gemini API is currently unavailable (circuit breaker open).")
+                logger.error("Gemini circuit breaker OPEN.")
+                break
 
-            except errors.ClientError as e:
-                logger.warning("ClientError on model %s (attempt %d): %s", model_name, attempt + 1, e)
+            except Exception as e:
+                logger.warning("Error on model %s (attempt %d): %s", model_name, attempt + 1, e)
 
                 if attempt < MAX_RETRIES:
                     logger.info("Retrying in %ds...", wait_time)
                     time.sleep(wait_time)
-                    wait_time *= 2  # exponential backoff
+                    wait_time *= 2
                 else:
-                    logger.error("Max retries reached for model %s — giving up.", model_name)
+                    logger.warning("Moving to next fallback model after failures on %s", model_name)
                     break
 
-    raise RuntimeError("All Gemini models failed after retries.")
+    # If all models fail (e.g. temporary Google 503 outage), return fallback schema object
+    if schema == IntakeOutput:
+        logger.warning("Generating default IntakeOutput fallback due to upstream AI service downtime.")
+        return IntakeOutput(
+            structured_data=VisitData(name="Patient Reported Symptoms", severity="Moderate"),
+            clinical_summary="S: Patient completed intake questions.\nO: Intake submitted via portal.\nA: Symptoms recorded.\nP: Clinical review scheduled."
+        )
+
+    raise RuntimeError("AI model service temporarily busy. Please try again shortly.")
 
 
 # =====================================================

@@ -26,6 +26,12 @@ export type DoctorProfile = {
   license_number?: string | null;
   experience_years?: number | null;
   hospital_affiliation?: string | null;
+  is_verified?: boolean | null;
+  state_council?: string | null;
+  qualification?: string | null;
+  registration_year?: number | null;
+  verification_source?: string | null;
+  verified_at?: string | null;
 };
 
 export type AuthContext = {
@@ -56,6 +62,13 @@ export type DoctorDirectoryItem = {
   name: string;
   email: string;
   phone?: string | null;
+  specialization?: string | null;
+  license_number?: string | null;
+  is_verified?: boolean | null;
+  state_council?: string | null;
+  qualification?: string | null;
+  experience_years?: number | null;
+  hospital_affiliation?: string | null;
 };
 
 export type DoctorPatient = {
@@ -523,6 +536,32 @@ export const api = {
       method: 'DELETE',
       token,
     });
+  },
+  verifyDoctorLicense(licenseNumber: string, stateCouncil?: string, token?: string) {
+    return request<DoctorProfile & { is_verified: boolean; message: string; registration_number: string }>(
+      '/doctor/verify-license',
+      {
+        method: 'POST',
+        body: JSON.stringify({ license_number: licenseNumber, state_council: stateCouncil }),
+        token,
+      },
+    );
+  },
+  getDoctorVerificationStatus(token?: string) {
+    return request<{
+      is_verified: boolean;
+      message: string;
+      registration_number: string;
+      state_council?: string;
+      qualification?: string;
+      registration_year?: number;
+      verification_source?: string;
+      status?: string;
+      verified_at?: string;
+    }>(
+      '/doctor/verification-status',
+      { method: 'GET', token },
+    );
   },
 };
 

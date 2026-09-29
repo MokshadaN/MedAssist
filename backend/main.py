@@ -138,19 +138,30 @@ def startup_event():
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables verified/created.")
 
-    # Initialize Redis Cache
+    # Initialize Cache (Redis if available, else InMemory)
     redis_password = os.getenv("REDIS_PASSWORD", "")
-    redis_host = os.getenv("REDIS_HOST", "redis")
+    redis_host = os.getenv("REDIS_HOST", "localhost" if settings.environment == "development" else "redis")
     redis_port = os.getenv("REDIS_PORT", "6379")
     
-    if redis_password:
-        redis_url = f"redis://:{redis_password}@{redis_host}:{redis_port}/2"
-    else:
-        redis_url = f"redis://{redis_host}:{redis_port}/2"
+    try:
+        from fastapi_cache.backends.inmemory import InMemoryBackend
         
-    redis = aioredis.from_url(redis_url, encoding="utf8", decode_responses=True)
-    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
-    logger.info("Redis cache initialized.")
+        # Only attempt Redis if explicitly enabled or in production
+        if os.getenv("REDIS_HOST") or settings.environment == "production":
+            if redis_password:
+                redis_url = f"redis://:{redis_password}@{redis_host}:{redis_port}/2"
+            else:
+                redis_url = f"redis://{redis_host}:{redis_port}/2"
+            redis = aioredis.from_url(redis_url, encoding="utf8", decode_responses=True, socket_connect_timeout=2)
+            FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+            logger.info("Redis cache initialized.")
+        else:
+            FastAPICache.init(InMemoryBackend(), prefix="fastapi-cache")
+            logger.info("In-memory cache backend initialized (local dev mode).")
+    except Exception as exc:
+        from fastapi_cache.backends.inmemory import InMemoryBackend
+        FastAPICache.init(InMemoryBackend(), prefix="fastapi-cache")
+        logger.warning("Redis unavailable (%s), fallen back to InMemoryBackend.", exc)
 
 
 @app.on_event("shutdown")
