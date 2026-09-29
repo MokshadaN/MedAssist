@@ -9,8 +9,8 @@ class Visit(Base):
     __tablename__ = "visits"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    patient_id = Column(String, ForeignKey("users.id"))
-    doctor_id = Column(String, ForeignKey("users.id"))
+    patient_id = Column(String, ForeignKey("users.id"), index=True)
+    doctor_id = Column(String, ForeignKey("users.id"), index=True)
     session_id = Column(String, ForeignKey("chat_sessions.id"))
     summary_id = Column(String, ForeignKey("ai_summaries.id"))
     status = Column(String, default="pending")

@@ -15,6 +15,11 @@ class BaseRegister(BaseModel):
     password: str = Field(min_length=8, max_length=128)
     phone: Optional[str] = Field(default=None, max_length=30)
 
+    model_config = {
+        "extra": "forbid",
+        "str_strip": True,
+    }
+
     @field_validator("password")
     @classmethod
     def password_fits_bcrypt_limit(cls, value: str) -> str:
@@ -41,6 +46,11 @@ class PatientRegister(BaseRegister):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str = Field(min_length=1, max_length=128)
+
+    model_config = {
+        "extra": "forbid",
+        "str_strip": True,
+    }
 
     @field_validator("password")
     @classmethod
@@ -100,6 +110,11 @@ class ProfileUpdate(BaseModel):
     experience_years: Optional[int] = Field(default=None, ge=0, le=100)
     hospital_affiliation: Optional[str] = Field(default=None, max_length=150)
 
+    model_config = {
+        "extra": "forbid",
+        "str_strip": True,
+    }
+
 
 
 class RegisterResponse(BaseModel):
@@ -110,10 +125,12 @@ class RegisterResponse(BaseModel):
 
 class LoginResponse(BaseModel):
     access_token: str
+    refresh_token: Optional[str] = None
     token_type: str = "bearer"
     user: UserOut
     doctor_profile: Optional[DoctorProfileOut] = None
     patient_profile: Optional[PatientProfileOut] = None
+
 
 
 class Token(BaseModel):

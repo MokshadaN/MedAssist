@@ -1,6 +1,7 @@
 """Triage service."""
 
 import json
+import logging
 import os
 import re
 
@@ -11,10 +12,13 @@ from sqlalchemy.orm import Session
 from services.patient_service import get_patient_by_user_id
 from services.places_service import get_nearby_hospitals_for_address
 from utils.prompts import TRIAGE_SYSTEM_PROMPT, triage_prompt
+from core.circuit_breaker import groq_breaker, CircuitBreakerError
 
 # Reliably load .env from the backend directory.
 env_path = os.path.join(os.path.dirname(__file__), "..", ".env")
 load_dotenv(env_path)
+
+logger = logging.getLogger(__name__)
 
 RED_FLAG_PATTERNS = [
     # Chest / cardiac
@@ -89,20 +93,27 @@ def detect_urgent_red_flags(text: str, user_id: str | None = None, db: Session |
     """
     client = _get_groq_client()
 
-    if not client:
-        print("Warning: GROQ_API_KEY missing. Using regex fallback for triage.")
+    if not client or groq_breaker.opened:
+        if groq_breaker.opened:
+            logger.warning("Groq API circuit breaker is OPEN — using regex fallback for triage.")
+        else:
+            logger.warning("GROQ_API_KEY missing — using regex fallback for triage.")
         result = _detect_urgent_red_flags_regex(text)
     else:
         try:
-            completion = client.chat.completions.create(
-                model="llama-3.1-8b-instant",
-                messages=[
-                    {"role": "system", "content": TRIAGE_SYSTEM_PROMPT},
-                    {"role": "user", "content": triage_prompt(text)},
-                ],
-                temperature=0.0,
-                response_format={"type": "json_object"},
-            )
+            @groq_breaker
+            def _call():
+                return client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=[
+                        {"role": "system", "content": TRIAGE_SYSTEM_PROMPT},
+                        {"role": "user", "content": triage_prompt(text)},
+                    ],
+                    temperature=0.0,
+                    response_format={"type": "json_object"},
+                )
+
+            completion = _call()
 
             response_json = completion.choices[0].message.content
             data = json.loads(response_json)
@@ -110,8 +121,11 @@ def detect_urgent_red_flags(text: str, user_id: str | None = None, db: Session |
                 "urgent": data.get("urgent", False),
                 "matched_terms": data.get("matched_terms", []),
             }
+        except CircuitBreakerError:
+            logger.error("Groq circuit breaker OPEN — falling back to regex.")
+            result = _detect_urgent_red_flags_regex(text)
         except Exception as exc:
-            print(f"Warning: Groq triage API error: {exc}")
+            logger.warning("Groq triage API error: %s — falling back to regex.", exc)
             result = _detect_urgent_red_flags_regex(text)
 
     return _attach_nearby_hospitals(result, user_id, db)
@@ -146,7 +160,7 @@ def _attach_nearby_hospitals(result: dict, user_id: str | None, db: Session | No
             "Medical emergency detected. Call emergency services or the nearest hospital immediately."
         )
     except Exception as exc:
-        print(f"Warning: error fetching hospital data: {exc}")
+        logger.warning("Error fetching hospital data: %s", exc)
         result["nearest_hospitals"] = []
         result["emergency_message"] = (
             "Medical emergency detected. Hospital lookup failed; call emergency services immediately."

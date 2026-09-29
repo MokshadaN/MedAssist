@@ -3,7 +3,10 @@ from sqlalchemy.orm import Session
 
 from core.dependencies import get_db, require_roles
 from schemas.risk import RiskCheckCreate, RiskCheckOut
-from services.risk_service import get_latest_risk_check, run_risk_check
+from services.risk_service import get_latest_risk_check
+from workers.ai_tasks import run_risk_check_async
+import uuid
+from datetime import datetime, timezone
 
 router = APIRouter(tags=["risk"])
 
@@ -14,7 +17,14 @@ def run_prescription_risk_check(
     current_user=Depends(require_roles("doctor")),
     db: Session = Depends(get_db),
 ):
-    return run_risk_check(db, data.prescription_id, current_user.id)
+    run_risk_check_async.delay(data.prescription_id, current_user.id)
+    return {
+        "id": f"processing-{uuid.uuid4()}",
+        "prescription_id": data.prescription_id,
+        "issues": [],
+        "severity": "processing",
+        "created_at": datetime.now(timezone.utc)
+    }
 
 
 @router.get("/{prescription_id}", response_model=RiskCheckOut)

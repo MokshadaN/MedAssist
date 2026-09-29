@@ -17,6 +17,10 @@ from models.ai_summary import AISummary
 from models.prescription import Prescription, PrescriptionItem
 from models.risk import RiskCheck
 from models.visit import Visit
+from core.circuit_breaker import hf_breaker, CircuitBreakerError
+import logging
+
+logger = logging.getLogger(__name__)
 
 # BioBERT model for clinical embeddings
 MODEL_ID = "NeuML/pubmedbert-base-embeddings"
@@ -64,15 +68,28 @@ def _get_embedding(text: str) -> np.ndarray:
         return np.zeros(768)  # Fallback if no token
 
     client = InferenceClient(api_key=settings.hf_token)
+    
+    if hf_breaker.opened:
+        logger.warning("HF circuit breaker OPEN — falling back to zero embedding for %s", text)
+        return np.zeros(768)
+
     try:
-        output = client.feature_extraction(text, model=MODEL_ID)
+        @hf_breaker
+        def _call():
+            return client.feature_extraction(text, model=MODEL_ID)
+
+        output = _call()
         arr = np.array(output)
         if arr.ndim == 2:
             return arr[0]
         if arr.ndim == 3:
             return arr[0][0]
         return arr
-    except Exception:
+    except CircuitBreakerError:
+        logger.error("HF circuit breaker OPEN — falling back to zero embedding.")
+        return np.zeros(768)
+    except Exception as exc:
+        logger.warning("HuggingFace API error: %s — returning zero embedding.", exc)
         return np.zeros(768)
 
 

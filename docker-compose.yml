@@ -1,7 +1,145 @@
+version: "3.9"
+
+# ── MedAssist Production Stack ────────────────────────────────────────────────
+# Usage:
+#   1. Copy .env.example to .env and fill in secrets
+#   2. docker compose up -d
+#   3. docker compose logs -f backend   (watch migrations + server)
+#
+# Services:
+#   db        — PostgreSQL 16 (production database)
+#   redis     — Redis 7 (rate-limiting store + Celery broker)
+#   backend   — FastAPI + Uvicorn (auto-migrates on start)
+#   worker    — Celery worker (background AI & notification tasks)
+#   mailhog   — SMTP dev/test server (disable in production)
+
 services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: medassist
+      POSTGRES_USER: ${DB_USER:-medassist}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-medassist} -d medassist"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ── Redis ───────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD must be set}
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend (FastAPI) ───────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USER:-medassist}:${DB_PASSWORD}@db:5432/medassist
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY must be set}
+      ENVIRONMENT: production
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:5173}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      HF_TOKEN: ${HF_TOKEN:-}
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@medassist.local}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM:-}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # Run Alembic migrations THEN start the server
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 --no-access-log"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # ── Celery Worker ───────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USER:-medassist}:${DB_PASSWORD}@db:5432/medassist
+      SECRET_KEY: ${SECRET_KEY}
+      ENVIRONMENT: production
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      HF_TOKEN: ${HF_TOKEN:-}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM:-}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A workers.celery_app worker --loglevel=info --concurrency=2
+
+  # ── Celery Beat ─────────────────────────────────────────────────────────────
+  beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${DB_USER:-medassist}:${DB_PASSWORD}@db:5432/medassist
+      SECRET_KEY: ${SECRET_KEY}
+      ENVIRONMENT: production
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A workers.celery_app beat --loglevel=info
+
+  # ── MailHog (Dev SMTP — REMOVE in production) ───────────────────────────────
   mailhog:
     image: mailhog/mailhog
-    ports:
-      - "1025:1025"   # SMTP server
-      - "8025:8025"   # Web UI — view emails at http://localhost:8025
     restart: unless-stopped
+    profiles:
+      - dev          # Only starts when: docker compose --profile dev up
+    ports:
+      - "1025:1025"  # SMTP server
+      - "8025:8025"  # Web UI → http://localhost:8025
+
+volumes:
+  pgdata:
+    driver: local
