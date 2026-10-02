@@ -7,6 +7,7 @@ from models.doctor import DoctorProfile
 from models.patient import PatientProfile
 from models.user import User
 from schemas.auth import DoctorRegister, PatientRegister, ProfileUpdate
+from services.doctor_verification_service import reset_verification_for_review
 from utils.security import create_access_token, hash_password, verify_password
 
 
@@ -58,9 +59,9 @@ def _create_user(db: Session, *, name: str, email: str, password: str, role: str
 
 def register_doctor(db: Session, doctor_data: DoctorRegister):
     try:
-        from services.doctor_verification_service import parse_and_validate_indian_registration
+        from services.doctor_verification_service import validate_registration_format
         import datetime
-        
+
         user = _create_user(
             db,
             name=doctor_data.name,
@@ -69,23 +70,37 @@ def register_doctor(db: Session, doctor_data: DoctorRegister):
             role="doctor",
             phone=doctor_data.phone,
         )
-        
-        norm_license = _normalize_text(doctor_data.license_number)
-        ver_result = parse_and_validate_indian_registration(norm_license) if norm_license else {}
-        is_ver = bool(ver_result.get("is_verified", False))
 
+        norm_license = _normalize_text(doctor_data.license_number)
+        if not norm_license:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Medical registration number is required",
+            )
+
+        # P0: format validation only — this NEVER verifies the doctor.
+        fmt_result = validate_registration_format(norm_license)
+        if not fmt_result.get("is_valid_format"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=fmt_result.get("reason", "Invalid medical registration number format."),
+            )
+
+        # Every new doctor starts unverified and pending manual approval.
         profile = DoctorProfile(
             user_id=user.id,
             specialization=_normalize_text(doctor_data.specialization),
             license_number=norm_license,
             experience_years=doctor_data.experience_years,
             hospital_affiliation=_normalize_text(doctor_data.hospital_affiliation),
-            is_verified=is_ver,
-            state_council=ver_result.get("state_council"),
-            qualification=ver_result.get("qualification"),
-            registration_year=ver_result.get("registration_year"),
-            verification_source=ver_result.get("verification_source"),
-            verified_at=datetime.datetime.utcnow() if is_ver else None,
+            is_verified=False,
+            verification_status="pending",
+            submitted_at=datetime.datetime.utcnow(),
+            state_council=fmt_result.get("state_council"),
+            qualification=None,
+            registration_year=fmt_result.get("registration_year"),
+            verification_source=None,
+            verified_at=None,
         )
         db.add(profile)
         db.commit()
@@ -190,6 +205,8 @@ def update_user_context(db: Session, user: User, data: ProfileUpdate):
             profile = DoctorProfile(user_id=user.id)
             db.add(profile)
 
+        previous_license = profile.license_number
+
         for field in ("specialization", "license_number", "experience_years", "hospital_affiliation"):
             if field not in update_data:
                 continue
@@ -197,6 +214,12 @@ def update_user_context(db: Session, user: User, data: ProfileUpdate):
             if isinstance(value, str):
                 value = _normalize_text(value)
             setattr(profile, field, value)
+
+        # P0: changing the registration number invalidates any previous
+        # verification — the doctor must be re-reviewed by an administrator.
+        new_license = profile.license_number
+        if "license_number" in update_data and new_license != previous_license:
+            reset_verification_for_review(profile)
 
     db.commit()
     db.refresh(user)

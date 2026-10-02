@@ -4,6 +4,12 @@ import os
 import sys
 from pathlib import Path
 
+# Use the OS certificate store for TLS (Windows: corporate/university SSL
+# inspection proxies aren't in Python's bundled CA list). Must run before
+# any network library (requests/httpx) performs TLS.
+import truststore  # noqa: E402
+truststore.inject_into_ssl()
+
 # Ensure backend package is importable when running celery from CLI
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
@@ -49,6 +55,10 @@ celery_app.conf.update(
         "workers.notification_tasks.*": {"queue": "notifications"},
         "workers.triage_tasks.*": {"queue": "triage"},
     },
+    # Explicit default queue: unroutes tasks land on "celery" and workers must
+    # subscribe to it too (P0: the compose worker command uses
+    # `-Q ai,notifications,triage,celery`).
+    task_default_queue="celery",
 
     # Serialization
     task_serializer="json",
@@ -59,6 +69,11 @@ celery_app.conf.update(
     task_acks_late=True,           # Acknowledge only after task completes (prevents lost tasks on crash)
     worker_prefetch_multiplier=1,  # Fetch one task at a time per worker (fair distribution)
     task_reject_on_worker_lost=True,
+
+    # Monitoring (P0): emit task/worker events so queue depth, runtime,
+    # retries and failures are observable (Flower, Sentry, etc.).
+    worker_send_task_events=True,
+    task_send_sent_event=True,
 
     # Result expiry
     result_expires=3600,           # Keep results for 1 hour
@@ -72,6 +87,8 @@ celery_app.conf.update(
     task_max_retries=3,
 
     # ── Periodic Tasks (Celery Beat) ──────────────────────────────────────────
+    # NOTE: Beat must run as EXACTLY ONE scheduler instance — the compose
+    # "beat" service is a single, non-scaled replica.
     beat_schedule={
         "process-medicine-reminders": {
             "task": "workers.notification_tasks.process_medicine_reminders",

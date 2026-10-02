@@ -1,5 +1,6 @@
 """Pydantic session schemas."""
 
+from datetime import datetime
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -17,8 +18,20 @@ class SessionOut(BaseModel):
     status: str
     initial_question: str | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
+
+
+class SessionMessageOut(BaseModel):
+    id: str
+    sender: str
+    message: str
+    timestamp: datetime
+
+
+class SessionDetailOut(BaseModel):
+    session_id: str
+    status: str
+    messages: list[SessionMessageOut]
 
 
 class IntakeAnswerCreate(BaseModel):
@@ -55,3 +68,7 @@ class IntakeResponse(BaseModel):
     matched_terms: list[str] = Field(default_factory=list)
     nearest_hospitals: list[EmergencyHospital] = Field(default_factory=list)
     emergency_message: str | None = None
+    triage_level: Literal["emergency", "urgent_care", "routine", "abstain"] | None = None
+    review_required: bool = False
+    # Non-emergency advisory; intake continues.
+    advisory: str | None = None

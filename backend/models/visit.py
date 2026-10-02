@@ -1,12 +1,15 @@
 """SQLAlchemy visit model."""
 
-from sqlalchemy import Column, String, DateTime, ForeignKey
+from sqlalchemy import Column, String, DateTime, ForeignKey, Index
 from datetime import datetime
 import uuid
 from core.database import Base
 
 class Visit(Base):
     __tablename__ = "visits"
+    __table_args__ = (
+        Index("uq_visits_session_id", "session_id", unique=True),
+    )
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     patient_id = Column(String, ForeignKey("users.id"), index=True)

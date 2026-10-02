@@ -4,6 +4,12 @@ import logging
 from pathlib import Path
 import sys
 
+# Use the OS certificate store for TLS (Windows: corporate/university SSL
+# inspection proxies aren't in Python's bundled CA list). Must run before
+# any network library (requests/httpx) performs TLS.
+import truststore  # noqa: E402
+truststore.inject_into_ssl()
+
 BACKEND_DIR = Path(__file__).resolve().parent
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
@@ -21,6 +27,13 @@ from redis import asyncio as aioredis
 import os
 
 from core.config import settings
+from core.domain_errors import (
+    ActionForbidden,
+    DomainError,
+    ResourceConflict,
+    ResourceNotFound,
+    ServiceUnavailable,
+)
 from core.limiter import limiter
 from core.database import Base, engine
 from core.logging_config import configure_logging
@@ -34,6 +47,7 @@ import models  # noqa: F401
 from schemas import ai, auth, feedback, message, patient, prescription, reminder, report, risk, session, triage, visit, schedule  # noqa: F401
 
 from api.v1.router import api_router
+from services import ai_service
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 configure_logging(environment=settings.environment, log_level=settings.log_level)
@@ -54,6 +68,29 @@ app = FastAPI(
 # Attach rate limiter to app state
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+_DOMAIN_ERROR_STATUS = {
+    ResourceNotFound: 404,
+    ActionForbidden: 403,
+    ResourceConflict: 409,
+    ServiceUnavailable: 503,
+}
+
+
+@app.exception_handler(DomainError)
+async def domain_error_handler(_request: Request, exc: DomainError):
+    status_code = next(
+        (
+            mapped_status
+            for error_type, mapped_status in _DOMAIN_ERROR_STATUS.items()
+            if isinstance(exc, error_type)
+        ),
+        400,
+    )
+    return JSONResponse(
+        status_code=status_code,
+        content={"detail": exc.detail, "code": exc.code},
+    )
 
 # ── Middlewares ───────────────────────────────────────────────────────────────
 app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -109,9 +146,12 @@ def health_detailed():
         overall = "degraded"
 
     # ── Gemini API ────────────────────────────────────────────────────────────
-    google_key = os.getenv("GOOGLE_API_KEY", "")
-    checks["gemini_api"] = {"status": "configured" if google_key else "not_configured"}
-    if not google_key:
+    google_keys = ai_service._get_api_keys()
+    checks["gemini_api"] = {
+        "status": "configured" if google_keys else "not_configured",
+        "keys": len(google_keys),
+    }
+    if not google_keys:
         overall = "degraded"
 
     # ── Groq API ──────────────────────────────────────────────────────────────
@@ -133,10 +173,16 @@ def health_detailed():
 
 @app.on_event("startup")
 def startup_event():
-    # Create tables for any model not yet in the DB (dev/test only).
-    # In production, use: alembic upgrade head
-    Base.metadata.create_all(bind=engine)
-    logger.info("Database tables verified/created.")
+    # Schema management (P0):
+    # - development/test: create any missing tables for convenience.
+    # - production: Alembic is the ONLY schema path. The compose command runs
+    #   `alembic upgrade head` before the app starts; the app must never
+    #   mutate the schema at runtime.
+    if settings.environment != "production":
+        Base.metadata.create_all(bind=engine)
+        logger.info("Development mode: database tables verified/created (production uses Alembic only).")
+    else:
+        logger.info("Production mode: skipping create_all — schema is managed by Alembic.")
 
     # Initialize Cache (Redis if available, else InMemory)
     redis_password = os.getenv("REDIS_PASSWORD", "")

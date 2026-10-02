@@ -28,6 +28,27 @@ class Settings(BaseSettings):
     database_url: str = f"sqlite:///{(BASE_DIR / 'medassist.db').as_posix()}"
     hf_token: str = ""
 
+    # ── Report uploads (P0) ───────────────────────────────────────────────────
+    # Single configured upload path shared by the API and the Celery workers.
+    # Defaults to <backend>/uploads/reports, which is the directory created in
+    # the Docker image (/app/uploads/reports). Override with the UPLOAD_DIR env
+    # var when using an externally mounted volume.
+    upload_dir: str = str(BASE_DIR / "uploads" / "reports")
+    # A worker is hard-killed after 10 minutes. A report may be recovered only
+    # after a longer interval so a legitimately slow analysis is not duplicated.
+    report_analysis_stale_minutes: int = 15
+    risk_check_stale_minutes: int = 15
+
+    # ── Clinical triage classifier ────────────────────────────────────────────
+    # Shadow mode never changes patient-facing urgency. It remains unavailable
+    # until a validated, calibrated classifier adapter is explicitly injected.
+    triage_classifier_shadow_enabled: bool = False
+
+    # ── Emergency QR profile (P0) ──────────────────────────────────────────────
+    # How long an emergency access token stays valid before the patient must
+    # regenerate it (rotation keeps leaked QR URLs short-lived).
+    emergency_qr_validity_days: int = 365
+
     # ── SMTP ──────────────────────────────────────────────────────────────────
     smtp_host: str = "smtp.gmail.com"
     smtp_port: int = 587

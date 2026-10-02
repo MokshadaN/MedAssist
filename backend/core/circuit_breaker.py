@@ -48,7 +48,9 @@ def _on_half_open(cb: CircuitBreaker) -> None:
 
 
 # ── Gemini (Google) Circuit Breaker ───────────────────────────────────────────
-# Opens after 5 consecutive failures; recovers after 60s
+# NOTE: ai_service.py creates one breaker PER API KEY (see
+# services/ai_service.py::_breaker_for_key) so an exhausted key does not
+# block healthy keys. This shared instance is kept for backward compatibility.
 gemini_breaker = CircuitBreaker(
     failure_threshold=5,
     recovery_timeout=60,
@@ -62,6 +64,16 @@ groq_breaker = CircuitBreaker(
     failure_threshold=3,
     recovery_timeout=30,
     name="Groq",
+    expected_exception=Exception,
+)
+
+# ── Groq Speech-to-Text Circuit Breaker ───────────────────────────────────────
+# SEPARATE from groq_breaker: malformed/empty user recordings are common and
+# must never trip the breaker protecting triage + the AI provider fallback.
+groq_stt_breaker = CircuitBreaker(
+    failure_threshold=5,
+    recovery_timeout=60,
+    name="Groq-STT",
     expected_exception=Exception,
 )
 

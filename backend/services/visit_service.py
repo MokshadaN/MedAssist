@@ -1,8 +1,11 @@
 """Visit service for visit and doctor workflows."""
 
 from fastapi import HTTPException, status
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from core.domain_errors import ResourceConflict
 from models.ai_summary import AISummary
 from models.session import ChatSession
 from models.patient import PatientProfile
@@ -50,6 +53,62 @@ def _serialize_visit(db: Session, visit: Visit) -> dict:
     return _visit_detail_payload(visit, patient, doctor)
 
 
+def _existing_visit_for_session(
+    db: Session,
+    session_id: str,
+    patient_id: str,
+    doctor_id: str,
+) -> Visit | None:
+    existing = db.query(Visit).filter(Visit.session_id == session_id).first()
+    if not existing:
+        return None
+    if existing.patient_id != patient_id or existing.doctor_id != doctor_id:
+        raise ResourceConflict("Intake session is already assigned to another visit")
+    return existing
+
+
+def _create_visit_once(
+    db: Session,
+    *,
+    patient_id: str,
+    doctor_id: str,
+    session_id: str,
+    summary_id: str | None = None,
+) -> Visit:
+    existing = _existing_visit_for_session(
+        db,
+        session_id,
+        patient_id,
+        doctor_id,
+    )
+    if existing:
+        return existing
+
+    visit = Visit(
+        patient_id=patient_id,
+        doctor_id=doctor_id,
+        session_id=session_id,
+        summary_id=summary_id,
+        status="pending",
+    )
+    db.add(visit)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        existing = _existing_visit_for_session(
+            db,
+            session_id,
+            patient_id,
+            doctor_id,
+        )
+        if existing:
+            return existing
+        raise
+    db.refresh(visit)
+    return visit
+
+
 def _patient_payload(patient: User, profile: PatientProfile | None, visit: Visit, visit_count: int) -> dict:
     return {
         "patient_id": patient.id,
@@ -71,36 +130,49 @@ def create_visit(db: Session, patient_id: str, doctor_id: str, session_id: str):
     session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chat session not found")
+    if session.patient_id != patient_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not allowed to use this session",
+        )
 
-    visit = Visit(
+    visit = _create_visit_once(
+        db,
         patient_id=patient_id,
         doctor_id=doctor_id,
         session_id=session_id,
-        status="pending",
     )
-    db.add(visit)
-    db.commit()
-    db.refresh(visit)
     return _serialize_visit(db, visit)
 
 
-def list_doctors(db: Session):
-    doctors = db.query(User).filter(User.role == "doctor").order_by(User.name.asc()).all()
+def list_doctors(db: Session, *, limit: int = 50, offset: int = 0):
+    doctor_rows = (
+        db.query(User, DoctorProfile)
+        .join(DoctorProfile, DoctorProfile.user_id == User.id)
+        .filter(
+            User.role == "doctor",
+            DoctorProfile.is_verified.is_(True),
+            DoctorProfile.verification_status == "approved",
+        )
+        .order_by(User.name.asc(), User.id.asc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
     result = []
-    for doctor in doctors:
-        profile = db.query(DoctorProfile).filter(DoctorProfile.user_id == doctor.id).first()
+    for doctor, profile in doctor_rows:
         result.append({
             "id": doctor.id,
             "name": doctor.name,
             "email": doctor.email,
             "phone": doctor.phone,
-            "specialization": profile.specialization if profile else None,
-            "license_number": profile.license_number if profile else None,
-            "is_verified": profile.is_verified if profile else False,
-            "state_council": profile.state_council if profile else None,
-            "qualification": profile.qualification if profile else None,
-            "experience_years": profile.experience_years if profile else None,
-            "hospital_affiliation": profile.hospital_affiliation if profile else None,
+            "specialization": profile.specialization,
+            "license_number": profile.license_number,
+            "is_verified": profile.is_verified,
+            "state_council": profile.state_council,
+            "qualification": profile.qualification,
+            "experience_years": profile.experience_years,
+            "hospital_affiliation": profile.hospital_affiliation,
         })
     return result
 
@@ -122,16 +194,13 @@ def create_patient_visit(db: Session, patient_id: str, doctor_id: str, session_i
         .first()
     )
 
-    visit = Visit(
+    visit = _create_visit_once(
+        db,
         patient_id=patient_id,
         doctor_id=doctor_id,
         session_id=session_id,
         summary_id=summary.id if summary else None,
-        status="pending",
     )
-    db.add(visit)
-    db.commit()
-    db.refresh(visit)
     return _serialize_visit(db, visit)
 
 
@@ -152,29 +221,43 @@ def close_visit(db: Session, visit_id: str, doctor_id: str | None = None):
     return _serialize_visit(db, visit)
 
 
-def get_doctor_patients(db: Session, doctor_id: str):
-    visits = (
-        db.query(Visit)
+def get_doctor_patients(
+    db: Session,
+    doctor_id: str,
+    *,
+    limit: int = 50,
+    offset: int = 0,
+):
+    patient_rows = (
+        db.query(
+            Visit.patient_id,
+            func.max(Visit.created_at).label("last_visit_at"),
+        )
         .filter(Visit.doctor_id == doctor_id)
-        .order_by(Visit.created_at.desc())
+        .group_by(Visit.patient_id)
+        .order_by(func.max(Visit.created_at).desc(), Visit.patient_id.asc())
+        .offset(offset)
+        .limit(limit)
         .all()
     )
 
     patients: list[dict] = []
-    seen_patient_ids: set[str] = set()
-
-    for visit in visits:
-        if visit.patient_id in seen_patient_ids:
-            continue
-
-        patient = db.query(User).filter(User.id == visit.patient_id).first()
+    for patient_id, _last_visit_at in patient_rows:
+        patient = db.query(User).filter(User.id == patient_id).first()
         if not patient:
             continue
 
         profile = db.query(PatientProfile).filter(PatientProfile.user_id == patient.id).first()
         visit_count = db.query(Visit).filter(Visit.doctor_id == doctor_id, Visit.patient_id == patient.id).count()
+        visit = (
+            db.query(Visit)
+            .filter(Visit.doctor_id == doctor_id, Visit.patient_id == patient.id)
+            .order_by(Visit.created_at.desc(), Visit.id.desc())
+            .first()
+        )
+        if not visit:
+            continue
         patients.append(_patient_payload(patient, profile, visit, visit_count))
-        seen_patient_ids.add(patient.id)
 
     return patients
 
@@ -188,7 +271,14 @@ def get_visit_details(db: Session, visit_id: str, doctor_id: str | None = None):
     return _serialize_visit(db, visit)
 
 
-def get_patient_history(db: Session, patient_id: str, doctor_id: str | None = None):
+def get_patient_history(
+    db: Session,
+    patient_id: str,
+    doctor_id: str | None = None,
+    *,
+    limit: int = 50,
+    offset: int = 0,
+):
     patient = db.query(User).filter(User.id == patient_id, User.role == "patient").first()
     if not patient:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
@@ -197,7 +287,12 @@ def get_patient_history(db: Session, patient_id: str, doctor_id: str | None = No
     if doctor_id:
         query = query.filter(Visit.doctor_id == doctor_id)
 
-    visits = query.order_by(Visit.created_at.desc()).all()
+    visits = (
+        query.order_by(Visit.created_at.desc(), Visit.id.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
     if not visits:
         return []
 
@@ -211,5 +306,11 @@ def get_patient_history(db: Session, patient_id: str, doctor_id: str | None = No
     return history
 
 
-def get_patient_own_history(db: Session, patient_id: str):
-    return get_patient_history(db, patient_id)
+def get_patient_own_history(
+    db: Session,
+    patient_id: str,
+    *,
+    limit: int = 50,
+    offset: int = 0,
+):
+    return get_patient_history(db, patient_id, limit=limit, offset=offset)

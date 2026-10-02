@@ -4,20 +4,28 @@ import json
 import os
 import time
 from collections import Counter
+from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
-from fastapi import HTTPException, status
 from huggingface_hub import InferenceClient
 from sqlalchemy.orm import Session
 
 from core.config import settings
+from core.domain_errors import (
+    ActionForbidden,
+    ResourceConflict,
+    ResourceNotFound,
+    ServiceUnavailable,
+)
 from models.ai_summary import AISummary
 from models.prescription import Prescription, PrescriptionItem
 from models.risk import RiskCheck
 from models.visit import Visit
 from core.circuit_breaker import hf_breaker, CircuitBreakerError
+from services.job_lifecycle import enqueue_job, is_stale, stale_before
 import logging
 
 logger = logging.getLogger(__name__)
@@ -47,18 +55,76 @@ HIGH_RISK_MEDICINES = {
 }
 
 
-def _get_prescription_for_doctor(db: Session, prescription_id: str, doctor_id: str) -> Prescription:
+def get_prescription_for_doctor(db: Session, prescription_id: str, doctor_id: str) -> Prescription:
     prescription = db.query(Prescription).filter(Prescription.id == prescription_id).first()
     if not prescription:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Prescription not found")
+        raise ResourceNotFound("Prescription not found")
 
     if prescription.doctor_id != doctor_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not allowed to access this prescription",
-        )
+        raise ActionForbidden("Not allowed to access this prescription")
 
     return prescription
+
+
+def queue_risk_check(
+    db: Session,
+    prescription_id: str,
+    doctor_id: str,
+    *,
+    stale_minutes: int,
+    enqueue: Callable[[str, str, str], None],
+) -> dict:
+    """Claim and enqueue one prescription risk-check workflow."""
+    prescription = get_prescription_for_doctor(db, prescription_id, doctor_id)
+    current_status = prescription.risk_status or "not_requested"
+    cutoff = stale_before(stale_minutes)
+    in_progress = current_status in {"queued", "processing"}
+    stale_job = is_stale(current_status, prescription.risk_status_updated_at, cutoff)
+    if in_progress and not stale_job:
+        raise ResourceConflict("A risk check is already in progress for this prescription")
+
+    job_id = enqueue_job(
+        db,
+        model=Prescription,
+        identity_filters=(Prescription.id == prescription.id,),
+        status_column=Prescription.risk_status,
+        job_id_column=Prescription.risk_job_id,
+        updated_at_column=Prescription.risk_status_updated_at,
+        error_column=Prescription.risk_error,
+        current_status=current_status,
+        current_job_id=prescription.risk_job_id,
+        stale_cutoff=cutoff if stale_job else None,
+    )
+    if job_id is None:
+        raise ResourceConflict("A risk check is already in progress for this prescription")
+
+    try:
+        enqueue(prescription_id, doctor_id, job_id)
+    except Exception:
+        db.query(Prescription).filter(
+            Prescription.id == prescription.id,
+            Prescription.risk_job_id == job_id,
+            Prescription.risk_status == "queued",
+        ).update(
+            {
+                Prescription.risk_status: "failed",
+                Prescription.risk_status_updated_at: datetime.utcnow(),
+                Prescription.risk_error: "Background risk service is unavailable.",
+            },
+            synchronize_session=False,
+        )
+        db.commit()
+        raise ServiceUnavailable("Risk check could not be queued. Try again later.")
+
+    return {
+        "id": job_id,
+        "prescription_id": prescription_id,
+        "issues": [],
+        "severity": "processing",
+        "created_at": datetime.utcnow(),
+        "status": "queued",
+        "error": None,
+    }
 
 
 @lru_cache(maxsize=100)
@@ -247,11 +313,19 @@ def _serialize_risk_check(risk_check: RiskCheck) -> dict:
         "issues": json.loads(risk_check.issues or "[]"),
         "severity": risk_check.severity,
         "created_at": risk_check.created_at,
+        "status": "completed",
+        "error": None,
     }
 
 
-def run_risk_check(db: Session, prescription_id: str, doctor_id: str) -> dict:
-    prescription = _get_prescription_for_doctor(db, prescription_id, doctor_id)
+def run_risk_check(
+    db: Session,
+    prescription_id: str,
+    doctor_id: str,
+    *,
+    commit: bool = True,
+) -> dict:
+    prescription = get_prescription_for_doctor(db, prescription_id, doctor_id)
     items = (
         db.query(PrescriptionItem)
         .filter(PrescriptionItem.prescription_id == prescription_id)
@@ -270,14 +344,27 @@ def run_risk_check(db: Session, prescription_id: str, doctor_id: str) -> dict:
         severity=_overall_severity(issues),
     )
     db.add(risk_check)
-    db.commit()
-    db.refresh(risk_check)
+    if commit:
+        db.commit()
+        db.refresh(risk_check)
+    else:
+        db.flush()
 
     return _serialize_risk_check(risk_check)
 
 
 def get_latest_risk_check(db: Session, prescription_id: str, doctor_id: str) -> dict:
-    _get_prescription_for_doctor(db, prescription_id, doctor_id)
+    prescription = get_prescription_for_doctor(db, prescription_id, doctor_id)
+    if prescription.risk_status in {"queued", "processing", "failed"}:
+        return {
+            "id": prescription.risk_job_id or f"risk-{prescription.id}",
+            "prescription_id": prescription.id,
+            "issues": [],
+            "severity": prescription.risk_status,
+            "created_at": prescription.risk_status_updated_at or prescription.created_at,
+            "status": prescription.risk_status,
+            "error": prescription.risk_error,
+        }
     risk_check = (
         db.query(RiskCheck)
         .filter(RiskCheck.prescription_id == prescription_id)
@@ -285,9 +372,6 @@ def get_latest_risk_check(db: Session, prescription_id: str, doctor_id: str) -> 
         .first()
     )
     if not risk_check:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Risk check not found for this prescription",
-        )
+        raise ResourceNotFound("Risk check not found for this prescription")
 
     return _serialize_risk_check(risk_check)

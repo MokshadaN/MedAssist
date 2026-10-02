@@ -56,3 +56,15 @@ def require_roles(*roles: str) -> Callable:
 
     return dependency
 
+
+def require_verified_doctor(current_user=Depends(require_roles("doctor")), db: Session = Depends(get_db)):
+    """
+    Guard for privileged clinical workflows (P0): the doctor must be verified
+    through the controlled approval workflow — a registration-number format
+    check alone never grants clinical privileges.
+    """
+    from services.access_control import get_verified_doctor_profile_or_403
+
+    get_verified_doctor_profile_or_403(db, current_user.id)
+    return current_user
+

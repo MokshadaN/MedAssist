@@ -19,11 +19,23 @@ def create_notification(db: Session, user_id: str, message: str, type: str) -> N
     return notification
 
 
-def get_notifications(db: Session, user_id: str) -> list[Notification]:
+def get_notifications(
+    db: Session,
+    user_id: str,
+    *,
+    limit: int = 50,
+    offset: int = 0,
+) -> list[Notification]:
     return (
         db.query(Notification)
         .filter(Notification.user_id == user_id)
-        .order_by(Notification.is_read.asc(), Notification.created_at.desc())
+        .order_by(
+            Notification.is_read.asc(),
+            Notification.created_at.desc(),
+            Notification.id.desc(),
+        )
+        .offset(offset)
+        .limit(limit)
         .all()
     )
 
