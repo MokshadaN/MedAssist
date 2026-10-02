@@ -1,11 +1,12 @@
 """API v1 router."""
 
 from fastapi import APIRouter
-from api.v1.endpoints import auth, sessions, messages, triage, reports, ai, doctor, prescriptions, visits, notifications, feedback, risk, reminders, places, patient, schedules
+from api.v1.endpoints import admin, auth, sessions, messages, triage, reports, ai, doctor, prescriptions, visits, notifications, feedback, risk, reminders, places, patient, schedules
 
 api_router = APIRouter()
 
 api_router.include_router(auth.router, prefix="/auth")
+api_router.include_router(admin.router, prefix="/admin")
 api_router.include_router(sessions.router, prefix="/chat")
 api_router.include_router(messages.router, prefix="/chat")
 api_router.include_router(triage.router, prefix="/triage")

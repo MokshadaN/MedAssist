@@ -38,21 +38,56 @@ Desired JSON Schema:
 """
 
 TRIAGE_SYSTEM_PROMPT = (
-    "You are a medical emergency detection JSON API. You MUST return strictly valid JSON and nothing else."
+    "You are an extraction-only clinical text API. Return strictly valid JSON "
+    "containing only explicitly stated facts. Never diagnose, recommend treatment, "
+    "or assign urgency."
 )
 
 
 def triage_prompt(transcript: str) -> str:
     return f"""
-You are a medical triage AI. Analyze the patient transcript below to determine if this is a severe medical emergency requiring immediate attention (like a heart attack, stroke, severe bleeding, or extreme pain).
+Extract only facts explicitly stated by the patient text below.
 
-Transcript: "{transcript}"
+Do not return an urgency level, diagnosis, possible condition, treatment,
+recommendation, or medical reasoning. Do not infer missing facts.
+Map different wording with the same explicit meaning to the allowed safety
+concepts below. Include a concept as present only when it describes the
+patient's current symptom. Put explicit denials in negated_safety_concepts.
+Do not treat past symptoms, hypothetical statements, or another person's
+symptoms as present.
 
-Return a STRICT JSON object in this exact format:
+Allowed safety concepts:
+- chest_pain_or_tightness
+- breathing_difficulty
+- coughing_or_vomiting_blood
+- severe_or_uncontrolled_bleeding
+- fainting_unconscious_or_collapse
+- seizure
+- new_weakness_numbness_or_inability_to_move
+- confusion_or_slurred_speech
+- severe_head_injury
+- worst_or_extreme_pain
+- severe_allergic_reaction
+- choking
+- overdose_or_poisoning
+- suicidal_or_homicidal_intent
+
+Return STRICT JSON in exactly this format:
 {{
-    "urgent": true or false,
-    "matched_terms": ["list of concerning phrases from transcript, empty if none"]
+    "symptoms": ["explicitly stated symptoms"],
+    "severity": "mild, moderate, severe, or null",
+    "duration": "explicit duration or null",
+    "trend": "worsening, improving, stable, or null",
+    "functional_impairment": true, false, or null,
+    "associated_symptoms": ["explicit associated symptoms"],
+    "negated_symptoms": ["symptoms explicitly denied by the patient"],
+    "present_safety_concepts": ["allowed concepts explicitly present now"],
+    "negated_safety_concepts": ["allowed concepts explicitly denied"]
 }}
+
+<patient_text>
+{transcript}
+</patient_text>
 """
 
 

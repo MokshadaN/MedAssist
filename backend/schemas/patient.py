@@ -1,5 +1,6 @@
 """Patient schemas."""
 
+from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field
 
@@ -23,9 +24,18 @@ class PatientProfileUpdate(PatientProfileBase):
 
 class PatientProfileOut(PatientProfileBase):
     id: str = Field(description="Patient profile ID")
+    emergency_profile_enabled: bool = False
+    emergency_access_token: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+
+class EmergencyAccessOut(BaseModel):
+    enabled: bool
+    access_token: str
+    expires_at: datetime
+    public_path: str
 
 
 class MedicationPublic(BaseModel):

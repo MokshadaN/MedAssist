@@ -1,9 +1,21 @@
-"""Doctor license & medical council verification service for Indian Medical Registries."""
+"""Doctor registration-number validation (P0).
+
+This service ONLY validates the FORMAT of an Indian medical registration
+number. It NEVER verifies a doctor — a well-formed registration number is
+easily forged, so verification is granted exclusively through the controlled
+manual approval workflow (admin review, see api/v1/endpoints/admin.py) or a
+future authoritative registry integration (NMC / State Council registers).
+
+Every newly registered doctor defaults to:
+    is_verified = False, verification_status = "pending"
+"""
 
 import re
-import datetime
 import logging
-from typing import Optional, Dict, Any
+from datetime import datetime
+from typing import Any, Dict, Optional
+
+from models.doctor import DoctorProfile
 
 logger = logging.getLogger(__name__)
 
@@ -25,122 +37,100 @@ INDIAN_STATE_COUNCILS = {
     "BMC": "Bihar Medical Council",
 }
 
-# Known verified credentials database for seamless instantaneous verification
-KNOWN_INDIAN_DOCTORS = {
-    "MCI-12345": {
-        "doctor_name": "Dr. Rajesh Sharma",
-        "state_council": "National Medical Commission (MCI)",
-        "council_code": "NMC",
-        "qualification": "MBBS, MD (Internal Medicine)",
-        "registration_year": 2012,
-        "status": "Active / Registered",
-    },
-    "MMC-2018/04/1234": {
-        "doctor_name": "Dr. Priya Deshmukh",
-        "state_council": "Maharashtra Medical Council",
-        "council_code": "MMC",
-        "qualification": "MBBS, MS (General Surgery)",
-        "registration_year": 2018,
-        "status": "Active / Registered",
-    },
-    "DMC-54321": {
-        "doctor_name": "Dr. Amit Verma",
-        "state_council": "Delhi Medical Council",
-        "council_code": "DMC",
-        "qualification": "MBBS, MD (Cardiology)",
-        "registration_year": 2015,
-        "status": "Active / Registered",
-    },
-    "KMC-67890": {
-        "doctor_name": "Dr. Ananya Rao",
-        "state_council": "Karnataka Medical Council",
-        "council_code": "KMC",
-        "qualification": "MBBS, DNB (Pediatrics)",
-        "registration_year": 2017,
-        "status": "Active / Registered",
-    },
-    "TNMC-11223": {
-        "doctor_name": "Dr. Karthik Sundaram",
-        "state_council": "Tamil Nadu Medical Council",
-        "council_code": "TNMC",
-        "qualification": "MBBS, MD (Pulmonology)",
-        "registration_year": 2014,
-        "status": "Active / Registered",
-    },
-    "LIC12345": {
-        "doctor_name": "Dr. MedAssist Physician",
-        "state_council": "National Medical Commission (MCI)",
-        "council_code": "NMC",
-        "qualification": "MBBS, MD (General Medicine)",
-        "registration_year": 2016,
-        "status": "Active / Registered",
-    },
-}
+# Kept as a backward-compatible alias for older imports.
+VERIFICATION_STATUS_PENDING = "pending"
+VERIFICATION_STATUS_APPROVED = "approved"
+VERIFICATION_STATUS_REJECTED = "rejected"
 
 
-def parse_and_validate_indian_registration(license_number: str, council_hint: Optional[str] = None) -> Dict[str, Any]:
+def reset_verification_for_review(
+    profile: DoctorProfile,
+    *,
+    submitted_at: datetime | None = None,
+) -> None:
+    """Reset authoritative verification fields after a new registration submission."""
+    profile.is_verified = False
+    profile.verification_status = VERIFICATION_STATUS_PENDING
+    profile.verification_source = None
+    profile.verification_note = None
+    profile.verified_by = None
+    profile.verified_at = None
+    profile.qualification = None
+    profile.submitted_at = submitted_at or datetime.utcnow()
+
+
+def validate_registration_format(license_number: str, council_hint: Optional[str] = None) -> Dict[str, Any]:
     """
-    Validates and verifies an Indian Medical Registration Number against
-    the National Medical Commission (NMC) & State Medical Council standards.
+    Validate the FORMAT of an Indian medical registration number and derive the
+    likely state council for record keeping.
+
+    Returns a dict with:
+    - is_valid_format: bool — syntactic validity only. NEVER a verification.
+    - registration_number, state_council, council_code, qualification,
+      registration_year: metadata captured for the manual review workflow.
+    - reason: why the format was rejected (when invalid).
+
+    This function must never return any "is_verified" key.
     """
-    clean_number = license_number.strip().upper()
-    
-    # 1. Direct registry lookup
-    if clean_number in KNOWN_INDIAN_DOCTORS:
-        rec = KNOWN_INDIAN_DOCTORS[clean_number]
+    clean_number = (license_number or "").strip().upper()
+    if not clean_number:
         return {
-            "is_verified": True,
+            "is_valid_format": False,
             "registration_number": clean_number,
-            "state_council": rec["state_council"],
-            "council_code": rec["council_code"],
-            "qualification": rec["qualification"],
-            "registration_year": rec["registration_year"],
-            "verification_source": "National Medical Commission (NMC) / State Council National Register",
-            "status": rec["status"],
-            "message": f"Successfully verified with {rec['state_council']} (Reg #{clean_number})",
+            "reason": "Registration number is required.",
         }
 
-    # 2. Check for council prefix patterns (e.g. MMC-12345, DMC/2020/543, MCI-98765)
-    matched_council_code = "NMC"
-    for code, name in INDIAN_STATE_COUNCILS.items():
+    # Check for council prefix patterns (e.g. MMC-12345, DMC/2020/543, MCI-98765)
+    matched_council_code: Optional[str] = None
+    for code in INDIAN_STATE_COUNCILS:
         if clean_number.startswith(code) or (council_hint and code in council_hint.upper()):
             matched_council_code = code
             break
 
-    # 3. Format syntax validation for general Indian registration numbers
+    # Format syntax validation for general Indian registration numbers.
     # Valid formats:
     # - Numeric only (4 to 8 digits)
     # - Alphanumeric with council prefix (e.g. MMC-2015/02/1234, DMC-12345, MCI-65432, 123456/2019)
     is_valid_format = bool(
-        re.match(r"^[A-Z]{2,5}[-/]?[0-9]{3,8}([/0-9]{1,10})?$", clean_number) or
-        re.match(r"^[0-9]{4,10}$", clean_number) or
-        re.match(r"^[A-Z0-9]{5,20}$", clean_number)
+        re.match(r"^[A-Z]{2,5}[-/]?[0-9]{3,8}([/0-9]{1,10})?$", clean_number)
+        or re.match(r"^[0-9]{4,10}$", clean_number)
+        or re.match(r"^[A-Z0-9]{5,20}$", clean_number)
     )
 
     if not is_valid_format:
         return {
-            "is_verified": False,
+            "is_valid_format": False,
             "registration_number": clean_number,
-            "reason": "Invalid registration number format. Standard Indian Medical Council formats: MCI-12345, MMC-2018/04/1234, DMC-54321, or 5-8 digit NMC number.",
+            "reason": (
+                "Invalid registration number format. Standard Indian Medical Council "
+                "formats: MCI-12345, MMC-2018/04/1234, DMC-54321, or a 4-8 digit NMC number."
+            ),
         }
 
-    # Determine state council name
-    council_name = INDIAN_STATE_COUNCILS.get(matched_council_code, "National Medical Commission (MCI)")
+    # Determine state council name (for the review record, not for verification)
+    council_name = INDIAN_STATE_COUNCILS.get(matched_council_code or "NMC", "National Medical Commission (MCI)")
     if council_hint and council_hint in INDIAN_STATE_COUNCILS.values():
         council_name = council_hint
 
-    # Extract or infer registration year
+    # Extract registration year if present (best-effort metadata for reviewers)
     year_match = re.search(r"(19[89][0-9]|20[0-2][0-9])", clean_number)
-    reg_year = int(year_match.group(1)) if year_match else (datetime.datetime.now().year - 5)
+    registration_year = int(year_match.group(1)) if year_match else None
+
+    logger.info(
+        "Registration number format validated (NOT verified): %s, council=%s",
+        clean_number, council_name,
+    )
 
     return {
-        "is_verified": True,
+        "is_valid_format": True,
         "registration_number": clean_number,
         "state_council": council_name,
-        "council_code": matched_council_code,
-        "qualification": "MBBS, MD / MS (Registered Medical Practitioner)",
-        "registration_year": reg_year,
-        "verification_source": "National Medical Commission (NMC) / State Council National Register",
-        "status": "Active / Registered Medical Practitioner (RMP)",
-        "message": f"Successfully verified with {council_name} (Registration #{clean_number})",
+        "council_code": matched_council_code or "NMC",
+        "qualification": None,  # only an authoritative registry or reviewer may attest this
+        "registration_year": registration_year,
+        "status": "Pending review by administrator",
+        "message": (
+            "Registration number format accepted. Your registration is now "
+            "pending review by an administrator — you will be verified after approval."
+        ),
     }

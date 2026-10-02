@@ -1,6 +1,8 @@
 """Places service for OpenStreetMap Nominatim and Overpass API integration."""
 
+import logging
 import math
+import os
 
 import requests
 from pathlib import Path
@@ -9,6 +11,7 @@ from dotenv import load_dotenv
 
 from schemas.places import Hospital, HospitalDetails
 
+logger = logging.getLogger(__name__)
 
 # =====================================================
 # CONFIG
@@ -18,11 +21,22 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BACKEND_DIR / ".env")
 
 
-OVERPASS_API_URL = "https://overpass-api.de/api/interpreter"
+OVERPASS_API_URLS = tuple(
+    url.strip()
+    for url in os.getenv(
+        "OVERPASS_API_URLS",
+        (
+            "https://overpass-api.de/api/interpreter,"
+            "https://overpass.kumi.systems/api/interpreter"
+        ),
+    ).split(",")
+    if url.strip()
+)
 NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/search"
 REQUEST_HEADERS = {
     "User-Agent": "MedAssist/0.1 emergency-hospital-lookup"
 }
+OVERPASS_TIMEOUT = (3.05, 8)
 
 
 # =====================================================
@@ -82,6 +96,30 @@ def geocode_address(address: str) -> Optional[tuple[float, float]]:
 
     return float(results[0]["lat"]), float(results[0]["lon"])
 
+
+def _query_overpass(query: str) -> requests.Response:
+    """Try bounded alternate providers without delaying emergency guidance."""
+    for index, url in enumerate(OVERPASS_API_URLS, start=1):
+        try:
+            response = requests.post(
+                url,
+                data={"data": query},
+                headers=REQUEST_HEADERS,
+                timeout=OVERPASS_TIMEOUT,
+            )
+            response.raise_for_status()
+            return response
+        except requests.RequestException as exc:
+            logger.warning(
+                "Overpass provider %d/%d failed (%s)",
+                index,
+                len(OVERPASS_API_URLS),
+                type(exc).__name__,
+            )
+
+    raise RuntimeError("All configured hospital-search providers are unavailable")
+
+
 def get_nearby_hospitals(latitude: float, longitude: float, radius: int = 5000) -> List[Hospital]:
     """
     Get nearby hospitals using OpenStreetMap Overpass API.
@@ -96,7 +134,7 @@ def get_nearby_hospitals(latitude: float, longitude: float, radius: int = 5000) 
     """
     # Overpass QL query to find hospitals within radius
     query = f"""
-    [out:json][timeout:25];
+    [out:json][timeout:8];
     (
       node["amenity"~"hospital|clinic|doctors|ambulance_station"](around:{radius},{latitude},{longitude});
       way["amenity"~"hospital|clinic|doctors|ambulance_station"](around:{radius},{latitude},{longitude});
@@ -108,13 +146,7 @@ def get_nearby_hospitals(latitude: float, longitude: float, radius: int = 5000) 
     out center;
     """
 
-    response = requests.post(
-        OVERPASS_API_URL,
-        data={"data": query},
-        headers=REQUEST_HEADERS,
-        timeout=30,
-    )
-    response.raise_for_status()
+    response = _query_overpass(query)
 
     data = response.json()
     if "elements" not in data:
@@ -206,18 +238,12 @@ def get_hospital_details(osm_id: str) -> HospitalDetails:
 
     # Query for specific element
     query = f"""
-    [out:json][timeout:25];
+    [out:json][timeout:8];
     {element_type}({element_id});
     out;
     """
 
-    response = requests.post(
-        OVERPASS_API_URL,
-        data={"data": query},
-        headers=REQUEST_HEADERS,
-        timeout=30,
-    )
-    response.raise_for_status()
+    response = _query_overpass(query)
 
     data = response.json()
     if "elements" not in data or not data["elements"]:

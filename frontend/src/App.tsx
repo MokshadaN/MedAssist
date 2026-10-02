@@ -61,6 +61,17 @@ type AuthMode = 'login' | 'register-doctor' | 'register-patient';
 type ChatMessage = { role: 'assistant' | 'user'; text: string };
 type FrequencyOption = 'once' | 'twice' | 'thrice';
 
+function settledFailureMessage(
+  results: Array<[string, PromiseSettledResult<unknown>]>,
+): string {
+  return results
+    .filter((entry): entry is [string, PromiseRejectedResult] => entry[1].status === 'rejected')
+    .map(([label, result]) => (
+      `${label}: ${result.reason instanceof Error ? result.reason.message : 'request failed'}`
+    ))
+    .join('; ');
+}
+
 interface MedicineInfo {
   name: string;
   generic?: string;
@@ -313,6 +324,7 @@ function PublicProfileView({ profile, loading }: { profile: PublicProfile | null
 function App() {
   const isPublicRoute = window.location.pathname.startsWith('/public-profile/');
   const routeProfileId = isPublicRoute ? window.location.pathname.split('/').pop() : null;
+  const routeProfileToken = new URLSearchParams(window.location.search).get('token');
 
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('medassist_token') || '');
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -326,12 +338,12 @@ function App() {
 
   useEffect(() => {
     if (isPublicRoute && routeProfileId) {
-      api.getPublicProfile(routeProfileId)
+      api.getPublicProfile(routeProfileId, routeProfileToken)
         .then(setPublicProfile)
         .catch((err: Error) => setFlash(err.message))
         .finally(() => setPublicLoading(false));
     }
-  }, [isPublicRoute, routeProfileId]);
+  }, [isPublicRoute, routeProfileId, routeProfileToken]);
 
   if (isPublicRoute) {
     return <PublicProfileView profile={publicProfile} loading={publicLoading} />;
@@ -348,7 +360,7 @@ function App() {
   const [doctors, setDoctors] = useState<DoctorDirectoryItem[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
   const [patientVisits, setPatientVisits] = useState<DoctorVisit[]>([]);
-  const [patientReports, setPatientReports] = useState<Array<{ id: string; file_url: string; parsed_data?: string | null }>>([]);
+  const [patientReports, setPatientReports] = useState<Array<{ id: string; file_url: string; parsed_data?: string | null; analysis_status?: string }>>([]);
   const [patientPrescriptions, setPatientPrescriptions] = useState<Prescription[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [patientReminders, setPatientReminders] = useState<Reminder[]>([]);
@@ -367,12 +379,27 @@ function App() {
   const [intakeMessages, setIntakeMessages] = useState<ChatMessage[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [isVoiceInput, setIsVoiceInput] = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  // Voice input records audio with MediaRecorder and transcribes it on the
+  // backend (Groq Whisper) — this works in Firefox too, unlike the old Web
+  // Speech API approach, and is more accurate for medical/accented speech.
+  const [voiceSupported] = useState(() =>
+    typeof window !== 'undefined'
+    && typeof MediaRecorder !== 'undefined'
+    && Boolean(navigator.mediaDevices?.getUserMedia));
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
   const recordingBaseTextRef = useRef('');
   const [structuredData, setStructuredData] = useState<Record<string, unknown> | null>(null);
   const [lastSummary, setLastSummary] = useState<AISummary | null>(null);
   const [emergencyHospitals, setEmergencyHospitals] = useState<EmergencyHospital[]>([]);
   const [emergencyMessage, setEmergencyMessage] = useState('');
+  // Non-emergency triage advisory; intake continues.
+  const [intakeAdvisory, setIntakeAdvisory] = useState('');
+  const [intakeTriageLevel, setIntakeTriageLevel] = useState<
+    'emergency' | 'urgent_care' | 'routine' | 'abstain' | null
+  >(null);
   const [isSendingIntake, setIsSendingIntake] = useState(false);
 
 
@@ -394,7 +421,7 @@ function App() {
   const [patients, setPatients] = useState<DoctorPatient[]>([]);
   const [selectedPatientId, setSelectedPatientId] = useState('');
   const [doctorHistory, setDoctorHistory] = useState<DoctorVisit[]>([]);
-  const [doctorReports, setDoctorReports] = useState<Array<{ id: string; file_url: string; parsed_data?: string | null }>>([]);
+  const [doctorReports, setDoctorReports] = useState<Array<{ id: string; file_url: string; parsed_data?: string | null; analysis_status?: string }>>([]);
   const [doctorReminders, setDoctorReminders] = useState<Reminder[]>([]);
   const [doctorReminderStatus, setDoctorReminderStatus] = useState('');
   const [selectedVisit, setSelectedVisit] = useState<DoctorVisit | null>(null);
@@ -459,6 +486,8 @@ function App() {
     setLastSummary(null);
     setEmergencyHospitals([]);
     setEmergencyMessage('');
+    setIntakeAdvisory('');
+    setIntakeTriageLevel(null);
     setIsSendingIntake(false);
 
     // Clear doctor state
@@ -537,7 +566,7 @@ function App() {
     const profileId = params.get('profile');
     if (profileId) {
       setPublicProfileId(profileId);
-      api.getPublicProfile(profileId)
+      api.getPublicProfile(profileId, params.get('token'))
         .then(setPublicProfile)
         .catch((err: Error) => setFlash(`Error loading profile: ${err.message}`));
     }
@@ -556,7 +585,7 @@ function App() {
     if (!authToken || !user || user.role !== 'patient') return;
     setBusy('Loading your dashboard');
     try {
-      const [doctorList, visits, reports, prescriptions, reminders, notes] = await Promise.all([
+      const [doctorResult, visitResult, reportResult, prescriptionResult, reminderResult, notificationResult] = await Promise.allSettled([
         api.listDoctors(authToken),
         api.getMyVisits(authToken),
         api.listReports(user.id, authToken),
@@ -564,15 +593,32 @@ function App() {
         api.listMyReminders(authToken),
         api.listNotifications(authToken),
       ]);
+      const doctorList = doctorResult.status === 'fulfilled' ? doctorResult.value : [];
       setDoctors(doctorList);
-      setSelectedDoctorId((current) => current || doctorList[0]?.id || '');
-      setPatientVisits(visits);
-      setPatientReports(reports);
-      setPatientPrescriptions(prescriptions);
-      setPatientReminders(reminders);
-      setNotifications(notes);
-    } catch (error) {
-      setNotificationStatus(error instanceof Error ? error.message : 'Could not load patient dashboard');
+      setSelectedDoctorId((current) => (
+        doctorList.some((doctor) => doctor.id === current)
+          ? current
+          : doctorList[0]?.id || ''
+      ));
+      setPatientVisits(visitResult.status === 'fulfilled' ? visitResult.value : []);
+      setPatientReports(reportResult.status === 'fulfilled' ? reportResult.value : []);
+      setPatientPrescriptions(
+        prescriptionResult.status === 'fulfilled' ? prescriptionResult.value : [],
+      );
+      setPatientReminders(reminderResult.status === 'fulfilled' ? reminderResult.value : []);
+      setNotifications(
+        notificationResult.status === 'fulfilled' ? notificationResult.value : [],
+      );
+
+      const failures = settledFailureMessage([
+        ['Doctors', doctorResult],
+        ['Visits', visitResult],
+        ['Reports', reportResult],
+        ['Prescriptions', prescriptionResult],
+        ['Reminders', reminderResult],
+        ['Notifications', notificationResult],
+      ]);
+      setNotificationStatus(failures ? `Some dashboard data could not be loaded — ${failures}` : '');
     } finally {
       setBusy('');
     }
@@ -582,15 +628,26 @@ function App() {
     if (!authToken || !user || user.role !== 'doctor') return;
     setBusy('Loading doctor dashboard');
     try {
-      const [loadedPatients, notes] = await Promise.all([
+      const [patientResult, notificationResult] = await Promise.allSettled([
         api.listPatients(authToken),
         api.listNotifications(authToken),
       ]);
+      const loadedPatients = patientResult.status === 'fulfilled' ? patientResult.value : [];
       setPatients(loadedPatients);
-      setNotifications(notes);
-      setSelectedPatientId((current) => current || loadedPatients[0]?.patient_id || '');
-    } catch (error) {
-      setNotificationStatus(error instanceof Error ? error.message : 'Could not load doctor dashboard');
+      setNotifications(
+        notificationResult.status === 'fulfilled' ? notificationResult.value : [],
+      );
+      setSelectedPatientId((current) => (
+        loadedPatients.some((patient) => patient.patient_id === current)
+          ? current
+          : loadedPatients[0]?.patient_id || ''
+      ));
+
+      const failures = settledFailureMessage([
+        ['Patients', patientResult],
+        ['Notifications', notificationResult],
+      ]);
+      setNotificationStatus(failures ? `Some dashboard data could not be loaded — ${failures}` : '');
     } finally {
       setBusy('');
     }
@@ -604,19 +661,33 @@ function App() {
   useEffect(() => {
     if (!authToken || !selectedPatientId || user?.role !== 'doctor') return;
     setDoctorReminderStatus('');
+    setDoctorHistory([]);
+    setDoctorReports([]);
+    setDoctorReminders([]);
+    setSelectedVisit(null);
     setBusy('Loading patient timeline');
-    Promise.all([
+    Promise.allSettled([
       api.getPatientHistory(selectedPatientId, authToken),
       api.listPatientReports(selectedPatientId, authToken),
-      api.listReminders(selectedPatientId),
+      api.listReminders(selectedPatientId, authToken),
     ])
-      .then(([history, reports, reminders]) => {
+      .then(([historyResult, reportResult, reminderResult]) => {
+        const history = historyResult.status === 'fulfilled' ? historyResult.value : [];
         setDoctorHistory(history);
-        setDoctorReports(reports);
-        setDoctorReminders(reminders);
+        setDoctorReports(reportResult.status === 'fulfilled' ? reportResult.value : []);
+        setDoctorReminders(
+          reminderResult.status === 'fulfilled' ? reminderResult.value : [],
+        );
         setSelectedVisit(history[0] || null);
+        const failures = settledFailureMessage([
+          ['Visit history', historyResult],
+          ['Reports', reportResult],
+          ['Reminders', reminderResult],
+        ]);
+        if (failures) {
+          setFlash(`Some patient data could not be loaded — ${failures}`);
+        }
       })
-      .catch((error) => setFlash(error instanceof Error ? error.message : 'Could not load patient history'))
       .finally(() => setBusy(''));
   }, [authToken, selectedPatientId, user?.role]);
 
@@ -635,6 +706,48 @@ function App() {
       setDoctorSummary(summaryResult.status === 'fulfilled' ? summaryResult.value : null);
     });
   }, [authToken, selectedVisit?.session_id]);
+
+  useEffect(() => {
+    let active = true;
+    const defaultNotes = 'Continue current therapy and monitor response.';
+
+    setPrescriptionId('');
+    setCurrentPrescriptionItems([]);
+    setPrescriptionNotes(defaultNotes);
+    setPrescriptionStatus('');
+    setMedicationStatus('');
+    setMedicationName('');
+    setDosage('');
+    setSyrupQuantity('');
+    setDuration('');
+    setFrequency('once');
+    setCustomInstructions('');
+
+    if (!authToken || !selectedVisit?.visit_id || user?.role !== 'doctor') {
+      return () => {
+        active = false;
+      };
+    }
+
+    api.getPrescription(selectedVisit.visit_id, authToken)
+      .then((prescription) => {
+        if (!active) return;
+        setPrescriptionId(prescription.id);
+        setPrescriptionNotes(prescription.notes || defaultNotes);
+        setCurrentPrescriptionItems(prescription.items || []);
+      })
+      .catch((error) => {
+        if (!active) return;
+        const message = error instanceof Error ? error.message : 'Could not load prescription';
+        if (message !== 'Prescription not found') {
+          setPrescriptionStatus(message);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [authToken, selectedVisit?.visit_id, user?.role]);
 
   useEffect(() => {
     if (!authToken || !selectedTimelineVisit?.session_id) {
@@ -725,6 +838,8 @@ function App() {
       setLastSummary(null);
       setEmergencyHospitals([]);
       setEmergencyMessage('');
+      setIntakeAdvisory('');
+      setIntakeTriageLevel(null);
       setIntakeOpen(true);
       setIntakeStatus('Intake started');
     } catch (error) {
@@ -734,71 +849,97 @@ function App() {
     }
   };
 
-  const toggleRecording = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setFlash('Speech recognition is not supported in this browser.');
-      return;
+  const pickRecorderMime = (): string => {
+    const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+    for (const type of candidates) {
+      if (MediaRecorder.isTypeSupported(type)) return type;
     }
+    return '';
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    // setIsRecording(false) happens in onstop so the button stays "live"
+    // until the recorder has fully flushed the last audio chunk.
+  };
+
+  const toggleRecording = () => {
+    if (isTranscribing || isSendingIntake) return;
 
     if (isRecording) {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-      setIsRecording(false);
+      stopRecording();
+      return;
+    }
+    if (!voiceSupported) {
+      setFlash('Voice input is not supported in this browser.');
       return;
     }
 
-    const recognition = new SpeechRecognition();
-    recognitionRef.current = recognition;
     recordingBaseTextRef.current = intakeText.trim();
+    audioChunksRef.current = [];
 
-    recognition.lang = 'en-US';
-    recognition.interimResults = true;
-    recognition.continuous = true;
-    recognition.maxAlternatives = 1;
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        mediaStreamRef.current = stream;
+        const mimeType = pickRecorderMime();
+        const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+        mediaRecorderRef.current = recorder;
 
-    recognition.onstart = () => {
-      setIsRecording(true);
-    };
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) audioChunksRef.current.push(event.data);
+        };
 
-    recognition.onresult = (event: any) => {
-      let currentTranscript = '';
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        currentTranscript += event.results[i][0].transcript;
-      }
+        recorder.onstop = async () => {
+          setIsRecording(false);
+          mediaRecorderRef.current = null;
+          // Release the mic immediately — don't hold it while uploading.
+          mediaStreamRef.current?.getTracks().forEach((track) => track.stop());
+          mediaStreamRef.current = null;
 
-      // We use a functional update to avoid issues with stale intakeText
-      // but we use the ref for the base text captured at start.
-      const fullTranscript = Array.from(event.results)
-        .map((res: any) => res[0].transcript)
-        .join('');
+          const blob = new Blob(audioChunksRef.current, { type: mimeType || 'audio/webm' });
+          audioChunksRef.current = [];
+          if (blob.size === 0) {
+            setFlash('No speech captured — please try again.');
+            return;
+          }
 
-      setIntakeText(recordingBaseTextRef.current + (recordingBaseTextRef.current ? ' ' : '') + fullTranscript);
-      setIsVoiceInput(true);
-    };
+          setIsTranscribing(true);
+          setBusy('Transcribing your voice');
+          try {
+            const result = await api.transcribeAudio(blob, authToken || '');
+            const text = (result.text || '').trim();
+            if (text) {
+              setIntakeText(
+                recordingBaseTextRef.current
+                  + (recordingBaseTextRef.current ? ' ' : '')
+                  + text
+              );
+              setIsVoiceInput(true);
+            } else {
+              setFlash('No speech detected in the recording — please try again.');
+            }
+          } catch (error) {
+            console.error('Transcription failed', error);
+            setFlash(error instanceof Error ? error.message : 'Voice transcription failed.');
+          } finally {
+            setIsTranscribing(false);
+            setBusy('');
+          }
+        };
 
-    recognition.onerror = (event: any) => {
-      console.error('Speech recognition error', event.error);
-      setIsRecording(false);
-      if (event.error !== 'no-speech' && event.error !== 'aborted') {
-        setFlash(`Speech recognition error: ${event.error}`);
-      }
-    };
-
-    recognition.onend = () => {
-      setIsRecording(false);
-      recognitionRef.current = null;
-    };
-
-    setIsRecording(true);
-    try {
-      recognition.start();
-    } catch (error) {
-      setIsRecording(false);
-      console.error('Failed to start recognition', error);
-      setFlash('Failed to start voice input.');
-    }
+        recorder.start();
+        setIsRecording(true);
+      })
+      .catch((error) => {
+        console.error('Failed to start recording', error);
+        if (error?.name === 'NotAllowedError') {
+          setFlash('Microphone access was denied — allow it in your browser settings to use voice input.');
+        } else {
+          setFlash('Failed to start voice input.');
+        }
+      });
   };
 
   const sendIntakeAnswer = async () => {
@@ -828,6 +969,8 @@ function App() {
         setEmergencyHospitals(response.nearest_hospitals || []);
         setEmergencyMessage(response.emergency_message || response.message);
       }
+      setIntakeAdvisory(response.advisory || '');
+      setIntakeTriageLevel(response.triage_level || null);
 
       if (response.status === 'complete') {
         const visit = await api.createPatientVisit(selectedDoctorId, response.session_id, authToken);
@@ -879,6 +1022,39 @@ function App() {
       setProfileStatus('Profile updated');
     } catch (error) {
       setProfileStatus(error instanceof Error ? error.message : 'Could not update profile');
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const enableEmergencyQR = async () => {
+    if (!authToken || !patientProfile) return;
+    setBusy('Enabling emergency QR');
+    try {
+      const info = await api.enableEmergencyAccess(authToken);
+      setPatientProfile((prev) => prev
+        ? { ...prev, emergency_profile_enabled: info.enabled, emergency_access_token: info.access_token }
+        : prev);
+      setShowQR(true);
+      setProfileStatus('Emergency QR enabled. Only people scanning your QR code can open the emergency profile.');
+    } catch (error) {
+      setProfileStatus(error instanceof Error ? error.message : 'Could not enable emergency QR');
+    } finally {
+      setBusy('');
+    }
+  };
+
+  const disableEmergencyQR = async () => {
+    if (!authToken || !patientProfile) return;
+    setBusy('Disabling emergency QR');
+    try {
+      if (!window.confirm('Disable the emergency QR profile? Scanning your QR code will no longer show any medical details.')) return;
+      const updated = await api.disableEmergencyAccess(authToken);
+      setPatientProfile(updated);
+      setShowQR(false);
+      setProfileStatus('Emergency QR disabled. The public link no longer works.');
+    } catch (error) {
+      setProfileStatus(error instanceof Error ? error.message : 'Could not disable emergency QR');
     } finally {
       setBusy('');
     }
@@ -1074,9 +1250,9 @@ function App() {
         user_id: selectedPatientId,
         message: doctorReminderMessage,
         time: new Date(doctorReminderTime).toISOString(),
-      });
+      }, authToken);
       setDoctorReminders((current) => [reminder, ...current.filter((item) => item.id !== reminder.id)]);
-      setDoctorReminderStatus('Follow-up already scheduled for this patient; the existing reminder was updated.');
+      setDoctorReminderStatus('Follow-up scheduled for this patient.');
     } catch (error) {
       setDoctorReminderStatus(error instanceof Error ? error.message : 'Could not schedule follow-up');
     }
@@ -1448,19 +1624,28 @@ function App() {
                   <div className="panel" style={{ background: 'var(--surface-soft)', marginTop: '1rem', border: '1px dashed var(--border)' }}>
                     <div className="eyebrow" style={{ marginBottom: '0.5rem' }}>Emergency QR</div>
                     <p style={{ fontSize: '0.8rem', opacity: 0.8, marginBottom: '1rem' }}>
-                      Emergency responders can scan this to see your vital medical details instantly.
+                      {patientProfile?.emergency_profile_enabled
+                        ? 'Emergency responders can scan this to see your vital medical details instantly. You control this — disable it at any time and the link stops working.'
+                        : 'Enable the emergency QR so responders can scan it and see your vital medical details. The profile is only reachable through your personal QR code.'}
                     </p>
 
-                    {showQR ? (
-                      <div style={{ background: '#fff', padding: '1rem', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <QRCodeSVG
-                          value={`${window.location.origin}/public-profile/${patientProfile?.id}`}
-                          size={150}
-                        />
-                        <button type="button" className="ghost" style={{ marginTop: '0.5rem', color: '#000' }} onClick={() => setShowQR(false)}>Hide QR</button>
-                      </div>
+                    {patientProfile?.emergency_profile_enabled ? (
+                      showQR ? (
+                        <div style={{ background: '#fff', padding: '1rem', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                          <QRCodeSVG
+                            value={`${window.location.origin}/public-profile/${patientProfile?.id}?token=${encodeURIComponent(patientProfile?.emergency_access_token || '')}`}
+                            size={150}
+                          />
+                          <button type="button" className="ghost" style={{ marginTop: '0.5rem', color: '#000' }} onClick={() => setShowQR(false)}>Hide QR</button>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                          <button type="button" className="secondary" style={{ width: '100%' }} onClick={() => setShowQR(true)}>Show Emergency QR</button>
+                          <button type="button" className="ghost" style={{ width: '100%' }} onClick={() => void disableEmergencyQR()}>Disable emergency profile</button>
+                        </div>
+                      )
                     ) : (
-                      <button type="button" className="secondary" style={{ width: '100%' }} onClick={() => setShowQR(true)}>Show Emergency QR</button>
+                      <button type="button" className="secondary" style={{ width: '100%' }} onClick={() => void enableEmergencyQR()}>Enable Emergency QR</button>
                     )}
                   </div>
 
@@ -1535,13 +1720,29 @@ function App() {
                         type="button"
                         className={`voice-btn ${isRecording ? 'recording' : ''}`}
                         onClick={toggleRecording}
-                        title={isRecording ? 'Stop recording' : 'Start voice input'}
+                        disabled={!voiceSupported || isTranscribing || isSendingIntake}
+                        title={
+                          !voiceSupported
+                            ? 'Voice input is not supported in this browser'
+                            : isTranscribing
+                              ? 'Transcribing your recording…'
+                              : isRecording
+                                ? 'Stop recording and transcribe'
+                                : 'Start voice input'
+                        }
                       >
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" />
-                          <path d="M16 10a1 1 0 10-2 0 4 4 0 01-8 0 1 1 0 00-2 0 6 6 0 1012 0z" />
-                          <path d="M10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z" />
-                        </svg>
+                        {isTranscribing ? (
+                          <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20" className="animate-spin">
+                            <path d="M10 3v3a.5.5 0 001 0V3h2a1 1 0 100-2H7a1 1 0 100 2h3zm4.549 5A1 1 0 0114 9.449V11a4 4 0 01-8 0V9.449A1 1 0 015 8.55V11a5 5 0 0010 0V8.55z" />
+                            <path d="M10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z" opacity="0.3" />
+                          </svg>
+                        ) : (
+                          <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" />
+                            <path d="M16 10a1 1 0 10-2 0 4 4 0 01-8 0 1 1 0 00-2 0 6 6 0 1012 0z" />
+                            <path d="M10 16a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z" />
+                          </svg>
+                        )}
                       </button>
                       <button className="primary" type="submit" disabled={isSendingIntake || !intakeText.trim()}>
                         {isSendingIntake ? 'Thinking...' : 'Send'}
@@ -1554,6 +1755,24 @@ function App() {
                     <pre className="code-block">{formatSummary(lastSummary)}</pre>
                   </div>
                 </div>
+                {intakeAdvisory && (
+                  <div
+                    style={{
+                      marginTop: '1rem',
+                      padding: '0.9rem 1rem',
+                      borderRadius: '10px',
+                      background: 'rgba(245, 158, 11, 0.12)',
+                      border: '1px solid rgba(245, 158, 11, 0.45)',
+                    }}
+                  >
+                    <div className="eyebrow" style={{ color: '#b45309', marginBottom: '0.35rem' }}>
+                      {intakeTriageLevel === 'abstain'
+                        ? '⚠ Urgency uncertain — professional review recommended'
+                        : '⚠ See a doctor within 24 hours'}
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: '#92400e' }}>{intakeAdvisory}</div>
+                  </div>
+                )}
                 {emergencyMessage && (
                   <div className="emergency-panel">
                     <div>
@@ -1657,6 +1876,11 @@ function App() {
                     <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
                       <div className="stack compact" style={{ gap: '0.25rem' }}>
                         <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                        {report.analysis_status && report.analysis_status !== 'uploaded' && (
+                          <span style={{ fontSize: '0.72rem', opacity: 0.75 }}>
+                            Analysis: {report.analysis_status}
+                          </span>
+                        )}
                         {report.parsed_data && (
                           <pre className="code-block" style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
                             {formatReportAnalysis(report.parsed_data)}
@@ -1667,9 +1891,9 @@ function App() {
                         className="secondary"
                         type="button"
                         onClick={() => void analyzeReport(report.id)}
-                        disabled={analyzingId === report.id}
+                        disabled={analyzingId === report.id || report.analysis_status === 'queued' || report.analysis_status === 'processing'}
                       >
-                        {analyzingId === report.id ? 'Analyzing...' : 'Analyze'}
+                        {analyzingId === report.id ? 'Analyzing...' : (report.analysis_status === 'completed' ? 'Analyzed' : 'Analyze')}
                       </button>
                       <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                       <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
@@ -1911,6 +2135,11 @@ function App() {
                   <div className="record-card" key={report.id} style={{ gridTemplateColumns: '1fr auto auto auto auto', alignItems: 'center', gap: '0.75rem' }}>
                     <div className="stack compact" style={{ gap: '0.25rem' }}>
                       <strong style={{ color: '#fff' }}>{report.file_url.split('/').pop()}</strong>
+                      {report.analysis_status && report.analysis_status !== 'uploaded' && (
+                        <span style={{ fontSize: '0.72rem', opacity: 0.75 }}>
+                          Analysis: {report.analysis_status}
+                        </span>
+                      )}
                       {report.parsed_data && (
                         <pre className="code-block" style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
                           {formatReportAnalysis(report.parsed_data)}
@@ -1921,9 +2150,9 @@ function App() {
                       className="secondary"
                       type="button"
                       onClick={() => void analyzeReport(report.id)}
-                      disabled={analyzingId === report.id}
+                      disabled={analyzingId === report.id || report.analysis_status === 'queued' || report.analysis_status === 'processing'}
                     >
-                      {analyzingId === report.id ? 'Analyzing...' : 'Analyze'}
+                      {analyzingId === report.id ? 'Analyzing...' : (report.analysis_status === 'completed' ? 'Analyzed' : 'Analyze')}
                     </button>
                     <button className="secondary" type="button" onClick={() => void openReport(report.file_url)}>Open</button>
                     <button className="secondary" type="button" onClick={() => void downloadReport(report.file_url)}>Download</button>
@@ -1983,11 +2212,11 @@ function App() {
                   </div>
                 </div>
                 <div className={`alert-card ${sessionSnapshot?.status === 'urgent' ? 'urgent' : ''}`} style={{ height: '100%' }}>
-                  <strong style={{ color: '#fff' }}>{sessionSnapshot?.status?.toUpperCase() || 'NORMAL'}</strong>
+                  <strong style={{ color: '#fff' }}>{sessionSnapshot?.status?.toUpperCase() || 'UNKNOWN'}</strong>
                   <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
                     {sessionSnapshot?.status === 'urgent'
-                      ? 'Immediate medical evaluation recommended based on AI triage.'
-                      : 'No urgent indicators detected in current session.'}
+                      ? 'Immediate medical evaluation recommended after deterministic emergency screening.'
+                      : 'No confirmed emergency rule is recorded. This is not a diagnosis or assurance that the situation is safe.'}
                   </p>
                 </div>
               </section>
@@ -2006,8 +2235,8 @@ function App() {
                     <textarea rows={2} value={prescriptionNotes} onChange={(e) => setPrescriptionNotes(e.target.value)} placeholder="Overall prescription notes..." />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <button className="secondary" style={{ height: '100%', width: '100%' }} onClick={() => void createPrescription()} disabled={!selectedVisit}>
-                      Create ID
+                    <button className="secondary" style={{ height: '100%', width: '100%' }} onClick={() => void createPrescription()} disabled={!selectedVisit || Boolean(prescriptionId)}>
+                      {prescriptionId ? 'Prescription loaded' : 'Create ID'}
                     </button>
                   </div>
                 </div>

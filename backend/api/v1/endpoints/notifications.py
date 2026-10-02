@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from core.dependencies import get_current_user, get_db
+from core.pagination import PageLimit, PageOffset
 from schemas.notification import NotificationOut
 from services.notification_service import get_notifications, mark_read
 
@@ -12,10 +13,12 @@ router = APIRouter(tags=["notifications"])
 
 @router.get("", response_model=list[NotificationOut])
 def list_notifications(
+    limit: PageLimit = 50,
+    offset: PageOffset = 0,
     current_user=Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return get_notifications(db, current_user.id)
+    return get_notifications(db, current_user.id, limit=limit, offset=offset)
 
 
 @router.post("/mark-read", response_model=NotificationOut)

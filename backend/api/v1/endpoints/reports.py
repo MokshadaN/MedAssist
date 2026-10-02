@@ -1,3 +1,15 @@
+"""Report endpoints.
+
+P0 changes:
+- Authentication + ownership on every route (the listing route was public).
+- Doctors only get access through an explicit active care relationship.
+- One configured upload path (settings.upload_dir) shared with the workers.
+- Analysis lifecycle states (uploaded/queued/processing/completed/failed) with
+  duplicate-request prevention.
+- Downloads are served as attachments with an allow-listed media type and a
+  path-safety check.
+"""
+
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Request
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
@@ -5,28 +17,38 @@ from typing import List
 from pathlib import Path
 import mimetypes
 
-from core.dependencies import get_current_user, require_roles
-from models.report import Report
+from core.config import settings
+from core.dependencies import get_current_user, get_db, require_roles
+from core.limiter import limiter
+from core.pagination import PageLimit, PageOffset
+from schemas.common import DeleteResponse
 from schemas.report import ReportOut
 from services import report_service
-from services.report_analyzer_service import serialize_report_analysis
+from services.access_control import require_patient_access, require_report_access
 from schemas.metric import MedicalMetricOut
-from core.database import SessionLocal
-from core.limiter import limiter
 from utils.file_upload import validate_and_read_upload
 from workers.ai_tasks import analyze_report_async
 
-UPLOAD_DIR = Path(__file__).resolve().parents[4] / "uploads" / "reports"
+# Single configured upload directory (API and workers share settings.upload_dir).
+UPLOAD_DIR = Path(settings.upload_dir)
 
-# Dependency to get DB session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Allowed download media types — never serve an unknown type inline as HTML.
+_ALLOWED_MEDIA_TYPES = {
+    "application/pdf": ".pdf",
+    "image/png": ".png",
+    "image/jpeg": ".jpg",
+    "image/jpeg": ".jpeg",
+}
 
 router = APIRouter()
+
+
+def _enqueue_report_analysis(report_id: str, file_path: str, job_id: str) -> None:
+    analyze_report_async.apply_async(
+        args=[report_id, file_path, job_id],
+        task_id=job_id,
+    )
+
 
 @router.post("/upload", response_model=ReportOut)
 @limiter.limit("5/hour")
@@ -39,8 +61,7 @@ async def upload_report(
 ):
     """Upload a patient report with full file validation."""
     try:
-        if current_user.role == "patient" and current_user.id != patient_id:
-            raise HTTPException(status_code=403, detail="You can only upload reports for your own profile")
+        require_patient_access(db, current_user, patient_id)
 
         # ── Validate: extension, size, magic bytes ─────────────────────────
         content, safe_name = await validate_and_read_upload(file)
@@ -71,62 +92,62 @@ def download_report(
     db: Session = Depends(get_db),
 ):
     """
-    Serve uploaded reports to the owning patient or any doctor.
+    Serve uploaded reports: only the owning patient or a doctor with an active
+    care relationship (P0 — previously any doctor could download any report).
     """
-    report = db.query(Report).filter(Report.file_url.endswith(filename)).first()
-    if not report:
-        raise HTTPException(status_code=404, detail="Report not found")
+    report = report_service.get_report_by_filename_or_raise(db, filename)
+    require_report_access(db, current_user, report)
 
-    if current_user.role == "patient" and report.patient_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You can only view your own reports")
-
-    if current_user.role not in {"patient", "doctor"}:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-
-    disk_path = UPLOAD_DIR / filename
+    # Path safety: the requested filename must resolve inside the upload dir.
+    disk_path = (UPLOAD_DIR / filename).resolve()
+    if not disk_path.is_relative_to(UPLOAD_DIR.resolve()):
+        raise HTTPException(status_code=404, detail="Report file not found on server")
     if not disk_path.exists():
         raise HTTPException(status_code=404, detail="Report file not found on server")
 
-    media_type, _ = mimetypes.guess_type(disk_path.name)
+    guessed_type, _ = mimetypes.guess_type(disk_path.name)
+    media_type = guessed_type if guessed_type in _ALLOWED_MEDIA_TYPES else "application/octet-stream"
 
+    # Download policy (P0): never render report files inline from the API URL.
     return FileResponse(
         path=disk_path,
         filename=Path(filename).name,
-        media_type=media_type or "application/octet-stream",
-        content_disposition_type="inline",
+        media_type=media_type,
+        content_disposition_type="attachment",
     )
 
+
 @router.get("/{patient_id}", response_model=List[ReportOut])
-def get_reports(patient_id: str, db: Session = Depends(get_db)):
+def get_reports(
+    patient_id: str,
+    limit: PageLimit = 50,
+    offset: PageOffset = 0,
+    current_user=Depends(require_roles("patient", "doctor")),
+    db: Session = Depends(get_db),
+):
     """
-    Retrieve all reports for a specific patient.
+    Retrieve all reports for a patient — the owner patient or a treating
+    doctor only (this route previously required no authentication at all).
     """
-    reports = report_service.get_reports(db, patient_id=patient_id)
+    require_patient_access(db, current_user, patient_id)
+    reports = report_service.get_reports(
+        db,
+        patient_id=patient_id,
+        limit=limit,
+        offset=offset,
+    )
     return reports
 
 
-@router.delete("/{report_id}")
+@router.delete("/{report_id}", response_model=DeleteResponse)
 def delete_report(
     report_id: str,
-    current_user=Depends(get_current_user),
+    current_user=Depends(require_roles("patient", "doctor")),
     db: Session = Depends(get_db),
 ):
-    report = db.query(Report).filter(Report.id == report_id).first()
-    if not report:
-        raise HTTPException(status_code=404, detail="Report not found")
-
-    if current_user.role == "patient" and report.patient_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You can only delete your own reports")
-
-    if current_user.role not in {"patient", "doctor"}:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-
-    disk_name = Path(report.file_url).name
-    disk_path = UPLOAD_DIR / disk_name
-    if disk_path.exists():
-        disk_path.unlink()
-
-    report_service.delete_report(db, report)
+    report = report_service.get_report_or_raise(db, report_id)
+    require_report_access(db, current_user, report)
+    report_service.delete_report_with_file(db, report, UPLOAD_DIR)
     return {"status": "deleted", "report_id": report_id}
 
 
@@ -136,35 +157,23 @@ def analyze_report(
     current_user=Depends(require_roles("patient", "doctor")),
     db: Session = Depends(get_db),
 ):
-    report = db.query(Report).filter(Report.id == report_id).first()
-    if not report:
-        raise HTTPException(status_code=404, detail="Report not found")
-
-    if current_user.role == "patient" and report.patient_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You can only analyze your own reports")
-
-    if current_user.role not in {"patient", "doctor"}:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-
-    disk_name = Path(report.file_url).name
-    disk_path = UPLOAD_DIR / disk_name
-    if not disk_path.exists():
-        raise HTTPException(status_code=404, detail="Report file not found on server")
-
-    # Mark as processing
-    parsed_data_placeholder = '{"status": "processing", "message": "Report analysis queued in background"}'
-    updated = report_service.update_report_analysis(db, report, parsed_data_placeholder)
-    
-    # Fire and forget the background celery task
-    analyze_report_async.delay(report_id, str(disk_path))
-    
-    return updated
+    report = report_service.get_report_or_raise(db, report_id)
+    require_report_access(db, current_user, report)
+    return report_service.queue_report_analysis(
+        db,
+        report,
+        disk_path=UPLOAD_DIR / Path(report.file_url).name,
+        stale_minutes=settings.report_analysis_stale_minutes,
+        enqueue=_enqueue_report_analysis,
+    )
 
 
 @router.get("/{patient_id}/metrics", response_model=List[MedicalMetricOut])
 def get_patient_metrics(
     patient_id: str,
     parameter: str = None,
+    limit: PageLimit = 50,
+    offset: PageOffset = 0,
     current_user=Depends(require_roles("patient", "doctor")),
     db: Session = Depends(get_db),
 ):
@@ -172,7 +181,11 @@ def get_patient_metrics(
     Retrieve historical medical metrics for a patient.
     Optionally filter by parameter (e.g. 'Hemoglobin').
     """
-    if current_user.role == "patient" and current_user.id != patient_id:
-        raise HTTPException(status_code=403, detail="You can only view your own metrics")
-
-    return report_service.get_patient_metrics(db, patient_id=patient_id, parameter=parameter)
+    require_patient_access(db, current_user, patient_id)
+    return report_service.get_patient_metrics(
+        db,
+        patient_id=patient_id,
+        parameter=parameter,
+        limit=limit,
+        offset=offset,
+    )

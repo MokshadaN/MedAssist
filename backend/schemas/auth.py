@@ -84,6 +84,8 @@ class DoctorProfileOut(BaseModel):
     registration_year: Optional[int] = None
     verification_source: Optional[str] = None
     verified_at: Optional[datetime] = None
+    verification_status: Optional[str] = "pending"  # pending | approved | rejected
+    submitted_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 
@@ -96,6 +98,8 @@ class PatientProfileOut(BaseModel):
     allergies: Optional[str] = None
     chronic_conditions: Optional[str] = None
     address: Optional[str] = None
+    emergency_profile_enabled: bool = False
+    emergency_access_token: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

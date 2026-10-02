@@ -11,5 +11,4 @@ class MessageOut(BaseModel):
     message: str
     sender: str
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

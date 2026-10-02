@@ -16,4 +16,6 @@ class RiskCheckOut(BaseModel):
     issues: list[dict[str, Any]]
     severity: str
     created_at: datetime
+    status: str = "completed"
+    error: str | None = None
 

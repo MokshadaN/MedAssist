@@ -150,16 +150,20 @@ def get_prescription_by_visit(db: Session, visit_id: str, doctor_id: str | None 
     return _serialize_prescription(db, prescription)
 
 
-def get_patient_prescriptions(db: Session, patient_id: str):
-    visits = db.query(Visit).filter(Visit.patient_id == patient_id).all()
-    visit_ids = [visit.id for visit in visits]
-    if not visit_ids:
-        return []
-
+def get_patient_prescriptions(
+    db: Session,
+    patient_id: str,
+    *,
+    limit: int = 50,
+    offset: int = 0,
+):
     prescriptions = (
         db.query(Prescription)
-        .filter(Prescription.visit_id.in_(visit_ids))
-        .order_by(Prescription.created_at.desc())
+        .join(Visit, Visit.id == Prescription.visit_id)
+        .filter(Visit.patient_id == patient_id)
+        .order_by(Prescription.created_at.desc(), Prescription.id.desc())
+        .offset(offset)
+        .limit(limit)
         .all()
     )
     return [_serialize_prescription(db, prescription) for prescription in prescriptions]

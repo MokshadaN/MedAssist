@@ -6,6 +6,7 @@ import re
 from datetime import date, datetime, timedelta
 from typing import List
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from models.medicine_schedule import MedicineSchedule
@@ -115,7 +116,13 @@ def create_medicine_schedule(
     return schedule
 
 
-def get_active_schedules(db: Session, patient_id: str) -> List[MedicineSchedule]:
+def get_active_schedules(
+    db: Session,
+    patient_id: str,
+    *,
+    limit: int = 50,
+    offset: int = 0,
+) -> List[MedicineSchedule]:
     """Get all active medicine schedules for a patient."""
     return (
         db.query(MedicineSchedule)
@@ -123,17 +130,31 @@ def get_active_schedules(db: Session, patient_id: str) -> List[MedicineSchedule]
             MedicineSchedule.patient_id == patient_id,
             MedicineSchedule.is_active == True,  # noqa: E712
         )
-        .order_by(MedicineSchedule.created_at.desc())
+        .order_by(MedicineSchedule.created_at.desc(), MedicineSchedule.id.desc())
+        .offset(offset)
+        .limit(limit)
         .all()
     )
 
 
-def get_all_schedules(db: Session, patient_id: str) -> List[MedicineSchedule]:
+def get_all_schedules(
+    db: Session,
+    patient_id: str,
+    *,
+    limit: int = 50,
+    offset: int = 0,
+) -> List[MedicineSchedule]:
     """Get all medicine schedules for a patient (active + inactive)."""
     return (
         db.query(MedicineSchedule)
         .filter(MedicineSchedule.patient_id == patient_id)
-        .order_by(MedicineSchedule.is_active.desc(), MedicineSchedule.created_at.desc())
+        .order_by(
+            MedicineSchedule.is_active.desc(),
+            MedicineSchedule.created_at.desc(),
+            MedicineSchedule.id.desc(),
+        )
+        .offset(offset)
+        .limit(limit)
         .all()
     )
 
@@ -220,7 +241,14 @@ def get_due_reminders(db: Session) -> list[tuple[MedicineSchedule, str]]:
                 )
                 .first()
             )
-            if already_sent:
+            if already_sent and already_sent.status in {"sent", "simulated"}:
+                continue
+            if (
+                already_sent
+                and already_sent.status == "processing"
+                and already_sent.updated_at
+                and already_sent.updated_at > datetime.utcnow() - timedelta(minutes=15)
+            ):
                 continue
 
             due.append((schedule, time_slot))
@@ -242,6 +270,54 @@ def process_due_reminders(db: Session) -> int:
 
     count = 0
     for schedule, time_slot in due:
+        delivery = (
+            db.query(SentReminder)
+            .filter(
+                SentReminder.schedule_id == schedule.id,
+                SentReminder.reminder_time == time_slot,
+                SentReminder.sent_date == date.today(),
+            )
+            .first()
+        )
+        if delivery is None:
+            delivery = SentReminder(
+                schedule_id=schedule.id,
+                reminder_time=time_slot,
+                sent_date=date.today(),
+                status="processing",
+                attempts=1,
+                updated_at=datetime.utcnow(),
+            )
+            db.add(delivery)
+            try:
+                db.commit()
+            except IntegrityError:
+                # Another scheduler/worker claimed this exact delivery.
+                db.rollback()
+                continue
+        else:
+            previous_status = delivery.status
+            claim = db.query(SentReminder).filter(
+                SentReminder.id == delivery.id,
+                SentReminder.status == previous_status,
+            )
+            if previous_status == "processing":
+                claim = claim.filter(
+                    SentReminder.updated_at <= datetime.utcnow() - timedelta(minutes=15)
+                )
+            claimed = claim.update(
+                {
+                    SentReminder.status: "processing",
+                    SentReminder.attempts: delivery.attempts + 1,
+                    SentReminder.error: None,
+                    SentReminder.updated_at: datetime.utcnow(),
+                },
+                synchronize_session=False,
+            )
+            db.commit()
+            if claimed != 1:
+                continue
+
         status = send_whatsapp_reminder(
             phone=schedule.patient_phone or "",
             medicine_name=schedule.medicine_name,
@@ -249,23 +325,74 @@ def process_due_reminders(db: Session) -> int:
             time_label=time_slot,
         )
 
-        sent = SentReminder(
-            schedule_id=schedule.id,
-            reminder_time=time_slot,
-            sent_date=date.today(),
-            status=status,
+        delivery = db.query(SentReminder).filter(SentReminder.id == delivery.id).first()
+        delivery.status = status
+        delivery.error = (
+            "WhatsApp delivery failed; retry is allowed."
+            if status == "failed"
+            else None
         )
-        db.add(sent)
+        delivery.updated_at = datetime.utcnow()
+        db.add(delivery)
+        db.commit()
         count += 1
         logger.info(
             "Processed reminder: %s at %s for patient %s → %s",
             schedule.medicine_name, time_slot, schedule.patient_id, status,
         )
 
-    if count:
-        db.commit()
-
     return count
+
+
+def _claim_followup_email(db: Session, reminder: Reminder, window: str) -> bool:
+    """Atomically claim one 24h/1h email delivery."""
+    status_column = getattr(Reminder, f"email_{window}_status")
+    updated_column = getattr(Reminder, f"email_{window}_status_updated_at")
+    sent_column = getattr(Reminder, f"email_sent_{window}")
+    current_status = getattr(reminder, f"email_{window}_status") or "pending"
+
+    if current_status == "sent":
+        return False
+    claim = db.query(Reminder).filter(
+        Reminder.id == reminder.id,
+        sent_column.is_(False),
+        status_column == current_status,
+    )
+    if current_status == "processing":
+        claim = claim.filter(updated_column <= datetime.utcnow() - timedelta(minutes=15))
+
+    claimed = claim.update(
+        {
+            status_column: "processing",
+            updated_column: datetime.utcnow(),
+            getattr(Reminder, f"email_{window}_error"): None,
+        },
+        synchronize_session=False,
+    )
+    db.commit()
+    return claimed == 1
+
+
+def _finish_followup_email(
+    db: Session,
+    reminder_id: str,
+    window: str,
+    *,
+    success: bool,
+    error: str | None = None,
+) -> None:
+    values = {
+        getattr(Reminder, f"email_{window}_status"): "sent" if success else "failed",
+        getattr(Reminder, f"email_{window}_status_updated_at"): datetime.utcnow(),
+        getattr(Reminder, f"email_{window}_error"): None if success else error,
+    }
+    if success:
+        values[getattr(Reminder, f"email_sent_{window}")] = True
+    db.query(Reminder).filter(Reminder.id == reminder_id).update(
+        values,
+        synchronize_session=False,
+    )
+    db.commit()
 
 
 def process_due_followups(db: Session) -> int:
@@ -282,44 +409,48 @@ def process_due_followups(db: Session) -> int:
         .all()
     )
     
+    windows = (
+        ("24h", 24.0, "[24H REMINDER]"),
+        ("1h", 1.0, "[1H URGENT REMINDER]"),
+    )
     emails_sent = 0
     for reminder in reminders:
         time_diff = reminder.time - now
         hours_diff = time_diff.total_seconds() / 3600.0
-        
-        should_update = False
-        
-        # Check 24-hour window (between 23.9 and 24.1 hours to allow for scheduler ticks)
-        if 23.9 <= hours_diff <= 24.1 and not reminder.email_sent_24h:
+
+        for window, target_hours, subject_prefix in windows:
+            if abs(hours_diff - target_hours) > 0.1:
+                continue
+            if getattr(reminder, f"email_{window}_status") == "sent":
+                continue
+            if not _claim_followup_email(db, reminder, window):
+                break
+
             user = db.query(User).filter(User.id == reminder.user_id).first()
             if user and user.email:
                 success = send_followup_email(
                     to_email=user.email,
                     patient_name=user.name or "Patient",
-                    message=f"[24H REMINDER] {reminder.message}",
-                    followup_time=reminder.time.isoformat()
+                    message=f"{subject_prefix} {reminder.message}",
+                    followup_time=reminder.time.isoformat(),
+                )
+                _finish_followup_email(
+                    db,
+                    reminder.id,
+                    window,
+                    success=success,
+                    error=None if success else "Follow-up email delivery failed.",
                 )
                 if success:
-                    reminder.email_sent_24h = True
-                    should_update = True
                     emails_sent += 1
-        
-        # Check 1-hour window (between 0.9 and 1.1 hours to allow for scheduler ticks)
-        elif 0.9 <= hours_diff <= 1.1 and not reminder.email_sent_1h:
-            user = db.query(User).filter(User.id == reminder.user_id).first()
-            if user and user.email:
-                success = send_followup_email(
-                    to_email=user.email,
-                    patient_name=user.name or "Patient",
-                    message=f"[1H URGENT REMINDER] {reminder.message}",
-                    followup_time=reminder.time.isoformat()
+            else:
+                _finish_followup_email(
+                    db,
+                    reminder.id,
+                    window,
+                    success=False,
+                    error="Patient email address is unavailable.",
                 )
-                if success:
-                    reminder.email_sent_1h = True
-                    should_update = True
-                    emails_sent += 1
-                    
-        if should_update:
-            db.commit()
-            
+            break
+
     return emails_sent

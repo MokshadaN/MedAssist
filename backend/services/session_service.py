@@ -71,6 +71,15 @@ def build_transcript(messages: list[ChatMessage]) -> str:
     return "\n\n".join(lines)
 
 
+def build_patient_triage_text(messages: list[ChatMessage]) -> str:
+    """Return only patient-authored text for safety-critical triage."""
+    return "\n".join(
+        msg.message
+        for msg in messages
+        if msg.sender == "patient"
+    )
+
+
 def _patient_answer_count(messages: list[ChatMessage]) -> int:
     return sum(1 for msg in messages if msg.sender == "patient")
 
@@ -148,9 +157,14 @@ def process_intake_answer(
     create_message(db, session.id, message, "patient")
     messages = get_session_messages(db, session.id)
     transcript = build_transcript(messages)
+    patient_triage_text = build_patient_triage_text(messages)
     patient_answer_count = _patient_answer_count(messages)
 
-    triage_result = detect_urgent_red_flags(transcript, session.patient_id, db)
+    triage_result = detect_urgent_red_flags(
+        patient_triage_text,
+        session.patient_id,
+        db,
+    )
     if triage_result["urgent"]:
         session.status = "urgent"
         db.commit()
@@ -164,7 +178,31 @@ def process_intake_answer(
             "matched_terms": triage_result["matched_terms"],
             "nearest_hospitals": triage_result.get("nearest_hospitals", []),
             "emergency_message": triage_result.get("emergency_message"),
+            "triage_level": "emergency",
+            "review_required": False,
         }
+
+    # 24-hour tier: not life-threatening, but worth telling the patient to
+    # see a doctor soon. The intake CONTINUES — only the emergency level
+    # above stops it.
+    advisory = None
+    if triage_result.get("level") == "urgent_care":
+        advisory = (
+            "Your symptoms suggest you should see a doctor within 24 hours — "
+            "this is not a medical emergency. Your intake continues below."
+        )
+    elif triage_result.get("level") == "abstain":
+        advisory = (
+            "We could not determine urgency automatically. Please seek review "
+            "from a qualified healthcare professional. If symptoms are severe, "
+            "worsening, or feel life-threatening, contact emergency services now."
+        )
+
+    if advisory and not any(
+        msg.sender == "ai" and msg.message == advisory
+        for msg in messages
+    ):
+        create_message(db, session.id, advisory, "ai")
 
     if patient_answer_count < len(INTAKE_QUESTIONS):
         next_question = INTAKE_QUESTIONS[patient_answer_count]
@@ -175,6 +213,9 @@ def process_intake_answer(
             "message": "Answer recorded.",
             "input_mode": input_mode,
             "next_question": next_question,
+            "advisory": advisory,
+            "triage_level": triage_result.get("level"),
+            "review_required": bool(triage_result.get("review_required")),
         }
 
     result = extract_and_summarize(transcript)
@@ -192,6 +233,9 @@ def process_intake_answer(
             "input_mode": input_mode,
             "next_question": followup_q,
             "missing_fields": missing,
+            "advisory": advisory,
+            "triage_level": triage_result.get("level"),
+            "review_required": bool(triage_result.get("review_required")),
         }
 
     structured_data = data.model_dump()
@@ -216,4 +260,7 @@ def process_intake_answer(
         "comparison": comparison,
         "summary_id": summary.id,
         "missing_fields": missing,
+        "advisory": advisory,
+        "triage_level": triage_result.get("level"),
+        "review_required": bool(triage_result.get("review_required")),
     }

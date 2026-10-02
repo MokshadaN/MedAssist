@@ -17,6 +17,15 @@ export type PatientProfile = {
   allergies?: string | null;
   chronic_conditions?: string | null;
   address?: string | null;
+  emergency_profile_enabled?: boolean;
+  emergency_access_token?: string | null;
+};
+
+export type EmergencyAccessInfo = {
+  enabled: boolean;
+  access_token: string;
+  expires_at: string;
+  public_path: string;
 };
 
 export type DoctorProfile = {
@@ -126,6 +135,9 @@ export type IntakeResponse = {
   matched_terms?: string[];
   nearest_hospitals?: EmergencyHospital[];
   emergency_message?: string | null;
+  triage_level?: 'emergency' | 'urgent_care' | 'routine' | 'abstain' | null;
+  review_required?: boolean;
+  advisory?: string | null;
 };
 
 export type AISummary = {
@@ -142,6 +154,7 @@ export type ReportOut = {
   id: string;
   file_url: string;
   parsed_data?: string | null;
+  analysis_status?: string; // uploaded | queued | processing | completed | failed
 };
 
 export type PatientPublicProfile = {
@@ -374,6 +387,16 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  transcribeAudio(file: Blob, token: string) {
+    // Browser MediaRecorder audio → Groq Whisper on the backend.
+    const form = new FormData();
+    form.append('file', file, 'speech.webm');
+    return request<{ text: string }>(`/ai/transcribe`, {
+      method: 'POST',
+      token,
+      body: form,
+    });
+  },
   getSession(sessionId: string, token: string) {
     return request<SessionState>(`/chat/${sessionId}`, { token });
   },
@@ -486,9 +509,10 @@ export const api = {
   getRiskCheck(prescriptionId: string, token: string) {
     return request<Record<string, unknown>>(`/risk/${prescriptionId}`, { token });
   },
-  createReminder(payload: { user_id: string; message: string; time: string }) {
+  createReminder(payload: { user_id: string; message: string; time: string }, token: string) {
     return request<Reminder>(`/reminders/create`, {
       method: 'POST',
+      token,
       body: JSON.stringify(payload),
     });
   },
@@ -499,25 +523,40 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
-  listReminders(userId: string) {
-    return request<Reminder[]>(`/reminders/${encodeURIComponent(userId)}`);
+  listReminders(userId: string, token: string) {
+    return request<Reminder[]>(`/reminders/${encodeURIComponent(userId)}`, { token });
   },
   listMyReminders(token: string) {
     return request<Reminder[]>(`/reminders/me`, { token });
   },
-  completeReminder(reminderId: string) {
+  completeReminder(reminderId: string, token: string) {
     return request<Reminder>(`/reminders/${encodeURIComponent(reminderId)}/complete`, {
       method: 'PATCH',
+      token,
       body: JSON.stringify({ is_completed: true }),
     });
   },
-  deleteReminder(reminderId: string) {
+  deleteReminder(reminderId: string, token: string) {
     return request<{ status: string }>(`/reminders/${encodeURIComponent(reminderId)}`, {
       method: 'DELETE',
+      token,
     });
   },
-  getPublicProfile(patientId: string) {
-    return request<PublicProfile>(`/patient/public/${patientId}`);
+  getPublicProfile(patientId: string, token?: string | null) {
+    const query = token ? `?token=${encodeURIComponent(token)}` : '';
+    return request<PublicProfile>(`/patient/public/${patientId}${query}`);
+  },
+  enableEmergencyAccess(token: string) {
+    return request<EmergencyAccessInfo>(`/patient/profile/emergency-access`, {
+      method: 'POST',
+      token,
+    });
+  },
+  disableEmergencyAccess(token: string) {
+    return request<PatientProfile>(`/patient/profile/emergency-access`, {
+      method: 'DELETE',
+      token,
+    });
   },
   getPatientMetrics(patientId: string, parameter: string | null, token: string) {
     const path = parameter 
@@ -538,7 +577,7 @@ export const api = {
     });
   },
   verifyDoctorLicense(licenseNumber: string, stateCouncil?: string, token?: string) {
-    return request<DoctorProfile & { is_verified: boolean; message: string; registration_number: string }>(
+    return request<DoctorProfile & { is_verified: boolean; message: string; registration_number: string; verification_status?: string; status?: string | null; }>(
       '/doctor/verify-license',
       {
         method: 'POST',

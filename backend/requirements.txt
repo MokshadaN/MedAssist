@@ -11,7 +11,8 @@ bcrypt==3.2.2
 python-jose[cryptography]>=3.3,<4.0
 email-validator>=2.2,<3.0
 celery>=5.4,<6.0
-redis>=5.0,<6.0
+# redis>=5.0,<6.0
+redis>=4.5,<5.0
 httpx>=0.27,<1.0
 requests>=2.32,<3.0
 psycopg2-binary>=2.9,<3.0
@@ -19,6 +20,8 @@ slowapi>=0.1.9,<1.0
 
 groq>=0.9.0,<2.0
 google-genai>=0.8.0,<1.0
+# Use OS cert store for TLS (fixes corporate/university SSL-inspection proxies)
+truststore>=0.9,<1.0
 Pillow>=10.0,<12.0
 torch>=2.2,<3.0
 torchvision>=0.17,<1.0

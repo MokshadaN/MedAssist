@@ -21,6 +21,20 @@ class DoctorPatientOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class DoctorDirectoryOut(BaseModel):
+    id: str
+    name: str
+    email: str
+    phone: Optional[str] = None
+    specialization: Optional[str] = None
+    license_number: Optional[str] = None
+    is_verified: bool = False
+    state_council: Optional[str] = None
+    qualification: Optional[str] = None
+    experience_years: Optional[int] = None
+    hospital_affiliation: Optional[str] = None
+
+
 class DoctorVisitOut(BaseModel):
     visit_id: str
     patient_id: str
@@ -48,6 +62,7 @@ class DoctorVerificationRequest(BaseModel):
 class DoctorVerificationResponse(BaseModel):
     is_verified: bool
     registration_number: str
+    verification_status: Optional[str] = None  # pending | approved | rejected
     state_council: Optional[str] = None
     council_code: Optional[str] = None
     qualification: Optional[str] = None

@@ -13,6 +13,12 @@ class Prescription(Base):
     doctor_id = Column(String, ForeignKey("users.id"))
     notes = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
+    # Background risk-check lifecycle: not_requested | queued | processing |
+    # completed | failed. The job ID is also the Celery task ID.
+    risk_status = Column(String, default="not_requested", nullable=False)
+    risk_job_id = Column(String, nullable=True)
+    risk_status_updated_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    risk_error = Column(String(255), nullable=True)
 
 
 class PrescriptionItem(Base):
