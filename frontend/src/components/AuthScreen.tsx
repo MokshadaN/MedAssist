@@ -1,8 +1,4 @@
 import React, { FormEvent, useState } from 'react';
-import { Leaf, Sparkles, Settings, HelpCircle, Shield, CheckCircle2, ArrowRight, Stethoscope, User, HeartPulse } from 'lucide-react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Badge } from './ui/badge';
 
 export type AuthMode = 'login' | 'register-patient' | 'register-doctor';
 
@@ -26,341 +22,598 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   return (
-    <div className="min-h-screen w-full bg-[#F7F8F4] text-[#1E2922] font-sans flex flex-col justify-between relative overflow-hidden selection:bg-[#2D5A43] selection:text-white">
-      {/* Subtle organic background glow */}
-      <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#E2EDE5]/60 to-[#D5E6DA]/20 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-[#EBF3ED]/70 to-[#F2F7F4]/30 blur-3xl pointer-events-none" />
+    <div
+      className="min-h-screen w-full relative flex flex-col justify-between selection:bg-[#2b988f] selection:text-white font-sans overflow-x-hidden"
+      style={{ backgroundColor: '#f4f3ed', color: '#102213' }}
+    >
+      {/* BEGIN: Botanical Ambient Layer */}
+      <div aria-hidden="true" className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div
+          className="absolute inset-0 hidden md:block"
+          style={{
+            backgroundImage: "url('/auth_bg.png')",
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'right center',
+          }}
+        />
+      </div>
+      {/* END: Botanical Ambient Layer */}
 
-      {/* Top Navigation Bar */}
-      <header className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between z-10">
-        <div className="flex items-center gap-2.5 group cursor-pointer">
-          <div className="w-9 h-9 rounded-xl bg-[#1B382B] flex items-center justify-center text-white shadow-sm transition-transform group-hover:scale-105">
-            <Leaf className="w-5 h-5 text-[#86EFAC]" />
-          </div>
-          <span className="font-semibold text-xl tracking-tight text-[#163024]">MedAssist</span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setAuthMode(authMode === 'login' ? 'register-patient' : 'login')}
-            className="text-sm font-medium text-[#2E4A3B] hover:text-[#132A1E] transition-colors"
-          >
-            {authMode === 'login' ? 'Sign Up' : 'Sign In'}
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content Area */}
-      <main className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 lg:py-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center z-10 my-auto">
-        
-        {/* Left Column: Hero Typography & Value Prop */}
-        <div className="lg:col-span-6 xl:col-span-6 space-y-6">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#4B6B59] bg-[#EAF2EC] px-3 py-1 rounded-full border border-[#D3E5D8]">
-            <span>MEDASSIST</span>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-bold text-[#142A1F] leading-[1.12] tracking-tight font-display">
-            Care records <br />
-            <span className="inline-flex items-center gap-2">
-              <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-[#38BDF8] text-white font-bold text-sm shadow-sm">
+      {/* BEGIN: Main Page Content */}
+      <main className="relative z-10 w-full max-w-[1340px] mx-auto px-6 sm:px-10 lg:px-16 pt-8 md:pt-14 pb-10 flex-1 flex flex-col justify-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+          
+          {/* BEGIN: Hero Info Section */}
+          <section className="lg:col-span-6 xl:col-span-7 pr-0 lg:pr-6" data-purpose="hero-copy-column">
+            {/* Logo and Brand Tag */}
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-5 h-5 rounded-[5px] bg-[#3fa89b] flex items-center justify-center text-white font-bold text-[11px] shadow-sm">
                 M
+              </div>
+              <span className="text-[11px] tracking-[0.2em] font-bold text-[#142318] uppercase">
+                MEDASSIST
               </span>
-              <span>without the</span>
-            </span> <br />
-            paperwork maze
-          </h1>
-
-          <p className="text-[#435E50] text-base lg:text-lg leading-relaxed max-w-xl">
-            Patients can start a visit, complete intake, review reports and prescriptions, and keep profile details current. Doctors can track timelines and act on the generated SOAP summary.
-          </p>
-
-          {/* Feature Badges */}
-          <div className="flex flex-wrap gap-2.5 pt-2">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#E5EFE7] text-[#244835] text-xs font-medium border border-[#D0E2D4]">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#2D6A4F]" />
-              <span>Patient intake</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#E5EFE7] text-[#244835] text-xs font-medium border border-[#D0E2D4]">
-              <HeartPulse className="w-3.5 h-3.5 text-[#2D6A4F]" />
-              <span>SOAP summaries</span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#E5EFE7] text-[#244835] text-xs font-medium border border-[#D0E2D4]">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#2D6A4F]" />
-              <span>Follow-up reminders</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Center / Decorative Foliage Botanical Illustration */}
-        <div className="hidden lg:flex lg:col-span-1 xl:col-span-1 justify-center items-center pointer-events-none relative -mr-16 z-0">
-          <div className="relative w-48 h-72 opacity-90 transition-transform duration-700 hover:scale-105">
-            {/* Elegant SVG Botanical Plant Illustration */}
-            <svg viewBox="0 0 200 300" className="w-full h-full drop-shadow-md" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M100 280 Q95 180 110 80 Q115 30 100 10" stroke="#2D5A43" strokeWidth="4" strokeLinecap="round" />
-              {/* Leaf 1 */}
-              <path d="M100 240 C60 220 40 180 60 150 C80 120 100 190 100 240 Z" fill="#2D5A43" opacity="0.85" />
-              <path d="M60 150 Q80 190 100 240" stroke="#86EFAC" strokeWidth="1.5" opacity="0.6" />
-              {/* Leaf 2 */}
-              <path d="M105 190 C150 170 170 130 150 100 C130 70 105 140 105 190 Z" fill="#1B382B" opacity="0.9" />
-              <path d="M150 100 Q130 140 105 190" stroke="#86EFAC" strokeWidth="1.5" opacity="0.6" />
-              {/* Leaf 3 */}
-              <path d="M108 130 C70 110 55 70 75 40 C95 10 110 80 108 130 Z" fill="#3D7055" opacity="0.85" />
-              {/* Leaf 4 */}
-              <path d="M110 80 C140 65 155 35 140 15 C125 -5 110 40 110 80 Z" fill="#528B6D" opacity="0.8" />
-              {/* Accent berries / pollen */}
-              <circle cx="98" cy="110" r="4" fill="#38BDF8" opacity="0.9" />
-              <circle cx="115" cy="160" r="5" fill="#34D399" opacity="0.9" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Right Column: Floating Auth Card */}
-        <div className="lg:col-span-5 xl:col-span-5 flex justify-center lg:justify-end z-10">
-          <div className="w-full max-w-[440px] bg-white rounded-3xl p-6 sm:p-8 shadow-[0_25px_60px_-15px_rgba(20,42,31,0.08)] border border-[#E3E8E3] relative transition-all">
-            
-            {/* Tab Switcher */}
-            <div className="grid grid-cols-3 p-1 bg-[#EEF2EE] rounded-2xl mb-6 text-sm font-medium">
-              <button
-                type="button"
-                onClick={() => setAuthMode('login')}
-                className={`py-2 px-3 rounded-xl transition-all duration-200 text-center ${
-                  authMode === 'login'
-                    ? 'bg-white text-[#132A1E] shadow-sm font-semibold'
-                    : 'text-[#627D6E] hover:text-[#183325]'
-                }`}
-              >
-                Login
-              </button>
-              <button
-                type="button"
-                onClick={() => setAuthMode('register-patient')}
-                className={`py-2 px-3 rounded-xl transition-all duration-200 text-center ${
-                  authMode === 'register-patient'
-                    ? 'bg-white text-[#132A1E] shadow-sm font-semibold'
-                    : 'text-[#627D6E] hover:text-[#183325]'
-                }`}
-              >
-                Patient
-              </button>
-              <button
-                type="button"
-                onClick={() => setAuthMode('register-doctor')}
-                className={`py-2 px-3 rounded-xl transition-all duration-200 text-center ${
-                  authMode === 'register-doctor'
-                    ? 'bg-white text-[#132A1E] shadow-sm font-semibold'
-                    : 'text-[#627D6E] hover:text-[#183325]'
-                }`}
-              >
-                Doctor
-              </button>
             </div>
 
-            {/* Auth Form */}
-            <form
-              onSubmit={authMode === 'login' ? handleLogin : handleRegister}
-              className="space-y-3"
+            {/* Main Display Headline */}
+            <h1
+              className="max-w-xl"
+              style={{
+                fontSize: 'clamp(2.8rem, 4.2vw, 3.8rem)',
+                lineHeight: 1.06,
+                letterSpacing: '-0.035em',
+                fontWeight: 700,
+                color: 'rgb(21, 43, 27)',
+              }}
             >
-              {authMode !== 'login' && (
-                <div>
-                  <input
-                    name="name"
-                    placeholder="Full name"
-                    required
-                    className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                  />
-                </div>
-              )}
+              Care<br />
+              records<br />
+              without the<br />
+              paperwork<br />
+              maze
+            </h1>
 
-              <div>
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                  required
-                  className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                />
-              </div>
+            {/* Explanatory Paragraph */}
+            <p
+              className="mt-7"
+              style={{
+                color: 'rgb(78, 96, 82)',
+                fontSize: '15px',
+                lineHeight: 1.55,
+                maxWidth: '440px',
+              }}
+            >
+              Patients can start a visit, complete intake, review reports and prescriptions, and keep profile details current. Doctors can track timelines and act on the generated SOAP summary.
+            </p>
 
-              <div>
-                <input
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                  required
-                  className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                />
-              </div>
-
-              {authMode !== 'login' && (
-                <div>
-                  <input
-                    name="phone"
-                    placeholder="Phone number"
-                    className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                  />
-                </div>
-              )}
-
-              {/* Patient Specific Fields */}
-              {authMode === 'register-patient' && (
-                <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
-                  <input
-                    name="address"
-                    placeholder="Address"
-                    required
-                    className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                  />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      name="age"
-                      type="number"
-                      placeholder="Age"
-                      className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                    />
-                    <input
-                      name="gender"
-                      placeholder="Gender"
-                      className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                    />
-                  </div>
-                  <input
-                    name="allergies"
-                    placeholder="Allergies"
-                    className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                  />
-                  <input
-                    name="chronic_conditions"
-                    placeholder="Chronic conditions"
-                    className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                  />
-                </div>
-              )}
-
-              {/* Doctor Specific Fields */}
-              {authMode === 'register-doctor' && (
-                <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1">
-                  <input
-                    name="specialization"
-                    placeholder="Specialization"
-                    required
-                    className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                  />
-                  <input
-                    name="license_number"
-                    placeholder="Medical Reg No"
-                    required
-                    className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                  />
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      name="experience_years"
-                      type="number"
-                      placeholder="Experience (yrs)"
-                      required
-                      className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                    />
-                    <input
-                      name="hospital_affiliation"
-                      placeholder="Hospital affiliation"
-                      className="w-full h-11 px-4 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] focus:border-[#2D5A43] focus:bg-white focus:outline-none text-[#142A1F] text-sm placeholder:text-[#8E9F94] transition-all"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Submit CTA Button */}
-              <button
-                type="submit"
-                disabled={Boolean(busy)}
-                className="w-full h-12 rounded-2xl bg-[#142A1F] hover:bg-[#0B1A13] active:scale-[0.99] text-white font-medium text-sm shadow-sm transition-all duration-200 mt-3 flex items-center justify-center gap-2 group"
+            {/* Feature Pills */}
+            <div className="mt-6 flex flex-wrap gap-2.5 items-center" data-purpose="feature-tags">
+              <span
+                className="inline-flex items-center"
+                style={{
+                  background: 'rgba(226, 235, 222, 0.75)',
+                  color: '#23452a',
+                  border: '1px solid rgba(200, 214, 195, 0.6)',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                }}
               >
-                <span>{authMode === 'login' ? 'Sign in' : 'Create account'}</span>
-                {authMode === 'login' ? (
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                ) : (
-                  <Sparkles className="w-4 h-4 text-[#86EFAC]" />
-                )}
-              </button>
-            </form>
+                Patient Intake
+              </span>
+              <span
+                className="inline-flex items-center"
+                style={{
+                  background: 'rgba(226, 235, 222, 0.75)',
+                  color: '#23452a',
+                  border: '1px solid rgba(200, 214, 195, 0.6)',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                }}
+              >
+                SOAP summaries
+              </span>
+              <span
+                className="inline-flex items-center"
+                style={{
+                  background: 'rgba(226, 235, 222, 0.75)',
+                  color: '#23452a',
+                  border: '1px solid rgba(200, 214, 195, 0.6)',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                }}
+              >
+                Follow-up reminders
+              </span>
+            </div>
+          </section>
+          {/* END: Hero Info Section */}
 
-            {/* Bottom Links */}
-            <div className="flex items-center justify-between text-xs text-[#527060] pt-4 mt-2 border-t border-[#EDF2EE]">
-              {authMode === 'login' ? (
-                <>
+          {/* BEGIN: Auth Card Section */}
+          <section className="lg:col-span-6 xl:col-span-5 flex justify-center lg:justify-end" data-purpose="registration-card-wrapper">
+            <div
+              className="w-full max-w-[420px] transition-all"
+              style={{
+                background: 'rgba(255, 255, 255, 0.88)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: '1px solid rgba(220, 226, 215, 0.7)',
+                boxShadow: 'rgba(27, 43, 29, 0.08) 0px 20px 48px -12px, rgba(0, 0, 0, 0.03) 0px 4px 16px -2px',
+                padding: '28px 28px 24px',
+                borderRadius: '24px',
+              }}
+            >
+              {/* Segmented Navigation Switcher */}
+              <nav
+                aria-label="Account Types"
+                className="w-full flex items-center mb-5 text-[13px] font-medium"
+                data-purpose="auth-tabs"
+                style={{ background: 'rgba(234, 239, 233, 0.75)', borderRadius: '14px', padding: '4px' }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('login')}
+                  className="flex-1 py-1.5 text-center transition-all"
+                  style={
+                    authMode === 'login'
+                      ? {
+                          background: '#ffffff',
+                          color: 'rgb(22, 44, 28)',
+                          fontWeight: 600,
+                          fontSize: '13px',
+                          borderRadius: '10px',
+                          boxShadow: 'rgba(0, 0, 0, 0.06) 0px 2px 6px',
+                        }
+                      : { color: 'rgb(90, 107, 93)', fontWeight: 500, fontSize: '13px' }
+                  }
+                >
+                  Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('register-patient')}
+                  className="flex-1 py-1.5 text-center transition-all"
+                  style={
+                    authMode === 'register-patient'
+                      ? {
+                          background: '#ffffff',
+                          color: 'rgb(22, 44, 28)',
+                          fontWeight: 600,
+                          fontSize: '13px',
+                          borderRadius: '10px',
+                          boxShadow: 'rgba(0, 0, 0, 0.06) 0px 2px 6px',
+                        }
+                      : { color: 'rgb(90, 107, 93)', fontWeight: 500, fontSize: '13px' }
+                  }
+                >
+                  Patient
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('register-doctor')}
+                  className="flex-1 py-1.5 text-center transition-all"
+                  style={
+                    authMode === 'register-doctor'
+                      ? {
+                          background: '#ffffff',
+                          color: 'rgb(22, 44, 28)',
+                          fontWeight: 600,
+                          fontSize: '13px',
+                          borderRadius: '10px',
+                          boxShadow: 'rgba(0, 0, 0, 0.06) 0px 2px 6px',
+                        }
+                      : { color: 'rgb(90, 107, 93)', fontWeight: 500, fontSize: '13px' }
+                  }
+                >
+                  Doctor
+                </button>
+              </nav>
+
+              {/* Form Content */}
+              <form
+                className="space-y-2.5"
+                data-purpose="auth-form"
+                onSubmit={authMode === 'login' ? handleLogin : handleRegister}
+              >
+                {authMode !== 'login' && (
+                  <div>
+                    <label className="sr-only" htmlFor="fullName">Full name</label>
+                    <input
+                      id="fullName"
+                      name="name"
+                      placeholder="Full name"
+                      required
+                      type="text"
+                      className="w-full transition-all focus:outline-none"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.75)',
+                        border: '1px solid rgba(215, 224, 212, 0.85)',
+                        borderRadius: '12px',
+                        fontSize: '13.5px',
+                        padding: '11px 16px',
+                        color: '#1c2b20',
+                      }}
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <label className="sr-only" htmlFor="email">Email</label>
+                  <input
+                    id="email"
+                    name="email"
+                    placeholder="Email"
+                    required
+                    type="email"
+                    className="w-full transition-all focus:outline-none"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.75)',
+                      border: '1px solid rgba(215, 224, 212, 0.85)',
+                      borderRadius: '12px',
+                      fontSize: '13.5px',
+                      padding: '11px 16px',
+                      color: '#1c2b20',
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label className="sr-only" htmlFor="password">Password</label>
+                  <input
+                    id="password"
+                    name="password"
+                    placeholder="Password"
+                    required
+                    type="password"
+                    className="w-full transition-all focus:outline-none"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.75)',
+                      border: '1px solid rgba(215, 224, 212, 0.85)',
+                      borderRadius: '12px',
+                      fontSize: '13.5px',
+                      padding: '11px 16px',
+                      color: '#1c2b20',
+                    }}
+                  />
+                </div>
+
+                {authMode !== 'login' && (
+                  <div>
+                    <label className="sr-only" htmlFor="phone">Phone number</label>
+                    <input
+                      id="phone"
+                      name="phone"
+                      placeholder="Phone number"
+                      type="tel"
+                      className="w-full transition-all focus:outline-none"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.75)',
+                        border: '1px solid rgba(215, 224, 212, 0.85)',
+                        borderRadius: '12px',
+                        fontSize: '13.5px',
+                        padding: '11px 16px',
+                        color: '#1c2b20',
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Patient Specific Fields */}
+                {authMode === 'register-patient' && (
+                  <>
+                    <div>
+                      <label className="sr-only" htmlFor="address">Address</label>
+                      <input
+                        id="address"
+                        name="address"
+                        placeholder="Address"
+                        required
+                        type="text"
+                        className="w-full transition-all focus:outline-none"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.75)',
+                          border: '1px solid rgba(215, 224, 212, 0.85)',
+                          borderRadius: '12px',
+                          fontSize: '13.5px',
+                          padding: '11px 16px',
+                          color: '#1c2b20',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="sr-only" htmlFor="age">Age</label>
+                      <input
+                        id="age"
+                        name="age"
+                        placeholder="Age"
+                        type="number"
+                        className="w-full transition-all focus:outline-none"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.75)',
+                          border: '1px solid rgba(215, 224, 212, 0.85)',
+                          borderRadius: '12px',
+                          fontSize: '13.5px',
+                          padding: '11px 16px',
+                          color: '#1c2b20',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="sr-only" htmlFor="gender">Gender</label>
+                      <input
+                        id="gender"
+                        name="gender"
+                        placeholder="Gender"
+                        type="text"
+                        className="w-full transition-all focus:outline-none"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.75)',
+                          border: '1px solid rgba(215, 224, 212, 0.85)',
+                          borderRadius: '12px',
+                          fontSize: '13.5px',
+                          padding: '11px 16px',
+                          color: '#1c2b20',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="sr-only" htmlFor="allergies">Allergies</label>
+                      <input
+                        id="allergies"
+                        name="allergies"
+                        placeholder="Allergies"
+                        type="text"
+                        className="w-full transition-all focus:outline-none"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.75)',
+                          border: '1px solid rgba(215, 224, 212, 0.85)',
+                          borderRadius: '12px',
+                          fontSize: '13.5px',
+                          padding: '11px 16px',
+                          color: '#1c2b20',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="sr-only" htmlFor="chronicConditions">Chronic conditions</label>
+                      <input
+                        id="chronicConditions"
+                        name="chronic_conditions"
+                        placeholder="Chronic conditions"
+                        type="text"
+                        className="w-full transition-all focus:outline-none"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.75)',
+                          border: '1px solid rgba(215, 224, 212, 0.85)',
+                          borderRadius: '12px',
+                          fontSize: '13.5px',
+                          padding: '11px 16px',
+                          color: '#1c2b20',
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Doctor Specific Fields */}
+                {authMode === 'register-doctor' && (
+                  <>
+                    <div>
+                      <label className="sr-only" htmlFor="specialization">Specialization</label>
+                      <input
+                        id="specialization"
+                        name="specialization"
+                        placeholder="Specialization (e.g. Cardiology)"
+                        required
+                        type="text"
+                        className="w-full transition-all focus:outline-none"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.75)',
+                          border: '1px solid rgba(215, 224, 212, 0.85)',
+                          borderRadius: '12px',
+                          fontSize: '13.5px',
+                          padding: '11px 16px',
+                          color: '#1c2b20',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="sr-only" htmlFor="licenseNumber">Medical Reg / License No</label>
+                      <input
+                        id="licenseNumber"
+                        name="license_number"
+                        placeholder="Medical Reg / License No"
+                        required
+                        type="text"
+                        className="w-full transition-all focus:outline-none"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.75)',
+                          border: '1px solid rgba(215, 224, 212, 0.85)',
+                          borderRadius: '12px',
+                          fontSize: '13.5px',
+                          padding: '11px 16px',
+                          color: '#1c2b20',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="sr-only" htmlFor="experienceYears">Experience (years)</label>
+                      <input
+                        id="experienceYears"
+                        name="experience_years"
+                        placeholder="Experience (years)"
+                        type="number"
+                        className="w-full transition-all focus:outline-none"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.75)',
+                          border: '1px solid rgba(215, 224, 212, 0.85)',
+                          borderRadius: '12px',
+                          fontSize: '13.5px',
+                          padding: '11px 16px',
+                          color: '#1c2b20',
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label className="sr-only" htmlFor="hospitalAffiliation">Hospital / Clinic Affiliation</label>
+                      <input
+                        id="hospitalAffiliation"
+                        name="hospital_affiliation"
+                        placeholder="Hospital / Clinic Affiliation"
+                        type="text"
+                        className="w-full transition-all focus:outline-none"
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.75)',
+                          border: '1px solid rgba(215, 224, 212, 0.85)',
+                          borderRadius: '12px',
+                          fontSize: '13.5px',
+                          padding: '11px 16px',
+                          color: '#1c2b20',
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Submit CTA Button */}
+                <div className="pt-1.5">
                   <button
-                    type="button"
-                    onClick={() => setShowForgotPassword((prev) => !prev)}
-                    className="hover:underline hover:text-[#183325] transition-colors"
+                    type="submit"
+                    disabled={Boolean(busy)}
+                    className="relative transition-all active:scale-[0.99]"
+                    style={{
+                      background: '#162c1c',
+                      borderRadius: '12px',
+                      padding: '13px 20px',
+                      fontWeight: 500,
+                      fontSize: '14.5px',
+                      letterSpacing: '-0.01em',
+                      color: '#f4f7f2',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      width: '100%',
+                      boxShadow: '0 4px 14px rgba(22, 44, 28, 0.25)',
+                    }}
                   >
-                    Forgot Password?
+                    <span>{authMode === 'login' ? 'Sign in' : 'Create account'}</span>
+                    <svg aria-hidden="true" className="absolute right-5 w-4 h-4 text-[#49704d]" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0C12 6.627 6.627 12 0 12c6.627 0 12 5.373 12 12 0-6.627 5.373-12 12-12-6.627 0-12-5.373-12-12z" />
+                    </svg>
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode('register-patient')}
-                    className="hover:underline hover:text-[#183325] font-medium transition-colors"
-                  >
-                    Create an Account
-                  </button>
-                </>
-              ) : (
-                <div className="w-full text-center">
-                  <span>Already have an account? </span>
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode('login')}
-                    className="font-semibold text-[#183325] hover:underline"
-                  >
-                    Sign In
-                  </button>
+                </div>
+              </form>
+
+              {/* Bottom Card Footer Actions */}
+              <div className="pt-3 text-[12px] text-[#566859]">
+                {authMode === 'login' ? (
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword((p) => !p)}
+                      className="hover:underline transition-colors"
+                    >
+                      Forgot Password?
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode('register-patient')}
+                      className="hover:underline font-medium text-[#162c1c]"
+                    >
+                      Create an Account
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <span>Already have an account? </span>
+                    <button
+                      type="button"
+                      onClick={() => setAuthMode('login')}
+                      className="font-semibold text-[#162c1c] hover:underline"
+                    >
+                      Sign In
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Forgot password hint */}
+              {showForgotPassword && (
+                <div className="mt-3 p-3 bg-[#e8eee6] rounded-xl text-xs text-[#2b4d32] border border-[#d2dec0] animate-in fade-in">
+                  Contact your clinic administrator or reset credentials with your registered medical email.
+                </div>
+              )}
+
+              {/* Flash & Status Messages */}
+              {flash && (
+                <div className="mt-3 p-3 bg-[#FEF2F2] rounded-xl text-xs text-[#991B1B] border border-[#FCA5A5] flex items-center gap-2 animate-in fade-in">
+                  <span>{flash}</span>
+                </div>
+              )}
+              {busy && (
+                <div className="mt-3 p-2.5 bg-[#EFF6FF] rounded-xl text-xs text-[#1E40AF] border border-[#BFDBFE] flex items-center gap-2 animate-pulse">
+                  <span>{busy}...</span>
                 </div>
               )}
             </div>
+          </section>
+          {/* END: Auth Card Section */}
 
-            {/* Forgot password hint */}
-            {showForgotPassword && (
-              <div className="mt-3 p-3 bg-[#F0F5F2] rounded-xl text-xs text-[#335342] border border-[#DDE7E0] animate-in fade-in duration-200">
-                Contact clinic administrator or use your registered email with your system administrator to reset credentials.
-              </div>
-            )}
-
-            {/* Flash & Status Messages */}
-            {flash && (
-              <div className="mt-3 p-3 bg-[#FEF2F2] rounded-xl text-xs text-[#991B1B] border border-[#FCA5A5] flex items-center gap-2 animate-in fade-in">
-                <span>{flash}</span>
-              </div>
-            )}
-            {busy && (
-              <div className="mt-3 p-2.5 bg-[#EFF6FF] rounded-xl text-xs text-[#1E40AF] border border-[#BFDBFE] flex items-center gap-2 animate-pulse">
-                <span>{busy}...</span>
-              </div>
-            )}
-          </div>
         </div>
-
       </main>
+      {/* END: Main Page Content */}
 
-      {/* Footer Navigation */}
-      <footer className="w-full max-w-7xl mx-auto px-6 lg:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#627D6E] z-10">
-        <div className="flex items-center gap-2">
-          <Settings className="w-3.5 h-3.5" />
-          <span>System Settings & Configuration</span>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <button className="flex items-center gap-1.5 hover:text-[#1C3627] transition-colors">
-            <Settings className="w-3.5 h-3.5" />
+      {/* BEGIN: Bottom Footer Utilities */}
+      <footer
+        className="relative z-10 w-full px-6 sm:px-12 py-5 text-[12px] text-[#4d564b] flex flex-row items-center justify-between font-normal"
+        data-purpose="page-footer"
+      >
+        <div>
+          <a
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-[#102213]"
+            href="#settings"
+            style={{ color: '#566859', fontSize: '12px' }}
+          >
+            <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
             <span>Settings</span>
-          </button>
-          <button className="flex items-center gap-1.5 hover:text-[#1C3627] transition-colors">
-            <HelpCircle className="w-3.5 h-3.5" />
+          </a>
+        </div>
+        <div className="flex items-center gap-5 sm:gap-6">
+          <a
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-[#102213]"
+            href="#help"
+            style={{ color: '#566859', fontSize: '12px' }}
+          >
+            <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" x2="12.01" y1="17" y2="17" />
+            </svg>
             <span>Help</span>
-          </button>
-          <button className="flex items-center gap-1.5 hover:text-[#1C3627] transition-colors">
-            <Shield className="w-3.5 h-3.5" />
+          </a>
+          <a
+            className="inline-flex items-center gap-1.5 transition-colors hover:text-[#102213]"
+            href="#privacy"
+            style={{ color: '#566859', fontSize: '12px' }}
+          >
+            <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
             <span>Privacy</span>
-          </button>
+          </a>
         </div>
       </footer>
+      {/* END: Bottom Footer Utilities */}
     </div>
   );
 };
