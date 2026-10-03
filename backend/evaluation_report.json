@@ -1,0 +1,121 @@
+{
+  "metrics": {
+    "total_cases": 13,
+    "sensitivity_pct": 0.0,
+    "specificity_pct": 100.0,
+    "under_triage_rate_pct": 100.0,
+    "over_triage_rate_pct": 0.0,
+    "f1_score": 0.0,
+    "accuracy_pct": 61.54,
+    "latency_p50_ms": 7.6,
+    "latency_p95_ms": 49.5,
+    "latency_p99_ms": 49.5,
+    "latency_mean_ms": 14.4
+  },
+  "case_details": [
+    {
+      "case_id": "EM-01",
+      "expected": "emergency",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 49.5,
+      "status": "[FAIL] False Negative (UNDER-TRIAGE - CRITICAL)"
+    },
+    {
+      "case_id": "EM-02",
+      "expected": "emergency",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 7.39,
+      "status": "[FAIL] False Negative (UNDER-TRIAGE - CRITICAL)"
+    },
+    {
+      "case_id": "EM-03",
+      "expected": "emergency",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 7.57,
+      "status": "[FAIL] False Negative (UNDER-TRIAGE - CRITICAL)"
+    },
+    {
+      "case_id": "EM-04",
+      "expected": "emergency",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 7.57,
+      "status": "[FAIL] False Negative (UNDER-TRIAGE - CRITICAL)"
+    },
+    {
+      "case_id": "EM-05",
+      "expected": "emergency",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 4.64,
+      "status": "[FAIL] False Negative (UNDER-TRIAGE - CRITICAL)"
+    },
+    {
+      "case_id": "UR-01",
+      "expected": "urgent_care",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 27.88,
+      "status": "[PASS] True Negative (Safe non-emergency)"
+    },
+    {
+      "case_id": "UR-02",
+      "expected": "urgent_care",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 6.16,
+      "status": "[PASS] True Negative (Safe non-emergency)"
+    },
+    {
+      "case_id": "UR-03",
+      "expected": "urgent_care",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 22.4,
+      "status": "[PASS] True Negative (Safe non-emergency)"
+    },
+    {
+      "case_id": "UR-04",
+      "expected": "urgent_care",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 6.36,
+      "status": "[PASS] True Negative (Safe non-emergency)"
+    },
+    {
+      "case_id": "RT-01",
+      "expected": "routine",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 8.21,
+      "status": "[PASS] True Negative (Safe non-emergency)"
+    },
+    {
+      "case_id": "RT-02",
+      "expected": "routine",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 7.17,
+      "status": "[PASS] True Negative (Safe non-emergency)"
+    },
+    {
+      "case_id": "RT-03",
+      "expected": "routine",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 25.08,
+      "status": "[PASS] True Negative (Safe non-emergency)"
+    },
+    {
+      "case_id": "RT-04",
+      "expected": "routine",
+      "predicted": "routine",
+      "emergency_flag": false,
+      "latency_ms": 7.19,
+      "status": "[PASS] True Negative (Safe non-emergency)"
+    }
+  ]
+}

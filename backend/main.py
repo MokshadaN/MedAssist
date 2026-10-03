@@ -7,8 +7,11 @@ import sys
 # Use the OS certificate store for TLS (Windows: corporate/university SSL
 # inspection proxies aren't in Python's bundled CA list). Must run before
 # any network library (requests/httpx) performs TLS.
-import truststore  # noqa: E402
-truststore.inject_into_ssl()
+try:
+    import truststore  # noqa: E402
+    truststore.inject_into_ssl()
+except ImportError:
+    pass
 
 BACKEND_DIR = Path(__file__).resolve().parent
 if str(BACKEND_DIR) not in sys.path:

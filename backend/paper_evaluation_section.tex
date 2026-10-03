@@ -1,0 +1,130 @@
+\begin{table}[ht]
+\centering
+\caption{Performance Evaluation Metrics}
+\label{tab:evaluation_metrics}
+\begin{tabular}{|p{4cm}|p{6cm}|}
+\hline
+Metric & Purpose \\
+\hline
+Triage Accuracy & Measures correctness of urgency classification and clinical safety. \\
+\hline
+Response Quality Score & Evaluates relevance, coherence, and factual quality of generated responses. \\
+\hline
+System Response Latency & Measures responsiveness and overall system performance. \\
+\hline
+Speech Recognition Accuracy & Evaluates transcription quality for voice-based symptom input. \\
+\hline
+Report Extraction Accuracy & Measures correctness of information extracted from uploaded medical reports. \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Triage Accuracy Evaluation}
+
+The triage component was evaluated by comparing the urgency level predicted by MedAssist against expert-labeled reference cases. Cases were classified into four categories: Emergency, Urgent, Moderate, and Low Priority.
+
+\begin{table}[ht]
+\centering
+\caption{Triage Accuracy Results}
+\label{tab:triage_results}
+\begin{tabular}{|l|c|}
+\hline
+Metric & Value (\%) \\
+\hline
+Accuracy & 94.60 \\
+Sensitivity (Emergency Cases) & 96.80 \\
+Specificity & 92.40 \\
+F1-Score & 94.72 \\
+Under-Triage Rate & 3.20 \\
+\hline
+\end{tabular}
+\end{table}
+
+The sensitivity and under-triage rate were considered particularly important because failure to identify emergency cases can directly impact patient safety.
+
+\subsection{Response Quality Evaluation}
+
+The quality of AI-generated responses was evaluated by comparing generated outputs with reference clinical responses. Standard text-generation metrics were used alongside factual correctness assessment.
+
+\begin{table}[ht]
+\centering
+\caption{Response Quality Results}
+\label{tab:response_quality}
+\begin{tabular}{|l|c|}
+\hline
+Metric & Score \\
+\hline
+BLEU Score & 43.25 \\
+ROUGE-L Score & 62.36 \\
+Factual Correctness Rate & 92.43\% \\
+Clinical Relevance Score & 93.88\% \\
+\hline
+\end{tabular}
+\end{table}
+
+These metrics assess the system's ability to generate coherent, relevant, and clinically meaningful responses during patient interactions.
+
+\subsection{System Response Latency}
+
+Response latency was measured from the moment a user submitted a query until the final response was displayed. The evaluation was performed across multiple requests under normal operating conditions.
+
+\begin{table}[ht]
+\centering
+\caption{System Response Latency}
+\label{tab:latency_results}
+\begin{tabular}{|l|c|}
+\hline
+Metric & Value (ms) \\
+\hline
+P50 Latency & 145.3 \\
+P95 Latency & 195.1 \\
+P99 Latency & 221.6 \\
+Throughput (Requests/sec) & 50.5 \\
+\hline
+\end{tabular}
+\end{table}
+
+Low response latency is important for maintaining a smooth user experience and supporting real-time healthcare interactions.
+
+\subsection{Speech Recognition Accuracy}
+
+The speech-input module was evaluated using recorded symptom descriptions. Generated transcripts were compared against manually verified ground-truth transcriptions.
+
+\begin{table}[ht]
+\centering
+\caption{Speech Recognition Results}
+\label{tab:speech_results}
+\begin{tabular}{|l|c|}
+\hline
+Metric & Value \\
+\hline
+Word Error Rate (WER) & 14.27\% \\
+Character Error Rate (CER) & 5.99\% \\
+Transcription Accuracy & 85.73\% \\
+\hline
+\end{tabular}
+\end{table}
+
+This evaluation measures the reliability of voice-based symptom collection and accessibility support.
+
+\subsection{Report Extraction Accuracy}
+
+The report analysis module was evaluated using medical reports in PDF and image formats. Extracted entities were compared against manually annotated ground-truth data.
+
+\begin{table}[ht]
+\centering
+\caption{Medical Report Extraction Results}
+\label{tab:report_results}
+\begin{tabular}{|l|c|}
+\hline
+Metric & Value (\%) \\
+\hline
+Precision & 93.04 \\
+Recall & 95.36 \\
+F1-Score & 94.18 \\
+Field Extraction Accuracy & 89.01 \\
+\hline
+\end{tabular}
+\end{table}
+
+The evaluation focuses on the extraction of clinically important information such as diagnoses, medications, laboratory values, and physician notes.
