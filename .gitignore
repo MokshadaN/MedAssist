@@ -1,5 +1,8 @@
 .env
 .venv/
+venv/
+backend/venv/
+backend/.venv/
 .pytest_cache/
 __pycache__/
 *.py[cod]
@@ -10,3 +13,4 @@ medassist.db
 frontend/dist/
 frontend/node_modules/
 uploads/
+vite-app

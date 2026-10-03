@@ -319,9 +319,30 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   }
 
   if (!response.ok) {
-    const errorData = typeof data === 'object' && data !== null ? (data as { detail?: string; message?: string }) : null;
-    const message = errorData?.detail || errorData?.message || (typeof data === 'string' ? data : '') || response.statusText;
-    throw new Error(message || 'Request failed');
+    let message = response.statusText || 'Request failed';
+    if (typeof data === 'string' && data) {
+      message = data;
+    } else if (typeof data === 'object' && data !== null) {
+      const errorData = data as { detail?: unknown; message?: string };
+      if (Array.isArray(errorData.detail)) {
+        // FastAPI 422 validation errors: [{loc:[...], msg:"...", type:"..."}]
+        message = errorData.detail
+          .map((e: unknown) => {
+            if (typeof e === 'object' && e !== null && 'msg' in e) {
+              const err = e as { msg: string; loc?: string[] };
+              const field = err.loc ? err.loc.filter((l) => l !== 'body').join('.') : '';
+              return field ? `${field}: ${err.msg}` : err.msg;
+            }
+            return String(e);
+          })
+          .join('; ');
+      } else if (typeof errorData.detail === 'string') {
+        message = errorData.detail;
+      } else if (typeof errorData.message === 'string') {
+        message = errorData.message;
+      }
+    }
+    throw new Error(message);
   }
 
   return data as T;

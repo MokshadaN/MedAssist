@@ -782,29 +782,34 @@ function App() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     setBusy('Creating account');
+
+    // Helper: return value only if non-empty, otherwise undefined (backend is optional)
+    const str = (key: string) => { const v = String(data.get(key) || '').trim(); return v || undefined; };
+    const num = (key: string) => { const v = Number(data.get(key) || 0); return v || undefined; };
+
     try {
       if (authMode === 'register-doctor') {
         await api.registerDoctor({
           name: String(data.get('name') || ''),
           email: String(data.get('email') || ''),
           password: String(data.get('password') || ''),
-          phone: String(data.get('phone') || ''),
+          phone: str('phone'),
           specialization: String(data.get('specialization') || ''),
           license_number: String(data.get('license_number') || ''),
           experience_years: Number(data.get('experience_years') || 0),
-          hospital_affiliation: String(data.get('hospital_affiliation') || ''),
+          hospital_affiliation: str('hospital_affiliation'),
         });
       } else {
         await api.registerPatient({
           name: String(data.get('name') || ''),
           email: String(data.get('email') || ''),
           password: String(data.get('password') || ''),
-          phone: String(data.get('phone') || ''),
-          age: Number(data.get('age') || 0) || undefined,
-          gender: String(data.get('gender') || ''),
-          allergies: String(data.get('allergies') || ''),
-          chronic_conditions: String(data.get('chronic_conditions') || ''),
-          address: String(data.get('address') || ''),
+          phone: str('phone'),
+          age: num('age'),
+          gender: str('gender'),
+          allergies: str('allergies'),
+          chronic_conditions: str('chronic_conditions'),
+          address: str('address'),
         });
       }
 
@@ -1352,49 +1357,130 @@ function App() {
 
   if (!user) {
     return (
-      <AuthScreen
-        authMode={authMode}
-        setAuthMode={setAuthMode}
-        handleLogin={handleLogin}
-        handleRegister={handleRegister}
-        flash={flash}
-        busy={busy}
-      />
+      <main className="auth-shell">
+        <header className="auth-header">
+          <div className="auth-logo-text">
+            <span className="auth-logo-icon">🌿</span> MedAssist
+          </div>
+        </header>
+
+        <div className="auth-body-content">
+          <section className="auth-hero-text">
+            <div className="auth-eyebrow">MEDASSIST</div>
+            <h1>Care records <br />without the <br />paperwork <br />maze</h1>
+            <p>Patients can start a visit, complete intake, review reports and prescriptions, and keep profile details current. Doctors can track timelines and act on the generated SOAP summary.</p>
+            <div className="auth-pills-row">
+              <span className="auth-pill">Patient intake</span>
+              <span className="auth-pill">SOAP summaries</span>
+              <span className="auth-pill">Follow-up reminders</span>
+            </div>
+          </section>
+
+          <section className="auth-card-floating">
+            <div className="auth-tab-bar">
+              <button type="button" className={`auth-tab-btn ${authMode === 'login' ? 'active' : ''}`} onClick={() => setAuthMode('login')}>Login</button>
+              <button type="button" className={`auth-tab-btn ${authMode === 'register-patient' ? 'active' : ''}`} onClick={() => setAuthMode('register-patient')}>Patient</button>
+              <button type="button" className={`auth-tab-btn ${authMode === 'register-doctor' ? 'active' : ''}`} onClick={() => setAuthMode('register-doctor')}>Doctor</button>
+            </div>
+
+            <form onSubmit={authMode === 'login' ? handleLogin : handleRegister}>
+              {authMode !== 'login' && (
+                <input className="auth-input-field" name="name" placeholder="Full name" required minLength={1} />
+              )}
+              <input className="auth-input-field" name="email" type="email" placeholder="Email" required />
+              <input className="auth-input-field" name="password" type="password" placeholder="Password (min 8 characters)" required minLength={8} />
+              {authMode !== 'login' && <input className="auth-input-field" name="phone" placeholder="Phone number" />}
+              {authMode === 'register-patient' && (
+                <>
+                  <input className="auth-input-field" name="address" placeholder="Address" required />
+                  <input className="auth-input-field" name="age" type="number" placeholder="Age" />
+                  <input className="auth-input-field" name="gender" placeholder="Gender" />
+                  <input className="auth-input-field" name="allergies" placeholder="Allergies" />
+                  <input className="auth-input-field" name="chronic_conditions" placeholder="Chronic conditions" />
+                </>
+              )}
+              {authMode === 'register-doctor' && (
+                <>
+                  <input className="auth-input-field" name="specialization" placeholder="Specialization" required />
+                  <input className="auth-input-field" name="license_number" placeholder="Medical Reg No" required />
+                  <input className="auth-input-field" name="experience_years" type="number" placeholder="Years of experience" required />
+                  <input className="auth-input-field" name="hospital_affiliation" placeholder="Hospital / Clinic" />
+                </>
+              )}
+              <button className="auth-submit-btn" type="submit">
+                {authMode === 'login' ? 'Sign in' : 'Create account'}
+              </button>
+            </form>
+
+            <div className="auth-card-links">
+              <a href="#forgot" onClick={(e) => { e.preventDefault(); setFlash('Please contact support to reset password.'); }}>Forgot Password?</a>
+              <a href="#create" onClick={(e) => { e.preventDefault(); setAuthMode('register-patient'); }}>Create an Account</a>
+            </div>
+
+            {flash && <div className="flash">{flash}</div>}
+            {busy && <div className="flash subtle">{busy}...</div>}
+          </section>
+        </div>
+      </main>
     );
   }
 
   return (
     <div className="app-shell">
-      <header className="app-topbar">
-        <div className="brand">
-          <div className="brand-badge">M</div>
-          <div>
-            <div className="eyebrow">{user.role === 'patient' ? 'Patient portal' : 'Doctor dashboard'}</div>
-            <h1>{user.name}</h1>
-            <p>{user.email}</p>
+      {/* LEFT SIDEBAR NAVIGATION (Matches screenUI_new mocks) */}
+      <aside className="sidebar">
+        <div>
+          <div className="sidebar-logo">
+            <div className="sidebar-logo-icon">🌿</div>
+            <div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>MedAssist</div>
+              <div style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
+                {user.role === 'patient' ? 'Patient Portal' : 'Doctor Portal'}
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="topbar-actions">
-          {user.role === 'patient' && (
-            <button
-              id="medicine-infobox-btn"
-              className={`secondary med-info-btn ${showMedicineBox ? 'active' : ''}`}
-              onClick={() => { setShowMedicineBox((v) => !v); setShowNotifications(false); }}
-              title="Medicine Information"
-            >
-              <Pill size={16} />
-              Medicine Info
-            </button>
-          )}
-          <button className="secondary" onClick={() => { setShowNotifications((value) => !value); setShowMedicineBox(false); }}>
-            Notifications ({notifications.filter((item) => !item.is_read).length})
-          </button>
-          <button className="ghost" onClick={signOut}>Sign out</button>
-        </div>
-      </header>
 
-      {busy && <div className="flash subtle">{busy}...</div>}
-      {notificationStatus && <div className="flash subtle">{notificationStatus}</div>}
+          <nav className="sidebar-nav">
+            <button className="sidebar-link active">
+              <Activity size={18} /> Dashboard
+            </button>
+            <button className="sidebar-link" onClick={() => { setShowNotifications((v) => !v); setShowMedicineBox(false); }}>
+              <Bell size={18} /> Reminders ({notifications.filter((n) => !n.is_read).length})
+            </button>
+            {user.role === 'patient' && (
+              <button className="sidebar-link" onClick={() => { setShowMedicineBox((v) => !v); setShowNotifications(false); }}>
+                <Pill size={18} /> Medications
+              </button>
+            )}
+          </nav>
+        </div>
+
+        <div className="sidebar-footer">
+          <button className="sidebar-link" onClick={signOut} style={{ color: 'var(--danger)' }}>
+            <LogOut size={18} /> Sign Out
+          </button>
+        </div>
+      </aside>
+
+      <div className="main-content">
+        {/* TOP SEARCH AND USER BAR */}
+        <header className="top-bar">
+          <div className="search-box">
+            <Search size={18} color="var(--text-secondary)" />
+            <input placeholder={user.role === 'patient' ? "Search medicines, reports, or ask a question..." : "Search patients by name, phone, or ID..."} />
+          </div>
+
+          <div className="top-user">
+            <button className="secondary" style={{ borderRadius: '50%', width: 40, height: 40, padding: 0 }} onClick={() => setShowNotifications((v) => !v)}>
+              <Bell size={18} />
+            </button>
+            <div className="user-avatar">{user.name.charAt(0)}</div>
+            <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>{user.name}</div>
+          </div>
+        </header>
+
+        {busy && <div className="flash subtle">{busy}...</div>}
+        {notificationStatus && <div className="flash subtle">{notificationStatus}</div>}
 
       {showNotifications && (
         <section className="panel notification-panel">
@@ -2289,6 +2375,7 @@ function App() {
           </div>
         </main>
       )}
+      </div>
     </div>
   );
 }
