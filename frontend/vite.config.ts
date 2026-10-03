@@ -8,10 +8,19 @@ import react from '@vitejs/plugin-react';
 //   ERR_CERT_AUTHORITY_INVALID warnings in Chrome on every launch.
 // For production, serve the built assets behind a real TLS certificate
 // (reverse proxy / managed load balancer) — never the dev server.
+import path from 'path';
+import tailwindcss from '@tailwindcss/vite';
+
 export default defineConfig({
   plugins: [
     react(),
+    tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   server: {
     port: 5173,
     proxy: {
