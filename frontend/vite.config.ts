@@ -23,10 +23,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        // Use 127.0.0.1 explicitly — on Windows, 'localhost' resolves to
+        // ::1 (IPv6) but uvicorn binds to 127.0.0.1 (IPv4), causing ECONNREFUSED.
+        target: 'http://127.0.0.1:8000',
         changeOrigin: true,
+        secure: false,
       },
     },
   },
