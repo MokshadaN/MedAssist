@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
-import { QRCodeCanvas } from 'qrcode.react';
 import {
   Heart,
   User,
@@ -54,6 +53,7 @@ import {
   SessionState,
   API_BASE,
   PublicProfile,
+  getShareableOrigin,
 } from './api';
 import { QRCodeSVG } from 'qrcode.react';
 
@@ -1633,9 +1633,12 @@ function App() {
                       showQR ? (
                         <div style={{ background: '#fff', padding: '1rem', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                           <QRCodeSVG
-                            value={`${window.location.origin}/public-profile/${patientProfile?.id}?token=${encodeURIComponent(patientProfile?.emergency_access_token || '')}`}
+                            value={`${getShareableOrigin()}/public-profile/${patientProfile?.id}?token=${encodeURIComponent(patientProfile?.emergency_access_token || '')}`}
                             size={150}
                           />
+                          <div style={{ marginTop: '0.5rem', fontSize: '0.7rem', color: '#555', wordBreak: 'break-all', textAlign: 'center', maxWidth: '280px' }}>
+                            {`${getShareableOrigin()}/public-profile/${patientProfile?.id}?token=${encodeURIComponent(patientProfile?.emergency_access_token || '')}`}
+                          </div>
                           <button type="button" className="ghost" style={{ marginTop: '0.5rem', color: '#000' }} onClick={() => setShowQR(false)}>Hide QR</button>
                         </div>
                       ) : (

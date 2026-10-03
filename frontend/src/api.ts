@@ -1,5 +1,26 @@
 export const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
+/**
+ * Origin used for shareable links (e.g. the emergency QR code).
+ *
+ * When the app is opened via `localhost`/`127.0.0.1` on the dev machine, a QR
+ * encoding that origin is useless: a phone scanning it resolves `localhost`
+ * to itself and nothing loads. In that case we swap in the LAN host from
+ * `VITE_PUBLIC_HOST` (set in `frontend/.env.development`) so the QR points to
+ * the dev machine's LAN address, which the phone can actually reach.
+ * In production (real hostname) `window.location.origin` is used as-is.
+ */
+export function getShareableOrigin(): string {
+  const { protocol, hostname, port } = window.location;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    const lanHost = (import.meta.env.VITE_PUBLIC_HOST as string | undefined || '').trim();
+    if (lanHost) {
+      return `${protocol}//${lanHost}${port ? `:${port}` : ''}`;
+    }
+  }
+  return window.location.origin;
+}
+
 export type AuthUser = {
   id: string;
   name: string;
