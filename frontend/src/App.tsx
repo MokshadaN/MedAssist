@@ -35,6 +35,7 @@ import {
   Pill
 } from 'lucide-react';
 import HealthMetricsChart from './components/HealthMetricsChart';
+import AuthScreen from './components/AuthScreen';
 import {
   api,
   AISummary,
@@ -1351,58 +1352,14 @@ function App() {
 
   if (!user) {
     return (
-      <main className="auth-shell">
-        <section className="auth-hero">
-          <div className="brand">
-            <div className="brand-badge">M</div>
-            <div>
-              <div className="eyebrow">MedAssist</div>
-              <h1>Care records without the paperwork maze</h1>
-            </div>
-          </div>
-          <p>Patients can start a visit, complete intake, review reports and prescriptions, and keep profile details current. Doctors can track timelines and act on the generated SOAP summary.</p>
-          <div className="auth-points">
-            <span className="pill">Patient intake</span>
-            <span className="pill">SOAP summaries</span>
-            <span className="pill">Follow-up reminders</span>
-          </div>
-        </section>
-
-        <section className="panel auth-card">
-          <div className="tabs">
-            <button className={`tab ${authMode === 'login' ? 'active' : ''}`} onClick={() => setAuthMode('login')}>Login</button>
-            <button className={`tab ${authMode === 'register-patient' ? 'active' : ''}`} onClick={() => setAuthMode('register-patient')}>Patient</button>
-            <button className={`tab ${authMode === 'register-doctor' ? 'active' : ''}`} onClick={() => setAuthMode('register-doctor')}>Doctor</button>
-          </div>
-
-          <form className="stack" onSubmit={authMode === 'login' ? handleLogin : handleRegister}>
-            {authMode !== 'login' && <input name="name" placeholder="Full name" required />}
-            <input name="email" type="email" placeholder="Email" required />
-            <input name="password" type="password" placeholder="Password" required />
-            {authMode !== 'login' && <input name="phone" placeholder="Phone number" />}
-            {authMode === 'register-patient' && (
-              <>
-                <input name="address" placeholder="Address" required />
-                <input name="age" type="number" placeholder="Age" />
-                <input name="gender" placeholder="Gender" />
-                <input name="allergies" placeholder="Allergies" />
-                <input name="chronic_conditions" placeholder="Chronic conditions" />
-              </>
-            )}
-            {authMode === 'register-doctor' && (
-              <>
-                <input name="specialization" placeholder="Specialization (e.g. Cardiology, General Medicine)" required />
-                <input name="license_number" placeholder="Medical Reg No (e.g. MCI-12345, MMC-2018/04/1234, DMC-54321)" required />
-                <input name="experience_years" type="number" placeholder="Years of experience" required />
-                <input name="hospital_affiliation" placeholder="Hospital / Clinic affiliation" />
-              </>
-            )}
-            <button className="primary" type="submit">{authMode === 'login' ? 'Sign in' : 'Create account'}</button>
-          </form>
-          {flash && <div className="flash">{flash}</div>}
-          {busy && <div className="flash subtle">{busy}...</div>}
-        </section>
-      </main>
+      <AuthScreen
+        authMode={authMode}
+        setAuthMode={setAuthMode}
+        handleLogin={handleLogin}
+        handleRegister={handleRegister}
+        flash={flash}
+        busy={busy}
+      />
     );
   }
 
