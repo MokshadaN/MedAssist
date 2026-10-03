@@ -1,212 +1,173 @@
-# 🏥 MedAssist: AI-Powered Healthcare Companion
+# MedAssist
 
-MedAssist is a comprehensive, full-stack medical assistance platform designed to bridge the gap between patients and healthcare providers. By leveraging cutting-edge AI, MedAssist streamlines the patient intake process, provides real-time clinical summaries, and offers critical emergency support through geolocation and secure medical profile sharing.
+MedAssist is a full-stack healthcare workflow application for patient intake, doctor review, reports, prescriptions, reminders, and emergency support.
 
-## 🚀 Key Features
+> **Development status:** This project is not approved for production use with real patient data. Complete the remaining security, clinical validation, monitoring, backup, and staging requirements in [`PRODUCTION_READINESS_AUDIT.md`](PRODUCTION_READINESS_AUDIT.md) first.
 
-### 🤖 AI-Driven Patient Intake
-- **Interactive Questionnaire:** A dynamic, chat-based intake system that gathers symptoms and medical history.
-- **Voice-to-Text Integration:** Hands-free input using the Web Speech API for improved accessibility and real-time transcription.
-- **Clinical Summarization:** Automatically generates **SOAP notes** (Subjective, Objective, Assessment, Plan) using advanced LLMs (Groq/Gemini), allowing doctors to review cases in seconds.
-- **Urgency Detection:** Real-time analysis of symptoms to identify high-risk indicators (red flags) and trigger immediate emergency protocols.
+## Features
 
-### 🆘 Emergency Support & QR Profiles
-- **Emergency QR Profile:** Every patient has a unique, scannable QR code located in their profile sidebar. In an emergency, first responders can scan this to access a secure, public-facing medical summary.
-    - **Shared Data:** Name, Age, Gender, Blood Type, Allergies, Chronic Conditions, and current Medications.
-    - **Security:** Only essential emergency information is shared on the public-facing URL.
-- **Nearby Hospital Finder:** Geolocation-based search using OpenStreetMap (Overpass API) to find the closest hospitals, clinics, and pharmacies. Includes real-time "Open Now" status, distance, and contact details.
+### Patient intake and triage
 
-### 💊 Medicine Information & Safety
-- **AI Medicine Search:** Patients can search for medications through the AI Health Assistant to receive detailed information on:
-    - **Benefits:** How the medication helps manage specific conditions.
-    - **Side Effects:** Common and rare side effects to watch for.
-    - **Interactions:** AI-driven warnings based on the patient's existing health profile.
-- **Medicine Info Box:** A dedicated in-app card that surfaces medicine details at a glance, including usage guidance, safety notes, and key side effects.
-- **Prescription Studio:** A specialized tool for doctors to create digital prescriptions with precise dosage, frequency (e.g., Once/Twice/Thrice daily), and custom instructions.
-- **Semantic Risk Check:** Advanced NLP (using PubMedBERT) matches patient-reported symptoms against prescribed medicine side effects to alert doctors of potential adverse reactions.
+- Multi-step text and voice intake.
+- Backend speech-to-text using Groq Whisper.
+- Patient-only triage input; generated questions and advisories are excluded.
+- Deterministic emergency rules run before AI extraction.
+- Groq models extract validated symptoms and standardized safety concepts without diagnosing.
+- Fixed policy code may escalate extracted safety concepts; uncertain or failed extraction returns `abstain/review_required`.
+- Confirmed emergencies can show nearby hospitals through OpenStreetMap providers.
+- Gemini/Groq fallback chain generates structured intake data and SOAP summaries.
 
-### 📋 Health & Practice Management
-- **Medical Report Analysis:** Upload lab reports (PDFs/Images). The AI parses complex data into easy-to-understand clinical snapshots and tracks health parameters over time.
-- **Health Metrics Visualization:** Interactive charts tracking vitals, lab results, and health trends using Recharts.
-- **Automated Reminders:** Smart scheduling for medication doses and follow-up appointments with "Urgent" status for overdue tasks.
+### Patient and doctor workflows
 
-### 🔐 Secure & Scalable
-- **Role-Based Dashboards:** Specialized, high-performance interfaces for both Patients and Doctors.
-- **JWT Authentication:** Secure token-based authentication with encrypted password storage.
-- **Robust Data Management:** SQLAlchemy ORM with a flexible SQLite/PostgreSQL backend for reliable data persistence.
+- Patient and doctor dashboards with role-based access.
+- Controlled admin approval for doctor verification.
+- Verified doctors can access linked patients and clinical workflows.
+- Visit history, SOAP summaries, reports, metrics, prescriptions, reminders, notifications, and schedules.
+- Doctor prescription history remains visible for later review.
+- Dashboard sections load independently, so one failed API does not hide all other data.
 
----
+### Reports and background jobs
 
-## 🛠 Tech Stack
+- PDF/image report upload and AI-assisted analysis.
+- Extracted medical metrics displayed as Recharts trends.
+- Report and risk jobs use persisted lifecycle states: `queued`, `processing`, `completed`, and `failed`.
+- Atomic worker claims, stale-job recovery, retries, and duplicate-job protection.
+- Celery routes work through `ai`, `notifications`, `triage`, and default queues.
+- Celery Beat is the only periodic scheduler.
 
-### Frontend
-- **Framework:** [React](https://reactjs.org/) (TypeScript)
-- **Build Tool:** [Vite](https://vitejs.dev/)
-- **Styling:** Vanilla CSS (Modern Design System with Dark Mode support)
-- **Icons:** [Lucide React](https://lucide.dev/)
-- **Charts:** [Recharts](https://recharts.org/)
-- **QR Generation:** `qrcode.react` (SVG/Canvas)
+### Security and API behavior
 
-### Backend
-- **Framework:** [FastAPI](https://fastapi.tiangolo.com/) (Python)
-- **Database:** [SQLite](https://www.sqlite.org/) with [SQLAlchemy](https://www.sqlalchemy.org/) ORM
-- **Task Queue:** [Celery](https://docs.celeryq.dev/) with [Redis](https://redis.io/)
-- **AI/ML:** [Groq Cloud API](https://groq.com/), [Google Gemini API](https://aistudio.google.com/), [PubMedBERT](https://huggingface.co/NeuML/pubmedbert-base-embeddings)
-- **Authentication:** [Python-jose](https://github.com/mpdavis/python-jose) (JWT)
+- JWT authentication and bcrypt password hashing.
+- Centralized patient ownership, doctor-patient relationship, and verified-doctor checks.
+- PHI-safe `401`/`403`/`404` behavior.
+- Expiring, opt-in emergency QR access with a minimal medical profile.
+- Bounded pagination on list endpoints.
+- Idempotent visits, reminders, report analysis, risk checks, and notification delivery.
+- Alembic manages production schema changes.
 
----
+## AI components
 
-## 📂 Project Structure
+- **General generation:** Gemini `3.8 Flash` with older Gemini fallbacks.
+- **Cross-provider fallback:** Groq `openai/gpt-oss-120b`.
+- **Triage extraction:** Groq `openai/gpt-oss-20b`, then `openai/gpt-oss-120b`.
+- **Speech-to-text:** Groq `whisper-large-v3-turbo`.
+- **Report image analysis:** Gemini `2.5 Flash`.
+- **Drug-risk embeddings:** `NeuML/pubmedbert-base-embeddings`.
+
+PubMedBERT is used by the drug-risk engine, not as a live triage classifier. The clinical triage classifier interface is currently shadow-only and has no trained model bundled.
+
+## Technology
+
+- **Frontend:** React 18, TypeScript, Vite, Recharts, Lucide React.
+- **Backend:** FastAPI, Pydantic, SQLAlchemy, Alembic.
+- **Local database:** SQLite.
+- **Container database:** PostgreSQL.
+- **Jobs and caching:** Celery, Redis, FastAPI Cache.
+- **Observability:** structured logging, request IDs, optional Sentry and OpenTelemetry.
+- **External services:** Google Gemini, Groq, Hugging Face, OpenStreetMap, optional SMTP and Twilio.
+
+## Project structure
 
 ```text
 MedAssist/
-├── backend/                # FastAPI Application
-│   ├── api/                # API Route Handlers (v1)
-│   ├── core/               # Security, Database Config, Environment
-│   ├── models/             # SQLAlchemy Database Models
-│   ├── schemas/            # Pydantic Data Validation Models
-│   ├── services/           # Business Logic & AI Integrations
-│   ├── data/               # Static datasets (e.g., drug side effects)
-│   └── main.py             # Server Entry Point
-├── frontend/               # React Application
-│   ├── src/
-│   │   ├── components/     # Reusable UI Components (Charts, etc.)
-│   │   ├── api.ts          # API Client & Type Definitions
-│   │   ├── App.tsx         # Main Application Logic & Dashboards
-│   │   └── styles.css      # Design System & Styling
-│   └── package.json        # Frontend Dependencies
-└── medassist.db            # Local SQLite Database
+├── backend/
+│   ├── alembic/        # Database migrations
+│   ├── api/v1/         # FastAPI routes
+│   ├── core/           # Configuration, security, errors, observability
+│   ├── models/         # SQLAlchemy models
+│   ├── schemas/        # Pydantic API contracts
+│   ├── services/       # Application and AI services
+│   ├── tests/          # Backend tests
+│   ├── workers/        # Celery tasks and scheduler
+│   └── main.py
+├── frontend/
+│   └── src/
+│       ├── App.tsx
+│       ├── api.ts
+│       └── styles.css
+├── docker-compose.yml
+└── PRODUCTION_READINESS_AUDIT.md
 ```
 
----
+## Local development
 
-## 🚦 Getting Started
+### Requirements
 
-### Prerequisites
 - Python 3.9+
 - Node.js 18+
-- Redis (Required for background task processing)
+- API keys for the AI features being tested
+- Redis only when testing caching or background workers
 
-### Backend Setup
-1. Navigate to the backend directory: `cd backend`
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   .\venv\Scripts\Activate.ps1  # Windows
-   source venv/bin/activate      # Unix/macOS
-   ```
-3. Install dependencies: `pip install -r requirements.txt`
-4. Configure `.env`:
-   ```env
-   DATABASE_URL=sqlite:///./medassist.db
-   SECRET_KEY=your_secret_key
-   GROQ_API_KEY=your_groq_key
-   GOOGLE_API_KEY=your_gemini_key
-   HF_TOKEN=your_huggingface_token
-   ```
-5. Run the server: `uvicorn main:app --reload`
+### Backend
 
-### Frontend Setup
-1. Navigate to the frontend directory: `cd frontend`
-2. Install dependencies: `npm install`
-3. Run the development server: `npm run dev`
-
----
-
-## 📖 API Documentation
-Once the backend is running, access the interactive documentation at:
-- **Swagger UI:** `http://localhost:8000/docs`
-- **ReDoc:** `http://localhost:8000/redoc`
-
-## 📄 License
-MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-*Developed with ❤️ for a healthier future.*
-
-## 🚀 Running the Application
-
-MedAssist can be run in either Development mode (local SQLite, no Docker required) or Production mode (PostgreSQL + Redis + Celery via Docker Compose).
-
-### Option 1: Development Mode (Local Setup)
-
-This is the fastest way to get started and develop locally. It uses SQLite for the database.
-
-**1. Clone the repository**
-```bash
-git clone https://github.com/MokshadaN/MedAssist.git
-cd MedAssist
-```
-
-**2. Set up the backend**
-```bash
+```powershell
 cd backend
-python -m venv venv
-# On Windows: venv\Scripts\activate
-# On Mac/Linux: source venv/bin/activate
-
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+Copy-Item .env.example .env
+python -m alembic upgrade head
+python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-**3. Configure Environment Variables**
-Copy the example config and fill in your API keys:
-```bash
-cp .env.example .env
-```
-_Make sure to add your `GOOGLE_API_KEY`, `GROQ_API_KEY`, and `HF_TOKEN` in the `.env` file._
+Edit `backend/.env` before starting. At minimum, set a development `SECRET_KEY` and the provider keys required by the features you use.
 
-**4. Start the Backend Server**
-```bash
-uvicorn main:app --reload
-```
-The backend API will be available at `http://localhost:8000`. You can view the API documentation at `http://localhost:8000/docs`.
+Development API documentation:
 
-**5. Start the Frontend (if applicable)**
-*(Assuming a standard React/Vite frontend exists in the `frontend` directory)*
-```bash
-cd ../frontend
+- Swagger: `http://127.0.0.1:8000/docs`
+- ReDoc: `http://127.0.0.1:8000/redoc`
+
+Documentation is disabled when `ENVIRONMENT=production`.
+
+### Create an administrator
+
+From `backend/` with the virtual environment active:
+
+```powershell
+python scripts/create_admin.py
+```
+
+Use the administrator account to approve or reject pending doctors.
+
+### Frontend
+
+In a second terminal:
+
+```powershell
+cd frontend
 npm install
 npm run dev
 ```
 
----
+## Manual verification
 
-### Option 2: Production Mode (Docker Compose)
+```powershell
+cd backend
+pip install -r requirements-dev.txt
+python -m pytest tests -q
+python -m alembic heads
+python -m alembic current
 
-The production stack sets up PostgreSQL, Redis, Celery Workers, Celery Beat, and the FastAPI application using Docker.
-
-**1. Clone and Configure**
-```bash
-git clone https://github.com/MokshadaN/MedAssist.git
-cd MedAssist
-cp backend/.env.example .env
+cd ..\frontend
+npm run build
 ```
 
-**2. Configure Production Environment Variables**
-Edit the `.env` file and set the following (at minimum):
-```env
-ENVIRONMENT=production
-DB_PASSWORD=your_secure_db_password
-REDIS_PASSWORD=your_secure_redis_password
-SECRET_KEY=generate_a_secure_random_string
-GOOGLE_API_KEY=your_key
-GROQ_API_KEY=your_key
-HF_TOKEN=your_token
-```
+## Docker Compose
 
-**3. Start the Stack**
-```bash
+The Compose stack includes PostgreSQL, Redis, FastAPI, a Celery worker, one Celery Beat scheduler, shared report storage, and optional MailHog.
+
+```powershell
+Copy-Item backend\.env.example .env
+# Edit the root .env and set secure values, especially:
+# DB_PASSWORD, REDIS_PASSWORD, SECRET_KEY, ALLOWED_ORIGINS and provider keys
 docker compose up -d
+docker compose logs -f backend worker beat
 ```
 
-**4. Check Logs**
-You can monitor the migrations and server startup by tailing the logs:
-```bash
-docker compose logs -f backend
-```
-The backend will automatically run Alembic migrations on startup and begin serving on port `8000`.
+The backend runs `alembic upgrade head` before serving requests.
 
-**5. Tear Down**
-```bash
-docker compose down
-```
+Compose is a deployment scaffold, not evidence of production readiness. Before real deployment, verify durable encrypted storage, malware scanning, private infrastructure, TLS, complete PHI auditing, worker delivery, monitoring, backups, and recovery.
+
+## License
+
+MIT License. See [`LICENSE`](LICENSE).
