@@ -60,127 +60,208 @@ export const PatientVisitTimeline: React.FC<PatientVisitTimelineProps> = ({
   ];
 
   return (
-    <div className="bg-[#FFFFFF] border border-[#E8ECE7] rounded-3xl p-6 shadow-sm space-y-5">
+    <div
+      style={{
+        background: '#FFFFFF',
+        borderRadius: 16,
+        border: '1px solid #E8E7E0',
+        padding: '1.25rem',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+      }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between pb-4 border-b border-[#F0F4F0]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-[#EFF7ED] text-[#1E432F] flex items-center justify-center">
-            <History className="w-4 h-4 text-[#10B981]" />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '1rem',
+          paddingBottom: '0.75rem',
+          borderBottom: '1px solid #F0F4F0',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              backgroundColor: '#EFF7ED',
+              color: '#1E432F',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+          >
+            <History size={16} color="#10B981" />
           </div>
           <div>
-            <h3 className="font-bold text-sm text-[#142A1F]">Visit Timeline & Clinical SOAP Notes</h3>
-            <span className="text-[10px] text-[#63806F]">Physician consultation history & generated documentation</span>
+            <h3 style={{ fontSize: '0.88rem', fontWeight: 600, color: '#142A1F', margin: 0, lineHeight: 1.2 }}>
+              Visit Timeline & Clinical SOAP Notes
+            </h3>
+            <span style={{ fontSize: '0.7rem', color: '#63806F' }}>
+              Physician consultation history & generated documentation
+            </span>
           </div>
         </div>
-        <button className="text-[11px] font-semibold text-[#142A1F] hover:text-[#059669] flex items-center gap-1 transition-colors">
+        <a
+          href="#"
+          onClick={(e) => { e.preventDefault(); }}
+          style={{
+            fontSize: '0.75rem',
+            fontWeight: 500,
+            color: '#78716C',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.25rem',
+          }}
+        >
           <span>View all</span>
-          <ArrowRight className="w-3 h-3" />
-        </button>
+          <ArrowRight size={13} />
+        </a>
       </div>
 
       {/* Timeline Items */}
-      <div className="space-y-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         {defaultVisits.map((visit) => {
           const isExpanded = expandedVisitId === visit.id;
 
           return (
             <div
               key={visit.id}
-              className="border border-[#E4ECE3] rounded-2xl overflow-hidden transition-all bg-[#FAFBF9]"
+              style={{
+                border: '1px solid #E4ECE3',
+                borderRadius: 12,
+                overflow: 'hidden',
+                backgroundColor: '#FAFBF9',
+                transition: 'all 0.15s ease',
+              }}
             >
               {/* Visit Row Header */}
               <div
                 onClick={() => setExpandedVisitId(isExpanded ? '' : visit.id)}
-                className="p-4 flex items-center justify-between cursor-pointer hover:bg-[#F3F7F4] transition-colors"
+                style={{
+                  padding: '0.85rem 1rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  cursor: 'pointer',
+                  backgroundColor: isExpanded ? '#F4F7F4' : '#FAFBF9',
+                  transition: 'background-color 0.15s ease',
+                }}
               >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-white border border-[#E1E8E0] flex flex-col items-center justify-center text-center shrink-0">
-                    <span className="text-[9px] font-bold text-[#63806F] uppercase leading-none">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      backgroundColor: '#FFFFFF',
+                      border: '1px solid #E1E8E0',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      textAlign: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <span style={{ fontSize: '0.55rem', fontWeight: 700, color: '#63806F', textTransform: 'uppercase', lineHeight: 1 }}>
                       {visit.date.split(' ')[0]}
                     </span>
-                    <span className="text-sm font-bold text-[#142A1F] leading-none mt-0.5">
+                    <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#142A1F', lineHeight: 1, marginTop: 2 }}>
                       {visit.date.split(' ')[1].replace(',', '')}
                     </span>
                   </div>
 
                   <div>
-                    <h4 className="font-bold text-xs text-[#142A1F]">{visit.type}</h4>
-                    <span className="text-[10px] text-[#63806F] block mt-0.5">
+                    <h4 style={{ fontSize: '0.82rem', fontWeight: 600, color: '#142A1F', margin: 0 }}>{visit.type}</h4>
+                    <span style={{ fontSize: '0.7rem', color: '#63806F', display: 'block', marginTop: 2 }}>
                       {visit.time} • {visit.location}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <span
+                    style={{
+                      padding: '0.2rem 0.55rem',
+                      borderRadius: 999,
+                      fontSize: '0.68rem',
+                      fontWeight: 700,
+                      backgroundColor: '#ECFDF5',
+                      color: '#059669',
+                      border: '1px solid #A7F3D0',
+                    }}
+                  >
                     {visit.status}
                   </span>
                   {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-[#7A9183]" />
+                    <ChevronUp size={16} color="#7A9183" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-[#7A9183]" />
+                    <ChevronDown size={16} color="#7A9183" />
                   )}
                 </div>
               </div>
 
               {/* Expandable SOAP Details */}
               {isExpanded && (
-                <div className="p-4 pt-0 border-t border-[#E8ECE7] bg-white animate-in fade-in duration-200">
-                  <div className="pt-3 pb-2 flex items-center justify-between text-xs">
-                    <div className="font-bold text-[#142A1F] flex items-center gap-1.5">
-                      <UserCheck className="w-3.5 h-3.5 text-[#10B981]" />
+                <div style={{ padding: '0.85rem 1rem', borderTop: '1px solid #E8ECE7', backgroundColor: '#FFFFFF' }}>
+                  <div style={{ paddingBottom: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.78rem' }}>
+                    <div style={{ fontWeight: 600, color: '#142A1F', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <UserCheck size={14} color="#10B981" />
                       <span>{visit.doctor}</span>
                     </div>
-                    <span className="text-[10px] text-[#7A9183]">Clinical Summary (SOAP)</span>
+                    <span style={{ fontSize: '0.7rem', color: '#7A9183' }}>Clinical Summary (SOAP)</span>
                   </div>
 
                   {/* 4 SOAP Boxes in Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-2">
-                    
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.65rem', marginTop: '0.35rem' }}>
                     {/* S: Subjective */}
-                    <div className="p-3 bg-[#F8FAF8] border border-[#E5ECE5] rounded-xl flex items-start gap-2.5">
-                      <span className="w-6 h-6 rounded-lg bg-[#E5EFE7] text-[#1B382B] font-bold text-xs flex items-center justify-center shrink-0">
+                    <div style={{ padding: '0.65rem 0.85rem', backgroundColor: '#F8FAF8', border: '1px solid #E5ECE5', borderRadius: 10, display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>
+                      <span style={{ width: 22, height: 22, borderRadius: 6, backgroundColor: '#E5EFE7', color: '#1B382B', fontWeight: 700, fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         S
                       </span>
-                      <div className="text-[11px] leading-relaxed">
-                        <strong className="block text-[#142A1F] font-bold">Subjective</strong>
-                        <p className="text-[#3E5C4B] mt-0.5">{visit.soap.subjective}</p>
+                      <div style={{ fontSize: '0.74rem', lineHeight: 1.45 }}>
+                        <strong style={{ display: 'block', color: '#142A1F', fontWeight: 600 }}>Subjective</strong>
+                        <p style={{ color: '#3E5C4B', margin: '2px 0 0 0' }}>{visit.soap.subjective}</p>
                       </div>
                     </div>
 
                     {/* O: Objective */}
-                    <div className="p-3 bg-[#F8FAF8] border border-[#E5ECE5] rounded-xl flex items-start gap-2.5">
-                      <span className="w-6 h-6 rounded-lg bg-[#EFF6FF] text-[#1E40AF] font-bold text-xs flex items-center justify-center shrink-0">
+                    <div style={{ padding: '0.65rem 0.85rem', backgroundColor: '#F8FAF8', border: '1px solid #E5ECE5', borderRadius: 10, display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>
+                      <span style={{ width: 22, height: 22, borderRadius: 6, backgroundColor: '#EFF6FF', color: '#1E40AF', fontWeight: 700, fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         O
                       </span>
-                      <div className="text-[11px] leading-relaxed">
-                        <strong className="block text-[#142A1F] font-bold">Objective</strong>
-                        <p className="text-[#3E5C4B] mt-0.5">{visit.soap.objective}</p>
+                      <div style={{ fontSize: '0.74rem', lineHeight: 1.45 }}>
+                        <strong style={{ display: 'block', color: '#142A1F', fontWeight: 600 }}>Objective</strong>
+                        <p style={{ color: '#3E5C4B', margin: '2px 0 0 0' }}>{visit.soap.objective}</p>
                       </div>
                     </div>
 
                     {/* A: Assessment */}
-                    <div className="p-3 bg-[#F8FAF8] border border-[#E5ECE5] rounded-xl flex items-start gap-2.5">
-                      <span className="w-6 h-6 rounded-lg bg-[#FEF3C7] text-[#92400E] font-bold text-xs flex items-center justify-center shrink-0">
+                    <div style={{ padding: '0.65rem 0.85rem', backgroundColor: '#F8FAF8', border: '1px solid #E5ECE5', borderRadius: 10, display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>
+                      <span style={{ width: 22, height: 22, borderRadius: 6, backgroundColor: '#FEF3C7', color: '#92400E', fontWeight: 700, fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         A
                       </span>
-                      <div className="text-[11px] leading-relaxed">
-                        <strong className="block text-[#142A1F] font-bold">Assessment</strong>
-                        <p className="text-[#3E5C4B] mt-0.5">{visit.soap.assessment}</p>
+                      <div style={{ fontSize: '0.74rem', lineHeight: 1.45 }}>
+                        <strong style={{ display: 'block', color: '#142A1F', fontWeight: 600 }}>Assessment</strong>
+                        <p style={{ color: '#3E5C4B', margin: '2px 0 0 0' }}>{visit.soap.assessment}</p>
                       </div>
                     </div>
 
                     {/* P: Plan */}
-                    <div className="p-3 bg-[#F8FAF8] border border-[#E5ECE5] rounded-xl flex items-start gap-2.5">
-                      <span className="w-6 h-6 rounded-lg bg-[#F3E8FF] text-[#6B21A8] font-bold text-xs flex items-center justify-center shrink-0">
+                    <div style={{ padding: '0.65rem 0.85rem', backgroundColor: '#F8FAF8', border: '1px solid #E5ECE5', borderRadius: 10, display: 'flex', alignItems: 'flex-start', gap: '0.6rem' }}>
+                      <span style={{ width: 22, height: 22, borderRadius: 6, backgroundColor: '#F3E8FF', color: '#6B21A8', fontWeight: 700, fontSize: '0.7rem', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         P
                       </span>
-                      <div className="text-[11px] leading-relaxed">
-                        <strong className="block text-[#142A1F] font-bold">Plan</strong>
-                        <p className="text-[#3E5C4B] mt-0.5">{visit.soap.plan}</p>
+                      <div style={{ fontSize: '0.74rem', lineHeight: 1.45 }}>
+                        <strong style={{ display: 'block', color: '#142A1F', fontWeight: 600 }}>Plan</strong>
+                        <p style={{ color: '#3E5C4B', margin: '2px 0 0 0' }}>{visit.soap.plan}</p>
                       </div>
                     </div>
-
                   </div>
                 </div>
               )}

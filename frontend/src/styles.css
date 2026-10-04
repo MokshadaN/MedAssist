@@ -1,5 +1,45 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --color-linen: #F8F7F3;
+  --color-linen-dark: #F0EFEA;
+  --color-sap: #142E1F;
+  --color-sap-hover: #0E2116;
+  --color-sap-light: #1B3D2A;
+  --color-sage-50: #F4F7F4;
+  --color-sage-100: #E7EFE8;
+  --color-sage-200: #D1E0D3;
+  --color-sage-500: #5F8467;
+  --color-sage-700: #2E5037;
+  --color-porcelain: #FFFFFF;
+  --color-cardborder: #E8E7E0;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --shadow-soft: 0 4px 20px -2px rgba(20, 46, 31, 0.04), 0 2px 6px -1px rgba(20, 46, 31, 0.02);
+  --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+}
+
+.botanical-bg {
+  background-color: #F8F7F3;
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBPjk8SZjKf69RdfY2mj7o7S0DyzZdEc59o5tLYIrbixSjTocYvFb6tgc4Wnl_CHB8gdoBDBpWsgVPgNolu-P4UAEMb9UBlMnrEeuFVySerjHR-ogiY1j6v8lNzLzr2_mdyuVoHi_r7JoUIBEPEA1DDTzzZhP5vDGyayc5HXSuF1bZBRe41eRWgYAEd8GyR4f22O0ja-OqeaTE4m5pTFuUK50vhBrFpKFme212Zedke47e_j27vkNsVs_UwxRyY3MK3TQ');
+  background-size: cover;
+  background-position: top right;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
 
 /* ── Design Tokens ── */
 :root {
@@ -1276,10 +1316,195 @@ input:focus, textarea:focus, select:focus {
 ══════════════════════════════════════ */
 .reports-list { display: grid; gap: 0.5rem; }
 
+/* Botanical background used by the doctor dashboard */
+.botanical-bg {
+  background-color: #F5F6F0;
+  background-image: url('/doc_bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
 /* ══════════════════════════════════════
-   DOCTOR DASHBOARD
+   DOCTOR DASHBOARD v2  (scoped to .dr-v2)
+   All new components live inside .dr-v2.
+   We reset/neutralise the generic global
+   rules that would otherwise clobber
+   Tailwind utility classes.
 ══════════════════════════════════════ */
-.doctor-dashboard { display: grid; gap: 1.25rem; align-content: start; }
+.dr-v2 {
+  /* full-page takeover */
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  display: flex;
+}
+
+/* Undo global body background inside the scope */
+.dr-v2,
+.dr-v2 * { box-sizing: border-box; }
+
+/* Undo global input/textarea/select width + padding overrides */
+.dr-v2 input,
+.dr-v2 textarea,
+.dr-v2 select {
+  width: auto;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  box-shadow: none;
+  transition: none;
+}
+
+/* Re-apply Tailwind-friendly focus ring resets */
+.dr-v2 input:focus,
+.dr-v2 textarea:focus,
+.dr-v2 select:focus { outline: none; box-shadow: none; }
+
+/* Undo .panel, .hero-card, .profile-card bleeding in */
+.dr-v2 .panel,
+.dr-v2 .hero-card,
+.dr-v2 .profile-card,
+.dr-v2 .panel h2,
+.dr-v2 .hero-card h2,
+.dr-v2 .profile-card h2 {
+  all: unset;
+}
+
+/* Undo .grid generic rule (conflicts with Tailwind grid) */
+.dr-v2 .grid { display: block; gap: 0; }
+
+/* Undo .stack, .row, .field generic rules */
+.dr-v2 .stack,
+.dr-v2 .row,
+.dr-v2 .field { all: unset; }
+
+/* Undo .primary / .secondary / .ghost / .tab button styles */
+.dr-v2 .primary,
+.dr-v2 .secondary,
+.dr-v2 .ghost,
+.dr-v2 .tab {
+  all: unset;
+  cursor: pointer;
+}
+
+/* The sidebar column is sticky full-height */
+.dr-v2-sidebar {
+  width: 256px;
+  flex-shrink: 0;
+  background: rgba(252,251,248,0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(232,231,224,0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+/* The main area scrolls independently */
+.dr-v2-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+/* Topbar sticky within main */
+.dr-v2-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(232,231,224,0.8);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Scrollable content area */
+.dr-v2-content {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+/* Clinical grid */
+.dr-v2-clinical-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* Left and right column stacks */
+.dr-v2-col-left,
+.dr-v2-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Sub-grids (2 equal cols) */
+.dr-v2-subgrid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+/* Metric card row */
+.dr-v2-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+/* Card base */
+.dr-v2-card {
+  background: rgba(255,255,255,0.97);
+  border: 1px solid #E8E7E0;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px -2px rgba(20,46,31,0.04), 0 2px 6px -1px rgba(20,46,31,0.02);
+}
+
+/* Scrollbar inside sidebar */
+.dr-v2-sidebar::-webkit-scrollbar,
+.dr-v2-main::-webkit-scrollbar { width: 4px; }
+.dr-v2-sidebar::-webkit-scrollbar-thumb,
+.dr-v2-main::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 4px; }
+
+@media (max-width: 1024px) {
+  .dr-v2-clinical-grid { grid-template-columns: 1fr; }
+  .dr-v2-metrics { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .dr-v2-subgrid-2 { grid-template-columns: 1fr; }
+  .dr-v2-metrics { grid-template-columns: 1fr 1fr; }
+  .dr-v2-content { padding: 1rem; }
+  .dr-v2-topbar { padding: 0.75rem 1rem; }
+}
+
 
 /* ══════════════════════════════════════
    MISC
@@ -1335,3 +1560,205 @@ input:focus, textarea:focus, select:focus {
   .auth-footer { flex-direction: column; gap: 0.75rem; text-align: center; }
   .notification-panel, .medicine-box-panel { right: 1rem; width: calc(100vw - 2rem); }
 }
+
+/* ══════════════════════════════════════
+   PATIENT PORTAL v2 (scoped to .pt-v2)
+══════════════════════════════════════ */
+.pt-v2-bg {
+  background-color: #f6f5f0;
+  background-image: url('/doc_bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.pt-v2 {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  display: flex;
+}
+
+.pt-v2,
+.pt-v2 * { box-sizing: border-box; }
+
+.pt-v2 input,
+.pt-v2 textarea,
+.pt-v2 select {
+  width: auto;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  box-shadow: none;
+  transition: none;
+}
+
+.pt-v2 input:focus,
+.pt-v2 textarea:focus,
+.pt-v2 select:focus { outline: none; box-shadow: none; }
+
+.pt-v2 .panel,
+.pt-v2 .hero-card,
+.pt-v2 .profile-card,
+.pt-v2 .panel h2,
+.pt-v2 .hero-card h2,
+.pt-v2 .profile-card h2 {
+  all: unset;
+}
+
+.pt-v2 .grid { display: block; gap: 0; }
+.pt-v2 .stack, .pt-v2 .row, .pt-v2 .field { all: unset; }
+.pt-v2 .primary, .pt-v2 .secondary, .pt-v2 .ghost, .pt-v2 .tab {
+  all: unset;
+  cursor: pointer;
+}
+
+.pt-v2-sidebar {
+  width: 256px;
+  flex-shrink: 0;
+  background: rgba(247, 246, 242, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-right: 1px solid rgba(234, 232, 224, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.pt-v2-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.pt-v2-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(234, 232, 224, 0.8);
+  padding: 0.85rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* ══════════════════════════════════════
+   DOCTOR PORTAL v2 (scoped to .doc-v2)
+══════════════════════════════════════ */
+.doc-v2-bg {
+  background-color: #f6f5f0;
+  background-image: url('/doc_bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.doc-v2 {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  display: flex;
+}
+
+.doc-v2,
+.doc-v2 * { box-sizing: border-box; }
+
+.doc-v2 input,
+.doc-v2 textarea,
+.doc-v2 select {
+  width: auto;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  box-shadow: none;
+  transition: none;
+}
+
+.doc-v2 input:focus,
+.doc-v2 textarea:focus,
+.doc-v2 select:focus { outline: none; box-shadow: none; }
+
+.doc-v2 .panel,
+.doc-v2 .hero-card,
+.doc-v2 .profile-card,
+.doc-v2 .panel h2,
+.doc-v2 .hero-card h2,
+.doc-v2 .profile-card h2 {
+  all: unset;
+}
+
+.doc-v2 .grid { display: block; gap: 0; }
+.doc-v2 .stack, .doc-v2 .row, .doc-v2 .field { all: unset; }
+.doc-v2 .primary, .doc-v2 .secondary, .doc-v2 .ghost, .doc-v2 .tab {
+  all: unset;
+  cursor: pointer;
+}
+
+.doc-v2-sidebar {
+  width: 256px;
+  flex-shrink: 0;
+  background: rgba(247, 246, 242, 0.78);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-right: 1px solid rgba(234, 232, 224, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.doc-v2-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.doc-v2-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(234, 232, 224, 0.85);
+  padding: 0.85rem 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+

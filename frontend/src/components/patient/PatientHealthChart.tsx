@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, ChevronDown, TrendingUp, Info } from 'lucide-react';
+import { Activity, ChevronDown, Info } from 'lucide-react';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -9,6 +9,11 @@ import {
   Tooltip,
   CartesianGrid
 } from 'recharts';
+
+const SAP = '#142E1F';
+const BORDER = '#E8E7E0';
+const STONE500 = '#78716C';
+const STONE800 = '#292524';
 
 export const PatientHealthChart: React.FC = () => {
   const [selectedMetric, setSelectedMetric] = useState('Systolic BP');
@@ -25,124 +30,172 @@ export const PatientHealthChart: React.FC = () => {
   ];
 
   return (
-    <div className="bg-[#FFFFFF] border border-[#E8ECE7] rounded-3xl p-6 shadow-sm space-y-5">
-      {/* Header with Metric & Range Selectors */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#F0F4F0]">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-[#EFF7ED] text-[#1E432F] flex items-center justify-center">
-            <Activity className="w-4 h-4 text-[#10B981]" />
+    <div
+      style={{
+        background: '#FFFFFF',
+        borderRadius: 16,
+        border: `1px solid ${BORDER}`,
+        padding: '1.25rem',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
+    >
+      <div>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Activity size={16} color={STONE800} />
+            <h3 style={{ fontSize: '0.88rem', fontWeight: 600, color: STONE800, margin: 0 }}>Health Metrics</h3>
           </div>
-          <div>
-            <h3 className="font-bold text-sm text-[#142A1F]">Health Metrics Timeline</h3>
-            <span className="text-[10px] text-[#63806F]">Visualize lab results & vital signs over time</span>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="flex items-center gap-2 self-end sm:self-auto">
-          <select
-            value={selectedMetric}
-            onChange={(e) => setSelectedMetric(e.target.value)}
-            className="h-9 px-3 rounded-xl bg-[#F4F6F2] border border-[#E3E8E3] text-xs font-semibold text-[#142A1F] focus:border-[#2D5A43] focus:outline-none"
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); }}
+            style={{ fontSize: '0.75rem', fontWeight: 500, color: STONE500, textDecoration: 'none' }}
           >
-            <option value="Systolic BP">Systolic BP</option>
-            <option value="Diastolic BP">Diastolic BP</option>
-            <option value="Heart Rate">Heart Rate (BPM)</option>
-            <option value="Blood Glucose">Fasting Glucose</option>
-            <option value="SpO2">SpO2 Oxygen (%)</option>
-          </select>
+            View trends →
+          </a>
+        </div>
 
-          {/* Time range pills */}
-          <div className="flex items-center p-1 bg-[#F4F6F2] rounded-xl text-[10px] font-bold text-[#63806F]">
-            {['W', 'M', '3M', '6M', '1Y'].map((range) => (
-              <button
-                key={range}
-                onClick={() => setSelectedRange(range)}
-                className={`px-2 py-1 rounded-lg transition-all ${
-                  selectedRange === range
-                    ? 'bg-white text-[#142A1F] shadow-2xs font-extrabold'
-                    : 'hover:text-[#142A1F]'
-                }`}
-              >
-                {range}
-              </button>
-            ))}
+        {/* Controls: Metric Dropdown & Range Switcher */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingBottom: '0.75rem',
+            borderBottom: '1px solid #f1eee6',
+          }}
+        >
+          {/* Dropdown Selector */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              backgroundColor: '#f6f5f0',
+              border: '1px solid #e5e2d6',
+              padding: '0.25rem 0.65rem',
+              borderRadius: 8,
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              color: STONE800,
+              cursor: 'pointer',
+            }}
+          >
+            <span>{selectedMetric}</span>
+            <ChevronDown size={12} color={STONE500} />
+          </div>
+
+          {/* Time Range Pills */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.7rem', fontWeight: 500, color: STONE500 }}>
+            {['W', 'M', '3M', '6M', '1Y'].map((range) => {
+              const active = selectedRange === range;
+              return (
+                <button
+                  key={range}
+                  type="button"
+                  onClick={() => setSelectedRange(range)}
+                  style={{
+                    padding: '2px 8px',
+                    borderRadius: 6,
+                    border: 'none',
+                    backgroundColor: active ? SAP : 'transparent',
+                    color: active ? '#FFFFFF' : STONE500,
+                    fontWeight: active ? 600 : 500,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {range}
+                </button>
+              );
+            })}
           </div>
         </div>
-      </div>
 
-      {/* Chart Area */}
-      <div className="h-56 w-full pt-2">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="colorMetric" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10B981" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F0F4F0" vertical={false} />
-            <XAxis
-              dataKey="date"
-              tick={{ fill: '#7A9183', fontSize: 10 }}
-              axisLine={{ stroke: '#E5ECE5' }}
-              tickLine={false}
-            />
-            <YAxis
-              domain={[0, 180]}
-              tick={{ fill: '#7A9183', fontSize: 10 }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#142A1F',
-                borderRadius: '12px',
-                border: 'none',
-                color: '#FFFFFF',
-                fontSize: '11px',
-                fontWeight: 'bold',
-                boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)',
-              }}
-              formatter={(val: any) => [`${val} mmHg`, 'Systolic BP']}
-            />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="#059669"
-              strokeWidth={2.5}
-              fillOpacity={1}
-              fill="url(#colorMetric)"
-              dot={{ stroke: '#059669', strokeWidth: 2, fill: '#FFFFFF', r: 4 }}
-              activeDot={{ stroke: '#142A1F', strokeWidth: 3, fill: '#86EFAC', r: 6 }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+        {/* Chart Area */}
+        <div style={{ height: 140, width: '100%', paddingTop: '1rem', position: 'relative' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+              <defs>
+                <linearGradient id="ptMetric" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b7e53" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#3b7e53" stopOpacity={0.0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1eee6" vertical={false} />
+              <XAxis
+                dataKey="date"
+                tick={{ fill: STONE500, fontSize: 9 }}
+                axisLine={{ stroke: '#f1eee6' }}
+                tickLine={false}
+              />
+              <YAxis
+                domain={[40, 160]}
+                tick={{ fill: STONE500, fontSize: 9 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: SAP,
+                  borderRadius: '8px',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                }}
+                formatter={(val: any) => [`${val} mmHg`, 'Systolic BP']}
+              />
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="#3b7e53"
+                strokeWidth={2}
+                fillOpacity={1}
+                fill="url(#ptMetric)"
+                dot={{ stroke: '#3b7e53', strokeWidth: 2, fill: '#FFFFFF', r: 3 }}
+                activeDot={{ stroke: SAP, strokeWidth: 2, fill: '#6ee7b7', r: 5 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
 
-      {/* Stats Summary & Caption */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-3 border-t border-[#F0F4F0]">
-        <div className="p-3 bg-[#F8FAF7] border border-[#E6ECE4] rounded-2xl">
-          <span className="text-[10px] uppercase font-bold text-[#7A9183] block">Average</span>
-          <div className="font-bold text-sm text-[#142A1F] mt-0.5">124 mmHg</div>
-        </div>
-        <div className="p-3 bg-[#F8FAF7] border border-[#E6ECE4] rounded-2xl">
-          <span className="text-[10px] uppercase font-bold text-[#7A9183] block">Highest Reading</span>
-          <div className="font-bold text-sm text-[#142A1F] mt-0.5">132 mmHg</div>
-        </div>
-        <div className="p-3 bg-[#F8FAF7] border border-[#E6ECE4] rounded-2xl col-span-2 sm:col-span-1">
-          <span className="text-[10px] uppercase font-bold text-[#7A9183] block">Status</span>
-          <div className="font-bold text-xs text-[#059669] mt-0.5 flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-            <span>Optimal Range</span>
+        {/* Bottom Stats */}
+        <div
+          style={{
+            marginTop: '1rem',
+            paddingTop: '0.75rem',
+            borderTop: '1px solid #f1eee6',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingLeft: '0.25rem',
+            paddingRight: '0.25rem',
+          }}
+        >
+          {/* Average BP */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span style={{ fontSize: '1.2rem' }}>📊</span>
+            <div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: STONE800, lineHeight: 1 }}>124 mmHg</div>
+              <div style={{ fontSize: '0.65rem', color: STONE500, fontWeight: 500 }}>Average</div>
+            </div>
+          </div>
+
+          {/* Highest BP */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ width: 24, height: 24, borderRadius: 999, background: '#fce8e6', color: '#d9534f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>
+              ↑
+            </div>
+            <div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: STONE800, lineHeight: 1 }}>132 mmHg</div>
+              <div style={{ fontSize: '0.65rem', color: STONE500, fontWeight: 500 }}>Highest</div>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Info Footnote */}
-      <div className="flex items-center gap-2 text-[11px] text-[#63806F] pt-1">
-        <Info className="w-3.5 h-3.5 text-[#10B981] shrink-0" />
-        <span>Values are automatically extracted and plotted from your analyzed medical reports.</span>
       </div>
     </div>
   );

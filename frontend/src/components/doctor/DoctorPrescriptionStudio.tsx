@@ -1,7 +1,30 @@
 import React from 'react';
+import { Pill, Folder, CircleDot, Droplet, Plus, ChevronDown } from 'lucide-react';
 import { DoctorVisit, PrescriptionItem } from '../../api';
 
-export type FrequencyOption = 'once' | 'twice' | 'thrice';
+export type FrequencyOption = 'once' | 'twice' | 'thrice' | 'prn';
+
+const SAP = '#142E1F';
+const SAP_HOVER = '#0E2116';
+const STONE50 = '#FAFAF9';
+const STONE100 = '#F5F5F4';
+const STONE200 = '#E7E5E4';
+const STONE400 = '#A8A29E';
+const STONE500 = '#78716C';
+const STONE600 = '#57534E';
+const STONE700 = '#44403C';
+const STONE800 = '#292524';
+
+const inputStyle: React.CSSProperties = {
+  width: '100%', padding: '0.55rem 0.75rem', fontSize: '0.78rem',
+  border: `1px solid ${STONE200}`, borderRadius: 10, background: STONE50,
+  color: STONE800, outline: 'none', fontFamily: 'inherit',
+};
+
+const labelStyle: React.CSSProperties = {
+  display: 'block', fontSize: '0.62rem', fontWeight: 700,
+  textTransform: 'uppercase', letterSpacing: '0.07em', color: STONE500, marginBottom: 4,
+};
 
 interface DoctorPrescriptionStudioProps {
   selectedVisit: DoctorVisit | null;
@@ -54,182 +77,128 @@ export const DoctorPrescriptionStudio: React.FC<DoctorPrescriptionStudioProps> =
   addMedication,
   medicationStatus,
 }) => {
-  return (
-    <section className="panel wide">
-      <div className="panel-head">
-        <div>
-          <div className="eyebrow">Care Plan</div>
-          <h2>Prescription Studio</h2>
-        </div>
-      </div>
-      <div className="stack compact">
-        <div className="row" style={{ gap: '1rem' }}>
-          <div style={{ flex: 2 }}>
-            <textarea
-              rows={2}
-              value={prescriptionNotes}
-              onChange={(e) => setPrescriptionNotes(e.target.value)}
-              placeholder="Overall prescription notes..."
-            />
-          </div>
-          <div style={{ flex: 1 }}>
-            <button
-              className="secondary"
-              style={{ height: '100%', width: '100%' }}
-              onClick={() => void createPrescription()}
-              disabled={!selectedVisit || Boolean(prescriptionId)}
-            >
-              {prescriptionId ? 'Prescription loaded' : 'Create ID'}
-            </button>
-          </div>
-        </div>
-        {prescriptionStatus && <div className="flash subtle">{prescriptionStatus}</div>}
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!prescriptionId && selectedVisit) await createPrescription();
+    await addMedication();
+  };
 
-        {prescriptionId && (
-          <div
-            className="panel animate-in"
-            style={{
-              background: 'var(--surface-soft)',
-              padding: '1rem',
-              border: '1px dashed var(--border)',
-            }}
-          >
-            {currentPrescriptionItems.length > 0 && (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <div className="eyebrow">Added Items</div>
-                <div className="stack compact" style={{ marginTop: '0.5rem' }}>
-                  {currentPrescriptionItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="record-card"
-                      style={{
-                        padding: '0.75rem',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div>
-                        <strong style={{ color: '#fff' }}>{item.medicine_name}</strong>
-                        <div style={{ fontSize: '0.85rem', opacity: 0.8 }}>
-                          {item.dosage || 'No dosage'} • {item.frequency} • {item.duration}
-                        </div>
-                      </div>
-                      <span className="pill">Added</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="eyebrow">Add Items</div>
-            <div className="stack compact" style={{ marginTop: '0.5rem' }}>
-              <label className="field">
-                <span>Medicine Name</span>
-                <input
-                  value={medicationName}
-                  onChange={(e) => setMedicationName(e.target.value)}
-                  placeholder="Medicine name"
-                />
-              </label>
-              <div className="row" style={{ gap: '0.75rem' }}>
-                <label className={`pill ${medicineType === 'tablet' ? 'active-pill' : ''}`} style={{ cursor: 'pointer' }}>
-                  <input
-                    type="radio"
-                    name="medicineType"
-                    checked={medicineType === 'tablet'}
-                    onChange={() => setMedicineType('tablet')}
-                    style={{ marginRight: '0.5rem' }}
-                  />
-                  Tablet
-                </label>
-                <label className={`pill ${medicineType === 'syrup' ? 'active-pill' : ''}`} style={{ cursor: 'pointer' }}>
-                  <input
-                    type="radio"
-                    name="medicineType"
-                    checked={medicineType === 'syrup'}
-                    onChange={() => setMedicineType('syrup')}
-                    style={{ marginRight: '0.5rem' }}
-                  />
-                  Syrup
-                </label>
-              </div>
-              {medicineType === 'tablet' ? (
-                <label className="field">
-                  <span>Dosage</span>
-                  <input
-                    value={dosage}
-                    onChange={(e) => setDosage(e.target.value)}
-                    placeholder="Dosage (e.g. 500mg)"
-                  />
-                </label>
-              ) : (
-                <label className="field">
-                  <span>Quantity</span>
-                  <input
-                    value={syrupQuantity}
-                    onChange={(e) => setSyrupQuantity(e.target.value)}
-                    placeholder="Quantity (e.g. 5 ml)"
-                  />
-                </label>
-              )}
-              <div className="field">
-                <span>Frequency</span>
-                <div className="row" style={{ gap: '0.75rem' }}>
-                  {(
-                    [
-                      ['once', 'Once a day'],
-                      ['twice', 'Twice a day'],
-                      ['thrice', 'Thrice a day'],
-                    ] as Array<[FrequencyOption, string]>
-                  ).map(([value, label]) => (
-                    <label
-                      key={value}
-                      className={`pill ${frequency === value ? 'active-pill' : ''}`}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <input
-                        type="radio"
-                        name="frequency"
-                        checked={frequency === value}
-                        onChange={() => setFrequency(value)}
-                        style={{ marginRight: '0.5rem' }}
-                      />
-                      {label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <label className="field">
-                <span>Duration</span>
-                <input
-                  value={duration}
-                  onChange={(e) => setDuration(e.target.value)}
-                  placeholder="Duration (e.g. 5 days)"
-                />
-              </label>
-              <label className="field">
-                <span>Custom Instructions</span>
-                <textarea
-                  rows={2}
-                  value={customInstructions}
-                  onChange={(e) => setCustomInstructions(e.target.value)}
-                  placeholder="Add special instructions or notes"
-                />
-              </label>
-            </div>
-            <button
-              className="primary"
-              style={{ marginTop: '1rem', width: '100%' }}
-              onClick={() => void addMedication()}
-              disabled={!medicationName || !duration}
-            >
-              Add Item
-            </button>
-            {medicationStatus && <div className="flash subtle" style={{ marginTop: '0.75rem' }}>{medicationStatus}</div>}
-          </div>
-        )}
+  const typeBtn = (type: 'tablet' | 'syrup', Icon: React.ElementType, label: string) => {
+    const active = medicineType === type;
+    return (
+      <button type="button" onClick={() => setMedicineType(type)}
+        style={{ flex: 1, padding: '0.45rem', borderRadius: 8, border: 'none', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, background: active ? SAP : 'transparent', color: active ? '#fff' : STONE600, transition: 'all 0.15s' }}>
+        <Icon size={12} /> {label}
+      </button>
+    );
+  };
+
+  return (
+    <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.75rem', borderBottom: `1px solid ${STONE100}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Pill size={16} color={SAP} />
+          <span style={{ fontFamily: '"Playfair Display", serif', fontWeight: 700, color: SAP, fontSize: '0.95rem' }}>Prescription Studio</span>
+        </div>
+        <button type="button"
+          onClick={() => { if (!prescriptionId && selectedVisit) void createPrescription(); }}
+          style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0.3rem 0.65rem', borderRadius: 8, border: `1px solid ${STONE200}`, background: STONE50, color: STONE600, fontSize: '0.68rem', fontWeight: 600, cursor: 'pointer' }}>
+          <Folder size={11} color={STONE400} />
+          {prescriptionId ? 'Prescription Active' : 'Load from Previous'}
+        </button>
       </div>
-    </section>
+
+      {/* Form */}
+      <form onSubmit={e => void handleAdd(e)} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        {/* Row 1: Medicine + Type */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.75rem', alignItems: 'end' }}>
+          <div>
+            <label style={labelStyle}>Medicine Name</label>
+            <input value={medicationName} onChange={e => setMedicationName(e.target.value)}
+              placeholder="Search medicine (e.g. Paracetamol, Amoxicillin)..."
+              type="text" style={inputStyle} />
+          </div>
+          <div style={{ minWidth: 120 }}>
+            <label style={labelStyle}>Type</label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 2, background: STONE100, padding: 3, borderRadius: 10 }}>
+              {typeBtn('tablet', CircleDot, 'Tablet')}
+              {typeBtn('syrup', Droplet, 'Syrup')}
+            </div>
+          </div>
+        </div>
+
+        {/* Row 2: Dosage + Frequency + Duration */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+          <div>
+            <label style={labelStyle}>Dosage</label>
+            <input value={medicineType === 'tablet' ? dosage : syrupQuantity}
+              onChange={e => medicineType === 'tablet' ? setDosage(e.target.value) : setSyrupQuantity(e.target.value)}
+              placeholder={medicineType === 'tablet' ? 'e.g. 500mg' : 'e.g. 5ml'}
+              type="text" style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>Frequency</label>
+            <div style={{ position: 'relative' }}>
+              <select value={frequency} onChange={e => setFrequency(e.target.value as FrequencyOption)}
+                style={{ ...inputStyle, appearance: 'none', paddingRight: '2rem' }}>
+                <option value="once">Once a day</option>
+                <option value="twice">Twice a day</option>
+                <option value="thrice">Thrice a day</option>
+                <option value="prn">As needed (PRN)</option>
+              </select>
+              <ChevronDown size={13} color={STONE400} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+            </div>
+          </div>
+          <div>
+            <label style={labelStyle}>Duration</label>
+            <input value={duration} onChange={e => setDuration(e.target.value)}
+              placeholder="e.g. 5 days" type="text" style={inputStyle} />
+          </div>
+        </div>
+
+        {/* Row 3: Instructions + Submit */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.75rem', alignItems: 'end' }}>
+          <div>
+            <label style={labelStyle}>Instructions (Optional)</label>
+            <input value={customInstructions} onChange={e => setCustomInstructions(e.target.value)}
+              placeholder="Add special instructions or notes..."
+              type="text" style={inputStyle} />
+          </div>
+          <button type="submit" disabled={!medicationName}
+            style={{ padding: '0.55rem 1rem', background: SAP, color: '#fff', border: 'none', borderRadius: 10, fontSize: '0.75rem', fontWeight: 700, cursor: medicationName ? 'pointer' : 'not-allowed', opacity: medicationName ? 1 : 0.5, display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
+            <Plus size={13} /> Add to Prescription
+          </button>
+        </div>
+      </form>
+
+      {/* Prescription items list */}
+      {currentPrescriptionItems.length > 0 && (
+        <div style={{ paddingTop: '0.75rem', borderTop: `1px solid ${STONE100}` }}>
+          <div style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: STONE500, marginBottom: '0.5rem' }}>
+            Active Prescription Items ({currentPrescriptionItems.length})
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            {currentPrescriptionItems.map(item => (
+              <div key={item.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.65rem', background: STONE50, border: `1px solid ${STONE200}`, borderRadius: 10 }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: SAP, fontSize: '0.78rem' }}>{item.medicine_name}</div>
+                  <div style={{ fontSize: '0.62rem', color: STONE600, marginTop: 1 }}>
+                    {item.dosage || 'Standard'} · {item.frequency} · {item.duration}
+                  </div>
+                </div>
+                <span style={{ padding: '2px 8px', fontSize: '0.6rem', fontWeight: 700, background: '#ecfdf5', color: '#065f46', borderRadius: 999 }}>
+                  PRESCRIBED
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {medicationStatus && <p style={{ fontSize: '0.72rem', color: '#059669', textAlign: 'center', margin: 0 }}>{medicationStatus}</p>}
+      {prescriptionStatus && <p style={{ fontSize: '0.72rem', color: STONE500, textAlign: 'center', margin: 0 }}>{prescriptionStatus}</p>}
+    </div>
   );
 };
 

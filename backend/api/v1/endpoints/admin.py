@@ -147,3 +147,226 @@ def review_doctor_verification(
         "message": message,
         "verified_at": profile.verified_at,
     }
+
+
+# ─── Extended Admin Management Endpoints ──────────────────────────────
+
+class AdminDoctorOut(BaseModel):
+    user_id: str
+    name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    specialization: str | None = None
+    license_number: str | None = None
+    state_council: str | None = None
+    registration_year: int | None = None
+    experience_years: int | None = None
+    hospital_affiliation: str | None = None
+    is_verified: bool = False
+    verification_status: str = "pending"
+    verification_note: str | None = None
+    created_at: datetime | None = None
+
+
+class AdminPatientOut(BaseModel):
+    user_id: str
+    name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    age: int | None = None
+    gender: str | None = None
+    address: str | None = None
+    allergies: str | None = None
+    chronic_conditions: str | None = None
+    created_at: datetime | None = None
+
+
+class AdminStatsOut(BaseModel):
+    total_users: int
+    total_doctors: int
+    verified_doctors: int
+    pending_doctors: int
+    total_patients: int
+    total_visits: int
+
+
+@router.get("/stats", response_model=AdminStatsOut)
+def get_admin_stats(
+    current_user=Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """Return platform overview stats for the admin dashboard."""
+    from models.patient import PatientProfile
+    from models.visit import Visit
+
+    total_users = db.query(User).count()
+    total_doctors = db.query(User).filter(User.role == "doctor").count()
+    verified_doctors = db.query(DoctorProfile).filter(DoctorProfile.is_verified == True).count()
+    pending_doctors = db.query(DoctorProfile).filter(DoctorProfile.verification_status == "pending").count()
+    total_patients = db.query(User).filter(User.role == "patient").count()
+    total_visits = db.query(Visit).count()
+
+    return AdminStatsOut(
+        total_users=total_users,
+        total_doctors=total_doctors,
+        verified_doctors=verified_doctors,
+        pending_doctors=pending_doctors,
+        total_patients=total_patients,
+        total_visits=total_visits,
+    )
+
+
+@router.get("/doctors", response_model=list[AdminDoctorOut])
+def list_all_doctors(
+    limit: PageLimit = 100,
+    offset: PageOffset = 0,
+    current_user=Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """List all registered doctors with verification & profile metadata."""
+    results = (
+        db.query(User, DoctorProfile)
+        .outerjoin(DoctorProfile, DoctorProfile.user_id == User.id)
+        .filter(User.role == "doctor")
+        .order_by(User.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+    return [
+        AdminDoctorOut(
+            user_id=user.id,
+            name=user.name,
+            email=user.email,
+            phone=user.phone,
+            specialization=profile.specialization if profile else None,
+            license_number=profile.license_number if profile else None,
+            state_council=profile.state_council if profile else None,
+            registration_year=profile.registration_year if profile else None,
+            experience_years=profile.experience_years if profile else None,
+            hospital_affiliation=profile.hospital_affiliation if profile else None,
+            is_verified=bool(profile.is_verified) if profile else False,
+            verification_status=profile.verification_status if profile else "none",
+            verification_note=profile.verification_note if profile else None,
+            created_at=user.created_at,
+        )
+        for user, profile in results
+    ]
+
+
+@router.get("/patients", response_model=list[AdminPatientOut])
+def list_all_patients(
+    limit: PageLimit = 100,
+    offset: PageOffset = 0,
+    current_user=Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """List all registered patients with medical profiles."""
+    from models.patient import PatientProfile
+
+    results = (
+        db.query(User, PatientProfile)
+        .outerjoin(PatientProfile, PatientProfile.user_id == User.id)
+        .filter(User.role == "patient")
+        .order_by(User.created_at.desc())
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+    return [
+        AdminPatientOut(
+            user_id=user.id,
+            name=user.name,
+            email=user.email,
+            phone=user.phone,
+            age=profile.age if profile else None,
+            gender=profile.gender if profile else None,
+            address=profile.address if profile else None,
+            allergies=profile.allergies if profile else None,
+            chronic_conditions=profile.chronic_conditions if profile else None,
+            created_at=user.created_at,
+        )
+        for user, profile in results
+    ]
+
+
+@router.delete("/doctors/{user_id}")
+def delete_doctor(
+    user_id: str,
+    current_user=Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """Delete a doctor user and associated doctor records."""
+    from models.visit import Visit
+    from models.prescription import Prescription
+    from models.triage import TriageRecord
+
+    user = db.query(User).filter(User.id == user_id, User.role == "doctor").first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Doctor not found")
+
+    # Clean up doctor profile
+    db.query(DoctorProfile).filter(DoctorProfile.user_id == user_id).delete()
+    # Clean up references in visits/prescriptions
+    db.query(Visit).filter(Visit.doctor_id == user_id).delete()
+    db.query(Prescription).filter(Prescription.doctor_id == user_id).delete()
+    db.query(TriageRecord).filter(TriageRecord.doctor_id == user_id).delete()
+    # Delete the user account
+    db.delete(user)
+    db.commit()
+
+    log_phi_access(
+        db,
+        current_user.id,
+        current_user.role,
+        "doctor_management",
+        user_id,
+        "delete",
+        detail=f"Doctor {user.email} deleted by admin {current_user.id}",
+    )
+    return {"message": f"Doctor {user.email} successfully deleted"}
+
+
+@router.delete("/patients/{user_id}")
+def delete_patient(
+    user_id: str,
+    current_user=Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    """Delete a patient user and associated patient records."""
+    from models.patient import PatientProfile
+    from models.visit import Visit
+    from models.prescription import Prescription
+    from models.report import Report
+    from models.reminder import Reminder
+    from models.notification import Notification
+    from models.metric import HealthMetric
+    from models.session import IntakeSession
+
+    user = db.query(User).filter(User.id == user_id, User.role == "patient").first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found")
+
+    # Clean up patient profile & records
+    db.query(PatientProfile).filter(PatientProfile.user_id == user_id).delete()
+    db.query(Visit).filter(Visit.patient_id == user_id).delete()
+    db.query(Prescription).filter(Prescription.patient_id == user_id).delete()
+    db.query(Report).filter(Report.patient_id == user_id).delete()
+    db.query(Reminder).filter(Reminder.patient_id == user_id).delete()
+    db.query(Notification).filter(Notification.user_id == user_id).delete()
+    db.query(HealthMetric).filter(HealthMetric.patient_id == user_id).delete()
+    db.query(IntakeSession).filter(IntakeSession.patient_id == user_id).delete()
+    # Delete the user account
+    db.delete(user)
+    db.commit()
+
+    log_phi_access(
+        db,
+        current_user.id,
+        current_user.role,
+        "patient_management",
+        user_id,
+        "delete",
+        detail=f"Patient {user.email} deleted by admin {current_user.id}",
+    )
+    return {"message": f"Patient {user.email} successfully deleted"}

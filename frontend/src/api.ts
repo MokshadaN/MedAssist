@@ -644,6 +644,96 @@ export const api = {
       { method: 'GET', token },
     );
   },
+  // ── Admin API Methods ──────────────────────────────
+  getAdminStats(token: string) {
+    return request<AdminStats>('/admin/stats', { token });
+  },
+  listPendingDoctors(token: string) {
+    return request<PendingDoctor[]>('/admin/doctors/pending', { token });
+  },
+  reviewDoctorVerification(userId: string, action: 'approve' | 'reject', note: string | undefined, token: string) {
+    return request<{
+      is_verified: boolean;
+      verification_status: string;
+      message: string;
+      registration_number?: string;
+    }>(`/admin/doctors/${encodeURIComponent(userId)}/review`, {
+      method: 'POST',
+      body: JSON.stringify({ action, note }),
+      token,
+    });
+  },
+  listAdminDoctors(token: string) {
+    return request<AdminDoctor[]>('/admin/doctors', { token });
+  },
+  listAdminPatients(token: string) {
+    return request<AdminPatient[]>('/admin/patients', { token });
+  },
+  deleteAdminDoctor(userId: string, token: string) {
+    return request<{ message: string }>(`/admin/doctors/${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+      token,
+    });
+  },
+  deleteAdminPatient(userId: string, token: string) {
+    return request<{ message: string }>(`/admin/patients/${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+      token,
+    });
+  },
+};
+
+export type AdminStats = {
+  total_users: number;
+  total_doctors: number;
+  verified_doctors: number;
+  pending_doctors: number;
+  total_patients: number;
+  total_visits: number;
+};
+
+export type PendingDoctor = {
+  user_id: string;
+  name?: string | null;
+  email?: string | null;
+  specialization?: string | null;
+  license_number?: string | null;
+  state_council?: string | null;
+  registration_year?: number | null;
+  experience_years?: number | null;
+  hospital_affiliation?: string | null;
+  verification_status: string;
+  submitted_at?: string | null;
+};
+
+export type AdminDoctor = {
+  user_id: string;
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  specialization?: string | null;
+  license_number?: string | null;
+  state_council?: string | null;
+  registration_year?: number | null;
+  experience_years?: number | null;
+  hospital_affiliation?: string | null;
+  is_verified: boolean;
+  verification_status: string;
+  verification_note?: string | null;
+  created_at?: string | null;
+};
+
+export type AdminPatient = {
+  user_id: string;
+  name?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  age?: number | null;
+  gender?: string | null;
+  address?: string | null;
+  allergies?: string | null;
+  chronic_conditions?: string | null;
+  created_at?: string | null;
 };
 
 export { request };
