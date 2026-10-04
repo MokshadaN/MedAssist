@@ -1,100 +1,126 @@
 import React from 'react';
-import { Pill, ArrowRight, ShieldCheck, Check, Sparkles, UserCheck } from 'lucide-react';
+import { Pill, ChevronRight } from 'lucide-react';
 import { Prescription } from '../../api';
 
 interface PatientPrescriptionsListProps {
   prescriptions: Prescription[];
 }
 
-export const PatientPrescriptionsList: React.FC<PatientPrescriptionsListProps> = ({
-  prescriptions,
-}) => {
-  const defaultItems = [
+const cardStyle: React.CSSProperties = {
+  background: '#FFFFFF',
+  borderRadius: 16,
+  border: '1px solid #E8E7E0',
+  padding: '1.25rem',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+};
+
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: '1rem',
+};
+
+const itemCardStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '0.85rem 0.95rem',
+  borderRadius: 12,
+  border: '1px solid #edebe2',
+  backgroundColor: '#fdfdfb',
+  cursor: 'pointer',
+};
+
+export const PatientPrescriptionsList: React.FC<PatientPrescriptionsListProps> = () => {
+  const items = [
     {
-      name: 'Flovent Diskus (Fluticasone)',
-      details: '100 mcg • 1 puff twice daily',
-      status: 'Active',
-      color: 'text-[#2563EB] bg-[#EFF6FF] border-[#BFDBFE]',
+      name: 'Flovent Diskus',
+      generic: 'Fluticasone',
+      dosage: '100 mcg • 1 puff twice daily',
+      iconBg: '#edf2fd',
+      iconColor: '#3366cc',
     },
     {
-      name: 'Ventolin HFA (Albuterol)',
-      details: '90 mcg • 2 puffs every 4–6 hours PRN',
-      status: 'Active',
-      color: 'text-[#10B981] bg-[#ECFDF5] border-[#A7F3D0]',
+      name: 'Ventolin HFA',
+      generic: 'Albuterol',
+      dosage: '90 mcg • 2 puffs every 4–6 hours PRN',
+      iconBg: '#eff4fc',
+      iconColor: '#2f6fbf',
     },
     {
-      name: 'Montelukast (Singulair)',
-      details: '10 mg • 1 tablet once daily (Evening)',
-      status: 'Active',
-      color: 'text-[#DC2626] bg-[#FEF2F2] border-[#FCA5A5]',
+      name: 'Montelukast',
+      generic: 'Singulair',
+      dosage: '10 mg • 1 tablet once daily (Evening)',
+      iconBg: '#fdf0ec',
+      iconColor: '#d9534f',
     },
   ];
 
   return (
-    <div className="bg-[#FFFFFF] border border-[#E8ECE7] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+    <div style={cardStyle}>
       <div>
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#F0F4F0]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#EFF7ED] text-[#1E432F] flex items-center justify-center">
-              <Pill className="w-4 h-4 text-[#059669]" />
-            </div>
-            <div>
-              <h3 className="font-bold text-sm text-[#142A1F]">Active Prescriptions</h3>
-              <span className="text-[10px] text-[#63806F]">Verified medical treatments</span>
-            </div>
+        <div style={headerStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Pill size={16} color="#292524" />
+            <h3 style={{ fontSize: '0.88rem', fontWeight: 600, color: '#292524', margin: 0 }}>Active Prescriptions</h3>
           </div>
-          <button className="text-[11px] font-semibold text-[#142A1F] hover:text-[#059669] flex items-center gap-1 transition-colors">
-            <span>View all</span>
-            <ArrowRight className="w-3 h-3" />
-          </button>
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); }}
+            style={{ fontSize: '0.75rem', fontWeight: 500, color: '#78716C', textDecoration: 'none' }}
+          >
+            View all →
+          </a>
         </div>
 
-        {/* Doctor Clinical Instruction Banner */}
-        <div className="mt-4 p-3 bg-[#F9FAF7] border border-[#E4EBE2] rounded-2xl flex items-start gap-2.5">
-          <div className="w-6 h-6 rounded-lg bg-[#E3EFE6] text-[#1B382B] flex items-center justify-center shrink-0 mt-0.5">
-            <UserCheck className="w-3.5 h-3.5 text-[#10B981]" />
-          </div>
-          <div className="text-[11px] text-[#335341] leading-relaxed">
-            <span className="font-bold block text-[#142A1F]">Dr. Evelyn Reed, MD</span>
-            <p className="mt-0.5">Continue peak-flow monitoring twice daily. Avoid known outdoor allergens and carry rescue inhaler.</p>
-          </div>
-        </div>
-
-        {/* Medication Cards */}
-        <div className="mt-3 space-y-2.5">
-          {defaultItems.map((med, index) => (
-            <div
-              key={index}
-              className="p-3 bg-[#FAFBF9] hover:bg-[#F3F7F4] border border-[#E6EBE5] rounded-2xl flex items-center justify-between transition-all group cursor-pointer"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-white border border-[#E2E8E2] flex items-center justify-center shrink-0 shadow-2xs">
-                  <Pill className="w-4 h-4 text-[#2D5A43]" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {items.map((item, idx) => (
+            <div key={idx} style={itemCardStyle}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 999,
+                    backgroundColor: item.iconBg,
+                    color: item.iconColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Pill size={18} />
                 </div>
                 <div>
-                  <h4 className="font-bold text-xs text-[#142A1F]">{med.name}</h4>
-                  <span className="text-[11px] text-[#63806F] block">{med.details}</span>
+                  <h4 style={{ fontSize: '0.83rem', fontWeight: 600, color: '#292524', margin: 0, lineHeight: 1.2 }}>
+                    {item.name} <span style={{ fontWeight: 400, color: '#78716C' }}>({item.generic})</span>
+                  </h4>
+                  <p style={{ fontSize: '0.72rem', color: '#78716C', marginTop: 2, margin: 0 }}>{item.dosage}</p>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]">
-                  {med.status}
-                </span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#8AA293] group-hover:text-[#142A1F] group-hover:translate-x-0.5 transition-all" />
+              <div
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 999,
+                  backgroundColor: '#f5f5f4',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#78716C',
+                  flexShrink: 0,
+                }}
+              >
+                <ChevronRight size={14} />
               </div>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Refill pill */}
-      <div className="pt-4 mt-4 border-t border-[#F0F4F0] flex items-center justify-between text-xs">
-        <span className="text-[11px] text-[#7A9183]">3 active medicines prescribed</span>
-        <button className="text-xs font-semibold text-[#142A1F] hover:text-[#059669] transition-colors">
-          Request Refill →
-        </button>
       </div>
     </div>
   );

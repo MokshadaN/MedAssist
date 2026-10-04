@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useMemo, useState, useRef } from 'react';
 import { AuthScreen, AuthMode } from './components/AuthScreen';
 import PatientDashboardView from './components/patient/PatientDashboardView';
 import DoctorDashboardView from './components/doctor/DoctorDashboardView';
+import AdminDashboardView from './components/admin/AdminDashboardView';
 import PublicProfileView from './components/public/PublicProfileView';
 import { MEDICINE_DB, MedicineInfo } from './data/medicineDatabase';
 import {
@@ -723,6 +724,20 @@ function App() {
     }
   };
 
+  const uploadDoctorReport = async (file: File) => {
+    if (!authToken || !selectedPatientId) return;
+    setBusy('Uploading report');
+    try {
+      const uploaded = await api.uploadReport(selectedPatientId, file, authToken);
+      setDoctorReports(await api.listPatientReports(selectedPatientId, authToken));
+      setReportStatus(`Report uploaded: ${uploaded.file_url.split('/').pop()}`);
+    } catch (error) {
+      setReportStatus(error instanceof Error ? error.message : 'Upload failed');
+    } finally {
+      setBusy('');
+    }
+  };
+
   const analyzeReport = async (reportId: string) => {
     if (!authToken || !user) return;
     setAnalyzingId(reportId);
@@ -935,6 +950,16 @@ function App() {
     );
   }
 
+  if (user.role === 'admin') {
+    return (
+      <AdminDashboardView
+        user={user}
+        authToken={authToken}
+        onSignOut={signOut}
+      />
+    );
+  }
+
   if (user.role === 'patient') {
     const publicProfileUrl = patientProfile?.emergency_access_token
       ? `${getShareableOrigin()}/public-profile/${patientProfile.id}?token=${encodeURIComponent(patientProfile.emergency_access_token)}`
@@ -1028,6 +1053,7 @@ function App() {
       onOpenReport={openReport}
       onDownloadReport={downloadReport}
       onDeleteReport={deleteReport}
+      onUploadReport={uploadDoctorReport}
       doctorSummary={doctorSummary}
       doctorReminderTime={doctorReminderTime}
       setDoctorReminderTime={setDoctorReminderTime}

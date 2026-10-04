@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, CheckCircle2, AlertCircle, ArrowRight, Plus, Bell } from 'lucide-react';
+import { Calendar, ChevronRight } from 'lucide-react';
 import { Reminder } from '../../api';
 
 interface PatientRemindersListProps {
@@ -7,102 +7,160 @@ interface PatientRemindersListProps {
   onCreateReminder?: (msg: string, days: number) => void;
 }
 
-export const PatientRemindersList: React.FC<PatientRemindersListProps> = ({
-  reminders,
-  onCreateReminder,
-}) => {
-  const sampleReminders = [
+const cardStyle: React.CSSProperties = {
+  background: '#FFFFFF',
+  borderRadius: 16,
+  border: '1px solid #E8E7E0',
+  padding: '1.25rem',
+  boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+};
+
+const headerStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: '1rem',
+};
+
+const listContainerStyle: React.CSSProperties = {
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+};
+
+const timelineLineStyle: React.CSSProperties = {
+  position: 'absolute',
+  left: 11,
+  top: 12,
+  bottom: 12,
+  width: 1,
+  backgroundColor: '#e5e2d6',
+  zIndex: 0,
+};
+
+const itemStyle: React.CSSProperties = {
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: '1rem',
+  cursor: 'pointer',
+};
+
+const dotOuterStyle: React.CSSProperties = {
+  position: 'relative',
+  zIndex: 1,
+  width: 22,
+  height: 22,
+  borderRadius: 999,
+  backgroundColor: '#f4f3ec',
+  border: '2px solid #FFFFFF',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: 2,
+  flexShrink: 0,
+};
+
+const itemCardStyle: React.CSSProperties = {
+  flex: 1,
+  backgroundColor: '#FFFFFF',
+  border: '1px solid #ece9df',
+  borderRadius: 12,
+  padding: '0.75rem',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+};
+
+export const PatientRemindersList: React.FC<PatientRemindersListProps> = () => {
+  const displayItems = [
     {
       id: 'rem-1',
-      status: 'Due today',
-      type: 'urgent',
+      month: 'OCT',
+      day: '3',
+      badge: 'Due today',
+      badgeBg: '#e4ede5',
+      badgeColor: '#2c5339',
+      dotBg: '#759e7e',
       title: 'Morning Dose: Flovent Inhaler (1 puff) & Peak Flow Check',
-      time: 'Today, 2:47 PM',
-      color: 'bg-[#DC2626]',
-      badgeBg: 'bg-[#FEF2F2] text-[#DC2626] border-[#FCA5A5]',
+      time: '2:47 PM',
     },
     {
       id: 'rem-2',
-      status: 'Due today',
-      type: 'urgent',
+      month: 'OCT',
+      day: '3',
+      badge: 'Due today',
+      badgeBg: '#e4ede5',
+      badgeColor: '#2c5339',
+      dotBg: '#759e7e',
       title: 'Evening Dose: Montelukast 10mg with dinner',
-      time: 'Today, 7:47 PM',
-      color: 'bg-[#059669]',
-      badgeBg: 'bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]',
+      time: '7:47 PM',
     },
     {
       id: 'rem-3',
-      status: 'Overdue',
-      type: 'overdue',
+      month: 'OCT',
+      day: '2',
+      badge: 'Overdue',
+      badgeBg: '#e9e7e1',
+      badgeColor: '#57534E',
+      dotBg: '#78716C',
       title: 'Record Blood Pressure log',
-      time: 'Yesterday, 7:17 PM',
-      color: 'bg-[#64748B]',
-      badgeBg: 'bg-[#F1F5F9] text-[#475569] border-[#CBD5E1]',
+      time: '7:17 PM',
     },
   ];
 
   return (
-    <div className="bg-[#FFFFFF] border border-[#E8ECE7] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+    <div style={cardStyle}>
       <div>
-        {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#F0F4F0]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#EFF7ED] text-[#1E432F] flex items-center justify-center">
-              <Clock className="w-4 h-4 text-[#10B981]" />
-            </div>
-            <div>
-              <h3 className="font-bold text-sm text-[#142A1F]">Follow-ups & Reminders</h3>
-              <span className="text-[10px] text-[#63806F]">Daily therapy & task schedule</span>
-            </div>
+        <div style={headerStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Calendar size={16} color="#292524" />
+            <h3 style={{ fontSize: '0.88rem', fontWeight: 600, color: '#292524', margin: 0 }}>Upcoming Appointments</h3>
           </div>
-          <button className="text-[11px] font-semibold text-[#142A1F] hover:text-[#059669] flex items-center gap-1 transition-colors">
-            <span>View all</span>
-            <ArrowRight className="w-3 h-3" />
-          </button>
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); }}
+            style={{ fontSize: '0.75rem', fontWeight: 500, color: '#78716C', textDecoration: 'none' }}
+          >
+            View all →
+          </a>
         </div>
 
-        {/* Timeline Items */}
-        <div className="mt-4 space-y-3 relative before:absolute before:left-[11px] before:top-3 before:bottom-3 before:w-[2px] before:bg-[#E5EBE5]">
-          {sampleReminders.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-start gap-3.5 pl-0 relative group cursor-pointer"
-            >
-              {/* Timeline Dot */}
-              <div className={`w-6 h-6 rounded-full ${item.color} text-white flex items-center justify-center shrink-0 border-4 border-white shadow-sm z-10`}>
-                <div className="w-1.5 h-1.5 rounded-full bg-white" />
+        <div style={listContainerStyle}>
+          <div style={timelineLineStyle} />
+
+          {displayItems.map((item) => (
+            <div key={item.id} style={itemStyle}>
+              <div style={dotOuterStyle}>
+                <div style={{ width: 10, height: 10, borderRadius: 999, backgroundColor: item.dotBg }} />
               </div>
 
-              {/* Reminder Card Body */}
-              <div className="flex-1 bg-[#F9FAF8] hover:bg-[#F3F7F4] border border-[#E6EBE5] rounded-2xl p-3 transition-all flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${item.badgeBg}`}>
-                      {item.status}
+              <div style={itemCardStyle}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.62rem', fontWeight: 700, color: '#78716C', textTransform: 'uppercase' }}>{item.month}</span>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#292524' }}>{item.day}</span>
+                    <span style={{ backgroundColor: item.badgeBg, color: item.badgeColor, fontSize: '0.62rem', fontWeight: 600, padding: '2px 8px', borderRadius: 999 }}>
+                      {item.badge}
                     </span>
-                    <span className="text-[10px] text-[#7A9183]">{item.time}</span>
                   </div>
-                  <h4 className="font-semibold text-xs text-[#142A1F] leading-snug">
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#292524', lineHeight: 1.3 }}>
                     {item.title}
-                  </h4>
+                  </div>
+                  <div style={{ fontSize: '0.7rem', color: '#78716C', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <span>🕒</span> <span>{item.time}</span>
+                  </div>
                 </div>
-                <ArrowRight className="w-3.5 h-3.5 text-[#8AA293] group-hover:text-[#142A1F] group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+                <ChevronRight size={16} color="#78716C" style={{ flexShrink: 0, marginLeft: 8 }} />
               </div>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Quick Add Reminder action */}
-      <div className="pt-4 mt-4 border-t border-[#F0F4F0] flex items-center justify-between text-xs">
-        <span className="text-[11px] text-[#7A9183]">3 items scheduled today</span>
-        <button
-          onClick={() => onCreateReminder?.('Routine BP check', 1)}
-          className="text-xs font-semibold text-[#142A1F] hover:text-[#059669] flex items-center gap-1 transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Add Reminder</span>
-        </button>
       </div>
     </div>
   );
