@@ -14,3 +14,6 @@ frontend/dist/
 frontend/node_modules/
 uploads/
 vite-app
+
+# Fine-tuned PubMedBERT model
+backend/pubmedbert/
