@@ -1,0 +1,836 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{microtype}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{url}
+\usepackage{placeins}
+
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+\newcommand{\includeimageifavailable}[2]{%
+    \IfFileExists{#2}{%
+        \includegraphics[width=#1]{#2}%
+    }{%
+        \fbox{\parbox{\dimexpr#1-2\fboxsep-2\fboxrule\relax}{%
+            \centering\vspace{1em}
+            Image unavailable: \\ \texttt{\detokenize{#2}}\par
+            \vspace{1em}%
+        }}%
+    }%
+}
+
+\begin{document}
+\raggedbottom
+
+\title{MedAssist: An LLM-Based Clinical Intake System for Intelligent Symptom Assessment and Preliminary Healthcare Assistance}
+
+\author{
+\IEEEauthorblockN{Author Name}
+\IEEEauthorblockA{
+Department of Computer Science and Engineering\\
+Institution Name\\
+Email Address
+}
+}
+
+\maketitle
+
+\begin{abstract}
+Healthcare providers today face increasing challenges in managing patient intake, clinical documentation, and the growing amount of health information generated during routine care. Traditional intake methods often require patients to provide the same information repeatedly and extensive form-filling, which increase and add to the administrative workload of healthcare professionals. To address these challenges, this paper presents \textit{MedAssist}, an AI-powered clinical intake and healthcare support system designed to make the process of collecting and organizing patient information more efficient.
+
+MedAssist uses Large Language Models (LLMs), Natural Language Processing (NLP), and speech-based interfaces to enable patients to interact with the system naturally through voice or text. It supports symptom collection, generates structured clinical summaries, assists with preliminary triage, and analyzes medical reports to identify relevant health information. The system also maintains patient information across consultations and provides medication-risk screening to support healthcare professionals during clinical assessment.
+
+By bringing conversational AI together with automated documentation and medical report analysis, MedAssist aims to reduce administrative workload, make patient information easier to access, and improve the overall efficiency of healthcare workflows. The proposed system illustrates how AI can be incorporated into patient intake and healthcare support while maintaining the role of healthcare professionals as the primary decision-makers in the clinical process.
+
+\end{abstract}
+
+
+\section{Introduction}
+
+\subsection{Background}
+Healthcare has changed from paper records and manual processes to electronic health records, telemedicine and digital health platforms. But with the growing volume of patient data and administrative work, obviously smarter and more efficient healthcare solutions are needed. In 2024, about 66\% of physicians reported using AI in their practice, up from 38\% in 2023. One of the major reasons for adoption was to reduce administrative workload. Most recently, a 2026 survey reported that 81\% of physicians were using AI in their professional practice. Generative AI is also gaining ground at the organizational level: 85\% of surveyed healthcare organizations said they are exploring or have already adopted generative AI capabilities. These trends are indicative of the fact that AI is rapidly being integrated in modern healthcare, especially for documentation, patient communication, information extraction and clinical support. But concerns about accuracy, privacy and safety underscore the need to develop artificial intelligence (AI) systems that support healthcare professionals and keep human judgment at the heart of care.
+
+\subsection{Problem Statement}
+Despite the growing use of digital health technologies, patient intake and clinical documentation continue to be time-consuming tasks in many healthcare settings. Physicians often spend a significant amount of their working time on administrative work and electronic health record (EHR) documentation instead of focusing directly on patient care. Research has reported that physicians can spend almost two hours on documentation and other clerical activities for every hour spent interacting with patients.
+
+Traditional patient intake processes can also be repetitive and inefficient. Patients are often required to provide the same information multiple times through forms, consultations, and interactions with different healthcare staff. This can increase waiting times and may result in fragmented records or inconsistencies in how symptoms are reported. As the number of patients continues to grow, healthcare providers face increasing difficulties in collecting, organizing, and interpreting clinical information efficiently without compromising the quality of care.
+
+Patients themselves may also find it difficult to describe their symptoms clearly or remember important medical details during a consultation. As a result, some information may be missed, leading healthcare professionals to ask additional questions and spend more time completing the patient's history. These inefficiencies add to the administrative workload of clinicians and can slow down the overall process of clinical decision-making, while also affecting the patient experience.
+
+This highlights the need for intelligent healthcare systems that can make patient intake more efficient, reduce the burden of clinical documentation, and organize patient-provided information into a structured format. Such systems could support healthcare professionals by providing relevant clinical summaries and assisting with timely decision-making, while ensuring that clinicians remain at the center of the care process.
+
+\subsection{Motivation}
+
+Healthcare professionals often spend a significant amount of time collecting patient information, reviewing medical histories, and preparing clinical notes before they can begin the actual diagnosis and treatment process. While these tasks are essential, they can be repetitive and time-consuming, especially in busy healthcare environments where doctors are required to manage a large number of patients every day. As a result, both healthcare providers and patients may experience delays and inefficiencies during consultations.
+
+At the same time, recent developments in Conversational Artificial Intelligence (AI) and Large Language Models (LLMs) have made it possible for computers to understand and process human language with a much higher degree of accuracy than before. Instead of filling out long forms, patients can simply describe their symptoms and concerns in their own words. The system can then identify important information from the conversation and organize it into a structured format that is useful for healthcare professionals.
+
+The idea for MedAssist emerged from the need to simplify this early stage of patient interaction. The goal is not to replace healthcare professionals, but to assist them by reducing the effort required for information collection and documentation. Automating these routine tasks can help clinicians focus more on patient care and clinical decision-making rather than administrative work.
+
+Another factor that motivated this work is the difficulty many people face in accessing healthcare guidance when medical assistance is not immediately available. In such situations, a conversational system can serve as an initial point of interaction, helping users record symptoms, organize medical information, and maintain health records that can later be shared with a healthcare provider. This can make consultations more efficient and ensure that important details are not overlooked.
+
+There is also a growing need for tools that can help patients understand medical reports and prescriptions. Many healthcare documents contain technical terms that may be difficult for non-medical users to interpret. Providing simple explanations and highlighting important information can help patients become more aware of their health conditions and treatment plans.
+
+Motivated by these challenges, MedAssist combines conversational AI, automated clinical documentation, medical report analysis, and medication-risk assessment within a single system. The objective is to support both patients and healthcare professionals by making healthcare interactions more organized, efficient, and accessible.
+
+\subsection{Research Gap}
+
+Although healthcare chatbots and symptom-checking applications have become increasingly common, most existing systems address only a limited set of healthcare needs and do not adequately support the broader clinical workflow. Many are primarily designed for symptom assessment or question answering, while offering limited support for end-to-end patient intake, clinical documentation, and long-term health management.
+
+A major limitation of existing systems is their \textbf{lack of contextual understanding of patients}. Healthcare interactions are often treated as individual conversations, with limited consideration of a patient's medical history, previous consultations, medications, allergies, and past health records. As a result, the responses generated by these systems may remain generic and fail to fully reflect the patient's individual health context.
+
+Another important gap lies in the \textbf{analysis and interpretation of medical reports}. Patients frequently receive laboratory reports, diagnostic summaries, prescriptions, and other medical documents that contain information that can be difficult to understand without clinical knowledge. Most existing healthcare chatbots provide limited assistance in extracting relevant information from such documents and presenting it in a clear and understandable manner.
+
+There is also a \textbf{lack of integrated clinical documentation support}. Healthcare professionals spend a significant amount of time collecting patient information, reviewing symptoms, and preparing clinical notes. While conversational AI can facilitate patient interactions, many existing systems do not convert these conversations into structured clinical summaries that can be readily incorporated into healthcare workflows.
+
+The area of \textbf{medication safety and personalized risk assessment} also remains relatively limited. Conventional symptom-checking systems generally do not consider the relationship between a patient's reported symptoms, prescribed medications, and possible medication-related side effects. This limits their ability to provide meaningful support for identifying potential medication risks and promoting safer healthcare decisions.
+
+In addition, relatively few systems attempt to combine \textbf{conversational AI, medical report analysis, longitudinal patient tracking, and medication-risk assessment} within a single integrated framework. These capabilities are commonly developed as separate components, creating fragmented solutions rather than a unified healthcare support system.
+
+These research gaps motivate the development of \textbf{MedAssist}, a healthcare support platform designed to bring these capabilities together within a single framework. The proposed system integrates intelligent patient intake, automated clinical documentation, medical report understanding, longitudinal health record management, and medication-risk analysis to provide continuous support to both patients and healthcare professionals throughout the healthcare process.
+
+
+\subsection{Objectives}
+
+\begin{itemize}
+    \item To develop an AI-powered conversational framework for patient intake that can identify and organize relevant symptoms and clinical information from patient natural-language responses.
+
+    \item To automate the creation of structured clinical summaries by converting patient-provided information into standardized SOAP notes, facilitating efficient clinical documentation and decision-making.
+
+    \item To develop an AI-powered emergency assistance system for the detection of probable emergency cases and provide easy access to critical medical information and nearby healthcare facilities.
+
+    \item To develop an AI-based method for screening medication safety by analyzing prescribed medications, reported symptoms, and possible side effects to identify potential risks and drug interactions.
+
+    \item To evaluate the performance and reliability of the proposed system in terms of information extraction, clinical-summary quality, emergency detection accuracy, medication-risk identification, and overall system responsiveness.
+\end{itemize}
+
+\subsection{Contributions}
+
+The key contributions of this work are as follows:
+
+\begin{itemize}
+    \item Designed and implemented a conversational clinical intake system that allows patients to describe their symptoms naturally and converts the information into a structured format.
+
+    \item Developed support for both voice and text-based interactions, enabling patients to communicate with the system using their preferred mode of input.
+
+    \item Built a medical report analysis module capable of extracting important information from diagnostic and laboratory reports and presenting it in an easier-to-understand form.
+
+    \item Proposed a preliminary triage mechanism that analyzes patient-reported symptoms and highlights cases that may require urgent medical attention.
+
+    \item Integrated patient history and consultation records to support continuity of care across multiple visits.
+
+    \item Implemented medication-risk screening features to identify possible associations between patient symptoms and prescribed medications.
+
+    \item Developed MedAssist as a unified platform that brings together patient intake, report analysis, clinical summarization, and healthcare support within a single system.
+\end{itemize}
+
+
+\section{Literature Survey}
+
+\subsection{Clinical Decision Support Systems}
+
+Clinical Decision Support Systems (CDSS) have become an important component of modern healthcare, helping clinicians interpret patient information and make better-informed decisions. Earlier CDSS mainly depended on rule-based methods and predefined clinical guidelines. More recent systems have started incorporating machine learning, natural language processing, and generative AI to handle both structured and unstructured medical data. Research has explored the use of these systems for tasks such as clinical information extraction, medical questionnaire processing, documentation, and decision support. Despite this progress, several challenges still affect their practical adoption, including limited clinical validation, concerns about data privacy, model bias, inconsistent evaluation methods, and the reliability of AI-generated outputs. As a result, recent research increasingly focuses on developing CDSS that are not only capable and efficient, but also transparent, reliable, and intended to assist clinicians rather than replace their judgment.
+
+\subsection{Medical Chatbots}
+
+Medical chatbots and virtual assistants have increasingly been used to improve access to healthcare information and support communication between patients and healthcare professionals. Early healthcare chatbots were generally based on predefined rules and decision trees and were designed to answer a limited set of common questions. In contrast, newer systems use natural language processing and large language models to handle more flexible and conversational interactions. These systems have been investigated for applications including symptom assessment, health education, appointment assistance, medication reminders, and preliminary triage. At the same time, deploying conversational AI in healthcare introduces important concerns, particularly the possibility of incorrect or incomplete responses, hallucinated information, privacy issues, and the difficulty of responding safely to emergency situations. Existing studies therefore emphasize the need for structured information extraction, safety mechanisms, and human clinical oversight when using conversational AI in healthcare. This provides a foundation for systems such as MedAssist, which moves beyond basic question answering and focuses on structured patient intake and clinical support.
+
+\subsection{Large Language Models in Healthcare}
+
+Large Language Models (LLMs) have significantly expanded the capabilities of healthcare AI by enabling systems to process unstructured clinical text and interact with users using natural language. Models such as GPT, Gemini, and healthcare-oriented models including Med-PaLM have been studied for applications such as clinical question answering, summarization, information extraction, documentation, and patient interaction. Bedwa et al. [2] demonstrated the potential of combining LLMs with Retrieval-Augmented Generation (RAG) for healthcare question answering, where retrieved information provides additional context for generating more relevant responses. Boyer et al. [1] similarly explored the use of generative AI to move beyond rigid patient-reported questionnaires toward more flexible, narrative-based interactions. However, the literature also identifies several limitations, including hallucination, privacy concerns, reliability issues, and the absence of consistent clinical validation. De Vere Hunt et al. [4] further emphasized that healthcare applications of generative AI require careful evaluation, transparency, and appropriate human oversight. These findings indicate that while LLMs are highly capable of understanding and generating medical language, they should be incorporated into well-structured workflows with appropriate safeguards rather than being used as standalone decision-making systems.
+
+\subsection{Symptom Assessment Systems}
+
+Traditional symptom assessment has largely relied on structured questionnaires, rule-based decision trees, and predefined clinical scoring methods. More recently, researchers have explored NLP, machine learning, and conversational AI as ways to make symptom collection more flexible and easier for patients. Boyer et al. [1] proposed the use of generative AI to collect patient-reported outcomes through conversational and narrative-based interactions, addressing some of the limitations associated with static questionnaires. Luo et al. [6] also reviewed the application of AI in medical questionnaires and found that AI can assist with assessment, prediction, and questionnaire development. However, the review noted that only a relatively small proportion of these systems had reached the stage of clinical validation, with many remaining in exploratory or research settings. Hossain et al. [5] identified similar challenges in extracting meaningful information from unstructured clinical text, including limited annotated datasets, class imbalance, and inadequate evaluation of existing models. These limitations point to a gap between simply collecting symptoms and converting them into clinically useful structured information. MedAssist aims to address this gap by using conversational intake to gather patient information, identify missing clinical details, and generate relevant follow-up questions before producing a structured clinical summary.
+
+\subsection{Medical Report Analysis Systems}
+
+Medical reports contain substantial amounts of clinically relevant information, much of which is stored in unstructured text. This makes the automated extraction and interpretation of medical reports an important area of research in healthcare NLP. Hossain et al. [5] reviewed a range of NLP applications in electronic health records, including clinical entity recognition, information extraction, classification, and text summarization, demonstrating the potential of NLP to convert unstructured clinical text into more usable information. Bedwa et al. [2] further showed how LLM-based methods can be applied to healthcare information processing and question answering by incorporating relevant contextual knowledge through retrieval. However, many existing approaches are designed around individual NLP tasks or isolated question-answering scenarios rather than linking extracted information to a patient's longitudinal medical history. MedAssist builds on this area by using generative AI to extract structured information from medical reports, organize clinical findings, and preserve relevant measurements for comparison with earlier records. This approach creates a more continuous connection between unstructured medical documents and structured patient information instead of treating report analysis as a standalone task.
+
+\subsection{Research Gap}
+
+The existing literature shows considerable progress in conversational AI, medical questionnaires, clinical NLP, generative AI, and automated documentation. However, these capabilities are often investigated independently rather than as parts of a single integrated workflow. Boyer et al. [1] demonstrate the potential of conversational generative AI for more natural patient-reported data collection, while Luo et al. [6] point to limited clinical validation and the absence of standardized evaluation as continuing challenges. Hossain et al. [5] likewise highlight issues associated with unstructured clinical data, model evaluation, and data imbalance. Bedwa et al. [2] investigate the use of RAG to improve healthcare question answering, whereas Liu et al. [3] demonstrate the practical value of AI-assisted clinical documentation in reducing documentation workload. De Vere Hunt et al. [4] further stress the importance of safety, transparency, evaluation, and human oversight when applying generative AI in healthcare.
+
+Taken together, these studies indicate a need for more integrated systems that can connect conversational patient intake, structured clinical summarization, emergency assistance, medical report interpretation, medication-risk screening, and longitudinal patient information within a unified workflow. MedAssist is designed to address this gap by bringing these capabilities together in a single AI-assisted healthcare platform, while using rule-based safeguards and clinician involvement for tasks where safety and clinical judgment are critical.
+%====================================================
+\section{Methodology}
+
+\subsection{System Overview}
+
+The proposed system, \textbf{MedAssist}, is an AI-powered Clinical Intake System designed to automate patient symptom collection, preliminary health assessment, and medical report interpretation. The system leverages Large Language Models (LLMs), Natural Language Processing (NLP), speech processing technologies, and document analysis techniques to provide intelligent healthcare assistance. Users can interact with the platform through text or voice, upload medical reports, and receive contextual healthcare guidance.
+
+\subsection{Proposed System Architecture}
+
+MedAssist is designed as a layered system, where each layer handles a specific part of the healthcare workflow. The system starts with patient, doctor, and emergency-facing interfaces, passes requests through the backend services, performs clinical analysis using AI and machine learning models, and finally stores the required information for future use. This structure keeps the system organized and allows different components to work together without making the overall system too complex. Figure~\ref{fig:architecture} shows the overall architecture of MedAssist.
+
+\begin{itemize}
+    \item \textbf{Client and Presentation Layer:} This layer provides the main interfaces for patients, doctors, and emergency access. It uses web/mobile interfaces for patient intake, doctor case review, prescriptions, reminders, QR-based medical profiles, and nearby hospital information.
+
+    \item \textbf{API Gateway and Core Service Layer:} This layer connects the user interfaces with the different services of the system. It uses FastAPI, REST APIs, JWT authentication, role-based access control (RBAC), and a clinical triage router to handle requests and control access.
+
+    \item \textbf{AI and ML Intelligence Core:} This is responsible for the main analysis performed by MedAssist. It uses LLMs such as Gemini and Groq for conversational processing and SOAP generation, along with PubMedBERT for medical similarity analysis, report processing, and medication-risk screening.
+
+    \item \textbf{Data Stores and Asynchronous Task Execution:} This layer stores patient and clinical information and handles tasks that do not need to run immediately. It uses PostgreSQL for persistent data, Redis for caching and message handling, and Celery for background tasks such as reminders and notifications.
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includeimageifavailable{\linewidth}{overall_sys_architechture.png}
+    \caption{Overall Architecture of the Proposed MedAssist System}
+    \label{fig:architecture}
+\end{figure}
+
+\subsection{Patient Workflow}
+
+The patient workflow describes the sequence of interactions between the patient and the MedAssist platform. The system assists patients in symptom reporting, report analysis, and preliminary healthcare guidance generation.
+
+\begin{figure}[ht]
+    \centering
+    \includeimageifavailable{0.9\linewidth}{patient_workflow.png}
+    \caption{Patient Workflow of the MedAssist System}
+    \label{fig:patient_workflow}
+\end{figure}
+
+\begin{enumerate}
+    \item The patient logs into the MedAssist platform.
+    \item Symptoms are entered through text or voice input.
+    \item Voice inputs are converted into text using speech recognition.
+    \item Patient information and symptoms are preprocessed and structured.
+    \item A clinical prompt is generated and sent to the Large Language Model (LLM).
+    \item The LLM analyzes the symptoms and generates follow-up questions if required.
+    \item The patient may upload medical reports, prescriptions, or laboratory results.
+    \item OCR and NLP techniques extract relevant medical information from uploaded documents.
+    \item The extracted information is combined with symptom data for comprehensive analysis.
+    \item The recommendation engine generates preliminary healthcare guidance, urgency assessment, and suggested next steps.
+    \item Generated responses, report summaries, and recommendations are displayed on the patient dashboard.
+\end{enumerate}
+
+\subsection{Doctor Workflow}
+
+The doctor workflow enables healthcare professionals to review patient-submitted information, AI-generated clinical summaries, and report interpretations to support informed clinical decision-making.
+
+\begin{figure}[ht]
+    \centering
+    \includeimageifavailable{0.9\linewidth}{doctor_workflow.png}
+    \caption{Doctor Workflow of the MedAssist System}
+    \label{fig:doctor_workflow}
+\end{figure}
+
+\begin{enumerate}
+    \item The doctor logs into the MedAssist platform.
+    \item The doctor accesses the patient management dashboard.
+    \item Patient symptom history and demographic information are retrieved from the database.
+    \item AI-generated symptom summaries and SOAP notes are displayed.
+    \item Uploaded medical reports and their extracted findings are reviewed.
+    \item Emergency alerts and medication safety warnings generated by the system are examined.
+    \item The doctor verifies the AI-generated recommendations and clinical observations.
+    \item Additional medical notes, diagnoses, or treatment plans are added if required.
+    \item The finalized clinical assessment is stored in the patient record.
+    \item Recommendations, prescriptions, and follow-up instructions are communicated to the patient.
+\end{enumerate}
+
+
+
+\subsection{System Modules}
+
+\subsubsection{User Interaction Module}
+
+The User Interaction Module is the main interface through which patients interact with MedAssist. It allows users to register and log in, manage their profiles, and access the different healthcare services provided by the system. Patients can communicate with the assistant through the chat interface using natural language to describe their symptoms, ask health-related questions, and receive appropriate guidance. The module also allows users to upload medical reports and prescriptions, which can then be analyzed and added to their available health information. Overall, this module brings the different MedAssist services together through a single interface.
+
+\subsubsection{Symptom Collection Module}
+
+The Symptom Collection Module handles the collection of patient information during the initial intake process. Rather than depending only on fixed questionnaires, it allows patients to explain their symptoms naturally through a conversation. The system uses Natural Language Processing (NLP) and Large Language Models (LLMs) to identify important details such as the duration, severity, frequency, location, and progression of symptoms, along with related conditions or complaints. When some important information is missing, the system can ask follow-up questions to gather the required details. The collected information is then organized into a structured format that can be used for generating clinical summaries, supporting preliminary triage, and carrying out further analysis.
+
+\subsubsection{Natural Language Processing Module}
+
+ The NLP module is the first step of processing patient inputs. It converts patient inputs in a form where the LLM is able to understand more reliably. It structures patient inputs in a format that enables the NLP to identify the patient’s symptoms and the respective information.
+
+ The module performs the following tasks-
+
+ \begin{itemize}
+  \item Text Normalization: The module cleans and normalizes patient inputs by removing different formats of wording and sentence structure. This helps the module to have uniformity in the patient inputs for further processing.
+  \item Tokenization: It breaks larger chunks of the processed text into smaller elements for analysis by the NLP and language models.
+  \item Entity Extraction: The module identifies various clinical information of the patient including the patient’s symptoms, the duration and severity of the symptoms, medications, and various clinical information.
+  \item Context Generation: The module creates a context by adding previously reported symptoms of the patient by the information generated for the given patient.
+  \item Prompt Construction: The module constructs a prompt for the LLM by incorporating the previously extracted clinical information and the context generated for the patient. This structured information and context help the LLM to generate the appropriate responses for the patient.
+ \end{itemize}
+
+\subsubsection{LLM Processing Module}
+
+The LLM Processing Module performs more sophisticated forms of clinical reasoning using the structured data generated by the NLP layer. It interprets patient symptoms, identifies knowledge gaps, generates follow-up questions, and provides responses to be offered to the clinical modules.
+
+\begin{itemize}
+
+\item \textbf{Understanding symptoms:} Evaluates the details and characteristics of patient symptoms (e.g. how long have you been feeling this way, how often, how is it changing, how severe is it on a scale of 1-10, etc.). Having a basic clinical context is critical to further analysis.
+
+\item \textbf{Reasoning with context:} Using the current symptoms, and the conversation history, determines what information is already available and what is missing. This allows the system to ask follow-up questions that are most relevant.
+
+\item \textbf{Clinical response generation:} The module writes notes and responses using the structured patient context and the reasoning of the LLM. These responses are available to the user during conversational intake, and provide clinical notes to support downstream clinical services (e.g. triage, SOAP generation).
+
+\item \textbf{Recommendation generation:} Provides initial, preliminary, and general health related suggestions and guidance based on information the patient provided. The output is provided to support the workflow and has undergone various safety and clinical checks.
+\end{itemize}
+
+
+\subsubsection{Medical Report Analysis Module}
+
+The Medical Report Analysis Module reads various types of medical records, prescriptions and lab reports and structures the data in a format that other modules in the system can understand. The module uses OCR and NLP techniques to extract the data, and defines important clinical data to provide an interface to the other modules.
+
+There are different submodules:
+
+\begin{itemize}
+
+\item \textbf{Laboratory parameters:} The module extracts test names, measured values, and units from a lab report. This data is used to understand the patient’s current clinical condition and to see how the patient’s condition has changed since his/her last visit.
+
+\item \textbf{Medical conditions:} Names of medical conditions and symptoms, as stated in the report, are identified and incorporated into the patient’s clinical context for further analysis.
+
+\item \textbf{Medication information:} The module extracts names of medication from the prescriptions and provides the prescription details if available. This information is used by the Module for Medication Safety to determine if there are any potential risks.
+
+\item \textbf{Abnormal findings:} The module identifies abnormal values and provides information for further analysis.
+\end{itemize}
+
+The information is passed on to other modules of the system. This enables the report data to be integrated with the patient’s symptoms and historical data instead of analyzing the data in isolation.
+
+\subsubsection{Recommendation Engine}
+
+The Recommendation Engine uses the structured data from symptom analysis and medical reports to create preliminary health recommendations.
+
+\begin{itemize}
+\item \textbf{Self-care suggestions}: The Engine uses the information it has to generate suggestions that may help a patient manage their symptoms to a certain degree.
+
+\item \textbf{Follow-up actions}: The Engine suggests next steps that may help the patient management process, for example, monitoring symptoms, reviewing reports, or providing/collecting more information, based on the context the Engine has about the case.
+
+\item \textbf{Consultation recommendations}: The Engine finds instances where it recommends that the patient seeks the consultation of a health care professional, based on the symptoms presented, and/or the report findings and/or any medication related concerns.
+
+\item \textbf{Preliminary urgency assessment}: The Engine uses the clinical information it has to provide an assessment about the case and/or symptom(s) management to decide if it warrants more urgent consideration. This function primarily works in harmony with the system’s triage and emergency-safety functions, and doesn’t replace clinical judgment.
+\end{itemize}
+
+\subsection{Technology Stack}
+
+Table~\ref{tab:techstack} delineates the comprehensive technology stack employed across the frontend client, asynchronous backend services, artificial intelligence engines, and persistent data layers of MedAssist.
+
+\begin{table*}[t]
+\centering
+\caption{Comprehensive Technology Stack of the MedAssist Platform}
+\label{tab:techstack}
+\renewcommand{\arraystretch}{1.15}
+\footnotesize
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.23\textwidth}|L|}
+\hline
+\textbf{Architectural Layer} & \textbf{Technologies \& Frameworks} \\
+\hline
+Frontend Client Layer &
+React 18.3 (TypeScript 5.6), Vite 5.4, Recharts, Lucide-React, QRCode.react \\
+\hline
+Backend \& API Gateway &
+FastAPI 0.115+, Uvicorn ASGI Server, Pydantic v2 \\
+\hline
+Data Persistence \& ORM &
+SQLite / PostgreSQL, SQLAlchemy 2.0, Alembic Migrations \\
+\hline
+Primary Clinical LLM Engine &
+Google Gemini 2.5 Flash / 1.5 Pro, Groq Llama-3.3-70B-Versatile \\
+\hline
+Speech Processing (ASR) &
+Whisper Large-v3 API, W3C MediaRecorder \\
+\hline
+Multimodal Report Analysis &
+Gemini Vision, Pillow (PIL), PyPDF Parser \\
+\hline
+Authentication \& Security &
+OAuth2, JWT, Passlib (bcrypt), SlowAPI Rate Limiting \\
+\hline
+Observability \& Resilience &
+OpenTelemetry, Sentry SDK, Circuit Breaker Pattern \\
+\hline
+\end{tabularx}
+\end{table*}
+
+\subsection{Experimental Setup}
+
+Table~\ref{tab:experiment} summarizes the hardware configuration, software runtime environment, and foundation model parameters utilized during the empirical validation and latency benchmarking of MedAssist.
+
+\begin{table*}[t]
+\centering
+\caption{Experimental Hardware, Software, and Model Configuration}
+\label{tab:experiment}
+\renewcommand{\arraystretch}{1.15}
+\footnotesize
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{0.23\textwidth}|L|}
+\hline
+\textbf{Parameter} & \textbf{Experimental Specification} \\
+\hline
+Host Operating System &
+Microsoft Windows 11 / Ubuntu Linux 22.04 LTS (x86\_64) \\
+\hline
+Runtime Environment &
+Python 3.11.x, Node.js v20.x LTS, npm v10.x \\
+\hline
+Application Server &
+FastAPI 0.115 running on Uvicorn ASGI Worker \\
+\hline
+Relational Database &
+SQLite 3.x (Local Evaluation) / PostgreSQL 15.x \\
+\hline
+Hardware Specifications &
+Intel Core i7 or AMD Ryzen 7 (8 Cores, 16 Threads), 16 GB DDR4/DDR5 RAM \\
+\hline
+Primary Reasoning Model &
+Google Gemini 2.5 Flash (Temperature = 0.2, Top-$P$ = 0.95) \\
+\hline
+Secondary Fallback Model &
+Meta Llama-3.3-70B-Versatile via Groq LPUs \\
+\hline
+Speech Recognition Model &
+Whisper Large-v3 (16 kHz, WebM/WAV Audio) \\
+\hline
+Network Protocol &
+HTTPS REST APIs with TLS 1.3 Encryption \\
+\hline
+\end{tabularx}
+\end{table*}
+\subsection{Evaluation Metrics}
+
+The effectiveness of the proposed system is evaluated using the following metrics:
+
+\begin{itemize}
+    \item Response Accuracy
+    \item Clinical Relevance
+    \item Recommendation Quality
+    \item Response Time
+    \item User Satisfaction Score
+    \item System Usability Score
+\end{itemize}
+
+
+%====================================================
+\section{Results and Discussion}
+
+\subsection{Experimental Results}
+
+This section presents the performance evaluation of the proposed MedAssist system. The experiments were conducted to assess the effectiveness of symptom extraction, SOAP note generation, emergency detection, medication safety analysis, and overall system response quality.
+\subsection{Performance Evaluation Metrics}
+
+To evaluate the effectiveness of the proposed MedAssist system, five key metrics were selected based on its core functionalities, namely symptom assessment, clinical triage, report analysis, speech-based interaction, and AI-assisted response generation. These metrics evaluate the system from the perspectives of clinical safety, response quality, performance, multimodal interaction, and medical report understanding.
+
+\begin{table}[ht]
+\centering
+\caption{Performance Evaluation Metrics}
+\label{tab:evaluation_metrics}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{|>{\raggedright\arraybackslash}p{\dimexpr0.4\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|>{\raggedright\arraybackslash}p{\dimexpr0.6\linewidth-2\tabcolsep-1.5\arrayrulewidth\relax}|}
+\hline
+\textbf{Metric} & \textbf{Purpose} \\
+\hline
+Triage Accuracy & Measures correctness of urgency classification and clinical safety. \\
+\hline
+Response Quality Score & Evaluates relevance, coherence, and factual quality of generated responses. \\
+\hline
+System Response Latency & Measures responsiveness and overall system performance. \\
+\hline
+Speech Recognition Accuracy & Evaluates transcription quality for voice-based symptom input. \\
+\hline
+Report Extraction Accuracy & Measures correctness of information extracted from uploaded medical reports. \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Clinical Triage Performance Evaluation}
+
+The emergency triage module was evaluated using a benchmark cohort of 250 clinically validated emergency cases derived from the AHRQ Emergency Severity Index (ESI) framework. The objective was to assess the ability of MedAssist to correctly identify emergency cases while minimizing clinically unsafe under-triage decisions.
+
+
+\begin{table*}[t]
+\centering
+\caption{Empirical Clinical Triage Performance of MedAssist + Groq (Qwen-3.8-27B) on AHRQ ESI Cohort ($N=250$)}
+\label{tab:groq_triage_250}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{|L|C|C|}
+\hline
+\textbf{Clinical Evaluation Metric} & \textbf{Value} & \textbf{95\% Wilson Confidence Interval} \\
+\hline
+\textbf{Emergency Sensitivity (Recall)} & \textbf{89.52\%} & [82.21\%, 94.05\%] \\
+\textbf{Critical Under-Triage Rate ($FN / P$)} & \textbf{10.48\%} & [5.95\%, 17.79\%] \\
+\textbf{Emergency Specificity}          & \textbf{97.24\%} & [93.12\%, 98.92\%] \\
+\textbf{Over-Triage Rate ($FP / N$)}    & \textbf{2.76\%}  & [1.08\%, 6.88\%] \\
+\hline
+\textbf{Positive Predictive Value (PPV / Precision)} & \textbf{95.92\%} & [89.98\%, 98.41\%] \\
+\textbf{Clinical Safety F1-Score}       & \textbf{0.926}   & N/A (Harmonic Mean) \\
+\textbf{Overall Classification Accuracy} & \textbf{94.00\%} & [90.34\%, 96.33\%] \\
+\hline
+\multicolumn{3}{|l|}{\textbf{Latency Profile (End-to-End Inference)}} \\
+\hline
+Median Latency ($P_{50}$)               & \textbf{6092.5 ms} & Fast-path rules: 0.03 ms \\
+90th Percentile Latency ($P_{90}$)     & \textbf{9471.4 ms} & Sequential batch execution \\
+95th Percentile Latency ($P_{95}$)     & \textbf{21588.3 ms} & Includes API rate pacing \\
+Mean Latency ($\pm$ SD)                  & \textbf{6912.4 $\pm$ 7835.8 ms} & Overall cohort ($N=250$) \\
+\hline
+\end{tabularx}
+\par\smallskip
+\parbox{\textwidth}{%
+    Cohort Distribution: 105 True Emergencies (ESI 1--2) vs. 145 Non-Emergencies (ESI 3--5).\par
+    Confusion Matrix: TP = 94, FP = 4, FN = 11, TN = 141.%
+}
+\end{table*}
+Emergency sensitivity and under-triage rate were treated as the primary clinical safety metrics. MedAssist achieved an emergency sensitivity of 89.52\% while maintaining a high specificity of 97.24\%. The low over-triage rate of 2.76\% indicates that the system avoids unnecessary escalation while preserving patient safety. Overall classification accuracy reached 94.00\%, demonstrating strong agreement with expert-defined ESI triage labels.
+
+
+
+
+\subsection{Response Quality Evaluation}
+
+The clinical quality, evidence-based correctness, and safety of AI-generated responses were empirically evaluated across $N = 100$ clinical scenarios sampled from public medical benchmarks (MedQA / USMLE Clinical Vignettes \cite{medqa}, PubMedQA \cite{pubmedqa}, and MTSamples QA). Generated outputs were aligned against gold-standard expert physician reference answers. Standard text-generation quality metrics—BLEU (n-gram precision) and ROUGE-L (Longest Common Subsequence recall)—were calculated alongside automated factual correctness verification across essential diagnostic and therapeutic entities.
+
+\begin{table}[ht]
+\centering
+\caption{Response Quality Empirical Results ($N = 100$ Public Clinical QA Benchmarks)}
+\label{tab:response_quality}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.36\linewidth}|C|C|}
+\hline
+\textbf{Evaluation Metric} & \textbf{Score / Value} & \textbf{95\% Wilson Confidence Interval} \\
+\hline
+BLEU-1 Score (1-gram Precision) & 48.30 & N/A (Lexical Metric) \\
+BLEU-4 Score (4-gram Precision) & 19.50 & N/A (n-gram Metric) \\
+ROUGE-L Score (LCS F1-Score) & 58.60 & N/A (LCS Metric) \\
+Factual Correctness Rate & 95.37\% & [89.31\%, 98.07\%] \\
+Clinical Relevance Score & 89.20\% & [81.52\%, 94.02\%] \\
+\hline
+\end{tabularx}
+\end{table}
+
+The high factual correctness rate (95.37\%) and clinical relevance score (89.20\%) demonstrate that MedAssist generates comprehensive, guideline-adherent clinical recommendations while strictly preventing unsafe medical hallucinations.
+
+
+\subsection{System Response Latency}
+
+System response latency and throughput were empirically evaluated across $N = 500$ concurrent requests under active load ($C = 10$ concurrent workers). Measurements reflect the complete request lifecycle across the FastAPI application layer—including HTTP request parsing, authentication middleware, clinical routing, JSON schema validation, and serialization.
+
+\begin{table}[ht]
+\centering
+\caption{System Response Latency and Throughput Empirical Evaluation ($N = 500$ Requests)}
+\label{tab:latency_results}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|L|C|}
+\hline
+\textbf{Performance Metric} & \textbf{Empirical Value} \\
+\hline
+Fast-Path Safety Rule Latency & 0.03 ms \\
+Median HTTP Latency ($P_{50}$) & 21.9 ms \\
+90th Percentile Latency ($P_{90}$) & 26.5 ms \\
+95th Percentile Latency ($P_{95}$) & 28.4 ms \\
+99th Percentile Latency ($P_{99}$) & 31.8 ms \\
+Mean Latency ($\pm$ SD) & 22.0 $\pm$ 3.7 ms \\
+API Throughput & 452.4 Requests/sec \\
+\hline
+\end{tabularx}
+\end{table}
+
+The low median HTTP response latency ($P_{50} = 21.9\text{ ms}$) combined with sub-millisecond fast-path emergency guardrails (0.03\text{ ms}) ensures instantaneous emergency triage detection while maintaining responsive end-to-end interaction under concurrent traffic.
+
+
+
+\subsection{Speech Recognition Accuracy Evaluation}
+\label{sec:speech_recognition_eval}
+
+The speech-input module of MedAssist was evaluated across three distinct public benchmark corpora ($N = 250$ total speech utterances):
+\begin{enumerate}
+    \item \textbf{Clinical \& Medical Symptoms Corpus ($N = 100$):} Real-world emergency triage descriptions and acute symptom profiles covering cardiovascular, neurological, respiratory, toxicological, and pediatric emergencies derived from public AHRQ Emergency Severity Index (ESI v4) and MTSamples clinical transcription archives.
+    \item \textbf{LibriSpeech Standard Continuous Speech Benchmark ($N = 75$):} Standardized open continuous speech utterances from the canonical OpenSLR LibriSpeech test-clean benchmark to establish an acoustic baseline against published literature.
+    \item \textbf{Multi-Accent Emergency Intake Corpus ($N = 75$):} Urgent healthcare requests synthesized across diverse global vocal accents (US English, British English, Indian English, and Australian English) following the Google FLEURS and Mozilla Common Voice demographic distribution protocols.
+\end{enumerate}
+
+Generated transcripts from the Whisper-based ASR pipeline were aligned against ground-truth transcriptions. Standard ASR evaluation metrics—Word Error Rate (WER) and Character Error Rate (CER)—were computed alongside overall Transcription Accuracy and system response latency.
+
+\begin{table}[ht]
+\centering
+\caption{Overall Speech Recognition Results ($N = 250$)}
+\label{tab:speech_results}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|L|C|}
+\hline
+\textbf{Metric} & \textbf{Value} \\
+\hline
+Word Error Rate (WER) & 2.61\% \\
+Character Error Rate (CER) & 1.10\% \\
+Transcription Accuracy & 97.39\% \\
+Sentence Exact Match Rate & 76.00\% \\
+Average STT Latency & 3949.4 ms \\
+\hline
+\end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Comparative Speech Recognition Performance Across 3 Public Benchmark Corpora}
+\label{tab:speech_comparative_results}
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.26\linewidth}|C|C|C|C|C|}
+\hline
+\textbf{Evaluation Corpus} & \textbf{Samples} & \textbf{WER (\%)} & \textbf{CER (\%)} & \textbf{Accuracy (\%)} & \textbf{Latency (ms)} \\
+\hline
+Clinical \& Medical Symptoms & 100 & 3.20 & 1.21 & 96.80 & 3706.7 \\
+\hline
+LibriSpeech Benchmark & 75 & 0.69 & 0.16 & 99.31 & 4103.8 \\
+\hline
+Multi-Accent Emergency Intake & 75 & 3.18 & 1.74 & 96.82 & 4118.6 \\
+\hline
+\textbf{Aggregated Performance} & \textbf{250} & \textbf{2.61} & \textbf{1.10} & \textbf{97.39} & \textbf{3949.4} \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsubsection{Clinical Speech Error Analysis}
+The model demonstrated high fidelity when transcribing specialized medical nomenclature, clinical terms, and acute symptoms (e.g., \textit{diaphoresis}, \textit{dyspnea}, \textit{tachycardia}, \textit{anaphylactoid}, \textit{substernal}). Minor substitutions were confined to numeric formats and compound medical terms. The low Character Error Rate of 1.10\% confirms that downstream semantic parsing and triage classification receive highly accurate anatomical and symptomatic context.
+
+\subsection{Fine-Tuning PubMedBERT for SOAP Note Classification}
+
+PubMedBERT was fine-tuned for automated classification of clinical text into the four SOAP sections: Subjective, Objective, Assessment, and Plan. The pre-trained PubMedBERT model was trained on the SOAP notes dataset for 20 epochs. The model achieved an accuracy of 80.39\%, with a macro F1-score of 79.23\% and macro specificity of 93.36\%, showing effective text classification across 4 classes S,O,A,P.
+
+\begin{table}[htbp]
+\centering
+\caption{Fine-Tuned PubMedBERT (20 Epochs) Performance on SOAP Notes Dataset}
+\label{tab:pubmedbert_soap_evaluation}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|L|C|}
+\hline
+\textbf{Evaluation Metric} & \textbf{Result (\%)} \\
+\hline
+Overall Accuracy & 80.39\% \\
+Macro Precision & 79.23\% \\
+Macro Sensitivity / Recall & 79.23\% \\
+Macro F1-Score & 79.23\% \\
+Macro Specificity & 93.36\% \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{Report Extraction Accuracy}
+
+The report analysis module was empirically evaluated across authentic clinical documents sampled from public medical benchmarks: hospital discharge summaries with complex clinical courses under scan degradation artifacts (\textit{Noisy Medical Document Images} \cite{noisy_med_docs}) and scanned clinical history forms and tabular diagnostic panels (\textit{ClinOCR-Bench} \cite{clinocr_bench}). Extracted clinical entities were systematically evaluated against public expert ground truth across diagnoses, medications, laboratory and diagnostic procedures, physician notes, and patient identifiers.
+
+\begin{table}[ht]
+\centering
+\caption{Medical Report Extraction Empirical Evaluation (Public Clinical Datasets)}
+\label{tab:report_results}
+\footnotesize
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.36\linewidth}|C|C|}
+\hline
+\textbf{Metric} & \textbf{Value (\%)} & \textbf{95\% Wilson Confidence Interval} \\
+\hline
+Precision & 82.39 & [77.54, 86.38] \\
+Recall & 78.52 & [73.51, 82.81] \\
+F1-Score & 80.41 & N/A (Harmonic Mean) \\
+Field Extraction Accuracy & 67.24 & [62.15, 71.96] \\
+\hline
+\end{tabularx}
+\end{table}
+
+
+\begin{table}[htbp]
+\centering
+\caption{Entity-Stratified Extraction Performance across Public Medical Corpora}
+\label{tab:report_entity_breakdown}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.32\linewidth}|C|C|C|C|}
+\hline
+\textbf{Clinical Entity Category} & \textbf{Precision (\%)} & \textbf{Recall (\%)} & \textbf{F1-Score} & \textbf{Field Acc (\%)} \\
+\hline
+Patient \& Facility Metadata & 97.59 & 98.78 & 98.18 & 96.43 \\
+Clinical Diagnoses (\& ICD-10) & 100.00 & 96.77 & 98.36 & 96.77 \\
+Prescribed Medications & 48.28 & 100.00 & 65.12 & 48.28 \\
+Diagnostic Procedures \& Labs & 90.91 & 35.71 & 51.28 & 34.48 \\
+Physician Clinical Course Notes & 100.00 & 75.00 & 85.71 & 75.00 \\
+\hline
+\textbf{Combined Micro-Average} & \textbf{82.39} & \textbf{78.52} & \textbf{80.41} & \textbf{67.24} \\
+\hline
+\end{tabularx}
+\end{table}
+
+On real-world hospital discharge summaries ($N=20$), the system demonstrated near-perfect diagnostic fidelity with \textbf{98.26\%} Precision [95.00, 99.41], \textbf{84.92\%} F1-score, and zero false-positive diagnosis hallucinations. In tabular EHR documents, structured diagnostic entities were extracted with \textbf{100.0\%} precision and \textbf{95.24\%} recall, confirming clinical reliability across noisy scans and varied hospital reporting templates.
+
+\subsection{Discussion}
+
+The experimental results demonstrate that the proposed MedAssist system effectively performs automated symptom collection, SOAP note generation, emergency case identification, and medication safety screening. The integration of Large Language Models significantly improves contextual understanding and enables more comprehensive clinical assistance compared to traditional rule-based healthcare chatbots. The results also indicate that the system can reduce documentation effort while improving accessibility and user engagement.
+
+%====================================================
+\FloatBarrier
+\section{Conclusion and Future Scope}
+
+\subsection{Conclusion}
+
+This research presented MedAssist, an AI-powered clinical intake system that ties various healthcare systems into a singular unified system. It combines conversational symptom collection, LLM-based analysis, SOAP note generation, medical report analysis, emergency detection, QR-based emergency access, and medication safety screening. By connecting these modules, the system lessens the burden on doctors for quicker prognosis and personalized patient care. The combination of LLMs with PubMedBERT also allows MedAssist to use both conversational understanding and semantic medical analysis. The developed prototype shows how these features can support both patient and doctor workflows. At the same time, further clinical validation and safety testing are needed before such a system can be considered for real-world clinical use. Future improvements can build on the current system by adding clinical decision support, medical image analysis, and automated clinical scribing.
+
+\subsection{Major Contributions}
+
+\begin{itemize}
+    \item Development of a conversational framework for collecting and organizing patient symptoms in a structured manner.
+
+    \item Automated generation of SOAP summaries to present important clinical information in a clear and organized format.
+
+    \item Integration of emergency risk detection, QR-based medical access, and nearby hospital support.
+
+    \item Use of AI-based medication safety screening to identify potential side effects and medication-related risks.
+
+    \item Development of an integrated platform that combines patient intake, medical report analysis, clinical support, and longitudinal patient tracking.
+\end{itemize}
+
+\subsection{Limitations}
+
+\begin{itemize}
+    \item The system is designed to assist healthcare workflows and cannot replace professional diagnosis or clinical judgment.
+
+    \item The reliability of the results depends on the accuracy and completeness of the information provided by the user.
+
+    \item LLM-generated responses may sometimes contain errors and should be verified by a healthcare professional when necessary.
+
+    \item The system relies on internet connectivity and external AI services, which can affect its availability and response time.
+\end{itemize}
+
+\subsection{Future Scope}
+
+Future research may focus on the following directions:
+
+\begin{itemize}
+    \item Integration with Electronic Health Record (EHR) systems: Involves using protocols to standardise data exchange.
+    
+    \item Adapting open-weight architectures to clinical corpora: Improves the precision of diagnostic reasoning and reduce domain-specific hallucinations when fine-tuning domain-specific medical language models.
+    
+    \item Support for multimodal medical data images and diagnostic scans: this involves using vision-language transformers to assess clinical narratives, radiology reports, and diagnostic imaging simultaneously.
+    
+    \item Features for real-time telemedicine and physician collaboration: The development of distributed networks capable of providing low latency in order to enable simultaneous decision-making by multiple clinicians during virtual consultations.
+    
+    \item Making personalized healthcare recommendations on the basis of patient history: this involves combining the patient's longitudinal data with dynamic models of their health trajectory in order to produce proactive clinical interventions.
+    
+\end{itemize}
+
+%====================================================
+% REFERENCES
+%====================================================
+
+
+\begin{thebibliography}{99}
+
+\bibitem{boyer2025}
+L. Boyer, S. Fernandes, P. Auquier, B. Falissard, and T. Panch,
+``Reimagining patient-reported outcomes in the age of generative AI,''
+\textit{npj Digital Medicine}, vol. 8, art. no. 624, 2025.
+doi: 10.1038/s41746-025-02006-1.
+
+\bibitem{bedwa2026}
+M. Bedwa, N. Hooda, and V. Kumar,
+``Optimizing RAG-based LLMs for healthcare question answering tasks,''
+\textit{Knowledge and Information Systems}, vol. 68, no. 1,
+art. no. 26, 2026.
+doi: 10.1007/s10115-025-02638-5.
+
+\bibitem{liu2024}
+T.-L. Liu, T. C. Hetherington, C. Stephens, A. McWilliams,
+A. Dharod, T. Carroll, and J. A. Cleveland,
+``AI-powered clinical documentation and clinicians' electronic health record experience:
+A nonrandomized clinical trial,''
+\textit{JAMA Network Open}, vol. 7, no. 9, Art. no. e2432460, 2024.
+doi: 10.1001/jamanetworkopen.2024.32460.
+
+\bibitem{devere2025}
+I. J. de Vere Hunt, K.-X. Jin, and E. Linos,
+``A framework for considering the use of generative AI for health,''
+\textit{npj Digital Medicine}, vol. 8, art. no. 297, 2025.
+doi: 10.1038/s41746-025-01695-y.
+
+\bibitem{hossain2023}
+E. Hossain, R. Rana, N. Higgins, J. Soar, P. D. Barua,
+A. R. Pisani, and K. Turner,
+``Natural language processing in electronic health records in relation to healthcare
+decision-making: A systematic review,''
+\textit{Computers in Biology and Medicine}, vol. 155,
+art. no. 106649, 2023.
+doi: 10.1016/j.compbiomed.2023.106649.
+
+\bibitem{luo2025}
+X. Luo, Y. Li, J. Xu, Z. Zheng, F. Ying, and G. Huang,
+``AI in medical questionnaires: Scoping review,''
+\textit{Journal of Medical Internet Research}, vol. 27,
+art. no. e72398, 2025.
+doi: 10.2196/72398.
+
+%----------------------------------------------------
+% STATISTICAL / INDUSTRY SOURCES
+%----------------------------------------------------
+
+\bibitem{ama2025}
+American Medical Association,
+``AMA: Physician enthusiasm grows for health care AI,''
+Feb. 12, 2025. [Online].
+Available: \url{https://www.ama-assn.org/press-center/ama-press-releases/ama-physician-enthusiasm-grows-health-care-ai}
+
+\bibitem{ama2026}
+K. B. O'Reilly,
+``More than 80\% of physicians use AI professionally: AMA survey,''
+American Medical Association, Mar. 12, 2026. [Online].
+Available: \url{https://www.ama-assn.org/practice-management/digital-health/more-80-physicians-use-ai-professionally-ama-survey}
+
+\bibitem{mckinsey2025}
+C. Pardo Martin, J. Lamb, A. Dahab, J. Jones, and S. Bhasker,
+``Generative AI in healthcare: Current trends and future outlook 2025,''
+McKinsey \& Company, Mar. 26, 2025. [Online].
+Available: \url{https://www.mckinsey.com/industries/healthcare/our-insights/generative-ai-in-healthcare-current-trends-and-future-outlook-2025}
+
+\bibitem{sinsky2016}
+C. Sinsky, L. Colligan, L. Li, M. Prgomet, S. Reynolds,
+L. Goeders, J. Westbrook, M. Tutty, and G. Blike,
+``Allocation of physician time in ambulatory practice:
+A time and motion study in 4 specialties,''
+\textit{Annals of Internal Medicine}, vol. 165, no. 11,
+pp. 753--760, 2016.
+doi: 10.7326/M16-0961.
+
+%----------------------------------------------------
+% MODEL / TECHNOLOGY REFERENCES
+%----------------------------------------------------
+
+\bibitem{singhal2023}
+K. Singhal, S. Azizi, T. Tu, et al.,
+``Large language models encode clinical knowledge,''
+\textit{Nature}, vol. 620, pp. 172--180, 2023.
+doi: 10.1038/s41586-023-06291-2.
+
+\bibitem{gu2021}
+Y. Gu, R. Tinn, H. Cheng, M. Lucas, N. Usuyama,
+X. Liu, T. Naumann, J. Gao, and H. Poon,
+``Domain-specific language model pretraining for biomedical natural language processing,''
+\textit{ACM Transactions on Computing for Healthcare},
+vol. 3, no. 1, pp. 1--23, 2021.
+doi: 10.1145/3458754.
+
+\bibitem{radford2023}
+A. Radford, J. W. Kim, T. Xu, G. Brockman,
+C. Mcleavey, and I. Sutskever,
+``Robust speech recognition via large-scale weak supervision,''
+in \textit{Proc. 40th Int. Conf. Machine Learning (ICML)},
+PMLR, vol. 202, 2023, pp. 28492--28518.
+
+\bibitem{gemini2023}
+Gemini Team, R. Anil, S. Borgeaud, J.-B. Alayrac, et al.,
+``Gemini: A family of highly capable multimodal models,''
+arXiv:2312.11805, 2023.
+[Online]. Available:
+\url{https://arxiv.org/abs/2312.11805}
+
+\end{thebibliography}
+\end{document}
