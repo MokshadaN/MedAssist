@@ -1,0 +1,76 @@
+{
+  "Total_Samples": 51,
+  "Accuracy": 25.49,
+  "Macro_Precision": 24.18,
+  "Macro_Recall": 26.67,
+  "Macro_F1": 15.29,
+  "Macro_Specificity": 76.06,
+  "Confusion_Matrix": [
+    [
+      3,
+      16,
+      0,
+      0
+    ],
+    [
+      0,
+      10,
+      1,
+      0
+    ],
+    [
+      0,
+      13,
+      0,
+      0
+    ],
+    [
+      1,
+      7,
+      0,
+      0
+    ]
+  ],
+  "Per_Class_Metrics": {
+    "0": {
+      "TP": 3,
+      "FP": 1,
+      "FN": 16,
+      "TN": 31,
+      "Precision": 75.0,
+      "Recall": 15.79,
+      "F1": 26.09,
+      "Specificity": 96.88
+    },
+    "1": {
+      "TP": 10,
+      "FP": 36,
+      "FN": 1,
+      "TN": 4,
+      "Precision": 21.74,
+      "Recall": 90.91,
+      "F1": 35.09,
+      "Specificity": 10.0
+    },
+    "2": {
+      "TP": 0,
+      "FP": 1,
+      "FN": 13,
+      "TN": 37,
+      "Precision": 0.0,
+      "Recall": 0.0,
+      "F1": 0.0,
+      "Specificity": 97.37
+    },
+    "3": {
+      "TP": 0,
+      "FP": 0,
+      "FN": 8,
+      "TN": 43,
+      "Precision": 0.0,
+      "Recall": 0.0,
+      "F1": 0.0,
+      "Specificity": 100.0
+    }
+  }
+}

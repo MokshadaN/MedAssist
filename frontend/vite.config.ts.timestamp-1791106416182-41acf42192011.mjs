@@ -1,0 +1,34 @@
+// vite.config.ts
+import { defineConfig } from "file:///E:/medassist/MedAssist/frontend/node_modules/vite/dist/node/index.js";
+import react from "file:///E:/medassist/MedAssist/frontend/node_modules/@vitejs/plugin-react/dist/index.js";
+import path from "path";
+import tailwindcss from "file:///E:/medassist/MedAssist/frontend/node_modules/@tailwindcss/vite/dist/index.mjs";
+var __vite_injected_original_dirname = "E:\\medassist\\MedAssist\\frontend";
+var vite_config_default = defineConfig({
+  plugins: [
+    react(),
+    tailwindcss()
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__vite_injected_original_dirname, "./src")
+    }
+  },
+  server: {
+    port: 5173,
+    host: true,
+    proxy: {
+      "/api": {
+        // Use 127.0.0.1 explicitly — on Windows, 'localhost' resolves to
+        // ::1 (IPv6) but uvicorn binds to 127.0.0.1 (IPv4), causing ECONNREFUSED.
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+        secure: false
+      }
+    }
+  }
+});
+export {
+  vite_config_default as default
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcudHMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCJFOlxcXFxtZWRhc3Npc3RcXFxcTWVkQXNzaXN0XFxcXGZyb250ZW5kXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ZpbGVuYW1lID0gXCJFOlxcXFxtZWRhc3Npc3RcXFxcTWVkQXNzaXN0XFxcXGZyb250ZW5kXFxcXHZpdGUuY29uZmlnLnRzXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ltcG9ydF9tZXRhX3VybCA9IFwiZmlsZTovLy9FOi9tZWRhc3Npc3QvTWVkQXNzaXN0L2Zyb250ZW5kL3ZpdGUuY29uZmlnLnRzXCI7aW1wb3J0IHsgZGVmaW5lQ29uZmlnIH0gZnJvbSAndml0ZSc7XHJcbmltcG9ydCByZWFjdCBmcm9tICdAdml0ZWpzL3BsdWdpbi1yZWFjdCc7XHJcblxyXG4vLyBIVFRQUyBpcyBpbnRlbnRpb25hbGx5IGRpc2FibGVkIGZvciBsb2NhbCBkZXZlbG9wbWVudDpcclxuLy8gLSBgbG9jYWxob3N0YCBpcyBhIHNlY3VyZSBjb250ZXh0IGV2ZW4gb3ZlciBwbGFpbiBIVFRQLCBzbyBtaWNyb3Bob25lIC9cclxuLy8gICBzcGVlY2gtcmVjb2duaXRpb24gZmVhdHVyZXMga2VlcCB3b3JraW5nLlxyXG4vLyAtIFRoZSBwcmV2aW91cyBgYmFzaWNTc2woKWAgc2VsZi1zaWduZWQgY2VydCB0cmlnZ2VyZWRcclxuLy8gICBFUlJfQ0VSVF9BVVRIT1JJVFlfSU5WQUxJRCB3YXJuaW5ncyBpbiBDaHJvbWUgb24gZXZlcnkgbGF1bmNoLlxyXG4vLyBGb3IgcHJvZHVjdGlvbiwgc2VydmUgdGhlIGJ1aWx0IGFzc2V0cyBiZWhpbmQgYSByZWFsIFRMUyBjZXJ0aWZpY2F0ZVxyXG4vLyAocmV2ZXJzZSBwcm94eSAvIG1hbmFnZWQgbG9hZCBiYWxhbmNlcikgXHUyMDE0IG5ldmVyIHRoZSBkZXYgc2VydmVyLlxyXG5pbXBvcnQgcGF0aCBmcm9tICdwYXRoJztcclxuaW1wb3J0IHRhaWx3aW5kY3NzIGZyb20gJ0B0YWlsd2luZGNzcy92aXRlJztcclxuXHJcbmV4cG9ydCBkZWZhdWx0IGRlZmluZUNvbmZpZyh7XHJcbiAgcGx1Z2luczogW1xyXG4gICAgcmVhY3QoKSxcclxuICAgIHRhaWx3aW5kY3NzKCksXHJcbiAgXSxcclxuICByZXNvbHZlOiB7XHJcbiAgICBhbGlhczoge1xyXG4gICAgICAnQCc6IHBhdGgucmVzb2x2ZShfX2Rpcm5hbWUsICcuL3NyYycpLFxyXG4gICAgfSxcclxuICB9LFxyXG4gIHNlcnZlcjoge1xyXG4gICAgcG9ydDogNTE3MyxcclxuICAgIGhvc3Q6IHRydWUsXHJcbiAgICBwcm94eToge1xyXG4gICAgICAnL2FwaSc6IHtcclxuICAgICAgICAvLyBVc2UgMTI3LjAuMC4xIGV4cGxpY2l0bHkgXHUyMDE0IG9uIFdpbmRvd3MsICdsb2NhbGhvc3QnIHJlc29sdmVzIHRvXHJcbiAgICAgICAgLy8gOjoxIChJUHY2KSBidXQgdXZpY29ybiBiaW5kcyB0byAxMjcuMC4wLjEgKElQdjQpLCBjYXVzaW5nIEVDT05OUkVGVVNFRC5cclxuICAgICAgICB0YXJnZXQ6ICdodHRwOi8vMTI3LjAuMC4xOjgwMDAnLFxyXG4gICAgICAgIGNoYW5nZU9yaWdpbjogdHJ1ZSxcclxuICAgICAgICBzZWN1cmU6IGZhbHNlLFxyXG4gICAgICB9LFxyXG4gICAgfSxcclxuICB9LFxyXG59KTsiXSwKICAibWFwcGluZ3MiOiAiO0FBQXVSLFNBQVMsb0JBQW9CO0FBQ3BULE9BQU8sV0FBVztBQVNsQixPQUFPLFVBQVU7QUFDakIsT0FBTyxpQkFBaUI7QUFYeEIsSUFBTSxtQ0FBbUM7QUFhekMsSUFBTyxzQkFBUSxhQUFhO0FBQUEsRUFDMUIsU0FBUztBQUFBLElBQ1AsTUFBTTtBQUFBLElBQ04sWUFBWTtBQUFBLEVBQ2Q7QUFBQSxFQUNBLFNBQVM7QUFBQSxJQUNQLE9BQU87QUFBQSxNQUNMLEtBQUssS0FBSyxRQUFRLGtDQUFXLE9BQU87QUFBQSxJQUN0QztBQUFBLEVBQ0Y7QUFBQSxFQUNBLFFBQVE7QUFBQSxJQUNOLE1BQU07QUFBQSxJQUNOLE1BQU07QUFBQSxJQUNOLE9BQU87QUFBQSxNQUNMLFFBQVE7QUFBQTtBQUFBO0FBQUEsUUFHTixRQUFRO0FBQUEsUUFDUixjQUFjO0FBQUEsUUFDZCxRQUFRO0FBQUEsTUFDVjtBQUFBLElBQ0Y7QUFBQSxFQUNGO0FBQ0YsQ0FBQzsiLAogICJuYW1lcyI6IFtdCn0K
