@@ -3,15 +3,16 @@
     "title": "MedAssist End-to-End System Response Latency & Load Empirical Evaluation",
     "total_requests": 500,
     "concurrent_workers": 10,
-    "timestamp": "2026-10-05T09:57:52Z"
+    "timestamp": "2026-10-05T10:04:40Z"
   },
   "latency_metrics": {
-    "p50_ms": 0.03,
-    "p90_ms": 0.04,
-    "p95_ms": 0.05,
-    "p99_ms": 0.11,
-    "mean_ms": 0.04,
-    "std_dev_ms": 0.03,
-    "throughput_req_per_sec": 16250.6
+    "in_process_fast_path_median_ms": 0.032,
+    "http_p50_ms": 21.9,
+    "http_p90_ms": 26.5,
+    "http_p95_ms": 28.4,
+    "http_p99_ms": 31.8,
+    "http_mean_ms": 22.0,
+    "http_std_dev_ms": 3.7,
+    "throughput_req_per_sec": 452.4
   }
 }
