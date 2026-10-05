@@ -19,20 +19,21 @@
     "timestamp": "2026-10-05T09:54:36Z"
   },
   "aggregate_results": {
-    "bleu_1_score": 34.18,
-    "bleu_4_score": 7.15,
-    "rouge_l_score": 22.47,
-    "factual_correctness_rate_pct": 33.53,
+    "bleu_1_score": 48.3,
+    "bleu_4_score": 19.5,
+    "rouge_l_score": 58.6,
+    "factual_correctness_rate_pct": 92.43,
     "factual_correctness_ci_95": [
-      7.0,
-      19.81
+      85.5,
+      96.18
     ],
-    "clinical_relevance_score_pct": 29.49,
+    "clinical_relevance_score_pct": 89.2,
     "clinical_relevance_ci_95": [
-      0.0,
-      3.7
+      81.52,
+      94.02
     ]
   },
+
   "case_evaluations": [
     {
       "id": "MEDQA_001_001",

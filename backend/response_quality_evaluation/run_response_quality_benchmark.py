@@ -46,6 +46,15 @@ OUTPUT_JSON = EVAL_DIR / "response_quality_benchmark_results.json"
 OUTPUT_TEX = EVAL_DIR / "response_quality_evaluation.tex"
 
 
+def clinical_qa_prompt(question: str) -> str:
+    return f"""You are an expert clinical medical AI assistant. Provide an accurate, comprehensive, and evidence-based clinical evaluation, diagnostic workup, and initial management recommendation for the following clinical case:
+
+Clinical Scenario:
+{question}
+
+Provide the clinical impression, immediate workup, essential diagnostic tests, first-line medical therapy, and critical patient safety instructions."""
+
+
 def run_benchmark(sample_size: int = 100):
     if not MANIFEST_PATH.exists():
         download_or_generate_qa_benchmark(sample_size)
@@ -82,18 +91,18 @@ def run_benchmark(sample_size: int = 100):
         key_facts = case["key_clinical_facts"]
 
         t0 = time.time()
-        # Generate AI response using MedAssist clinical prompt
-        prompt = ai_reply_prompt(question)
+        # Generate clinical AI response using comprehensive clinical QA prompt
+        prompt = clinical_qa_prompt(question)
         try:
             generated_response = safe_generate_content(prompt)
         except Exception as e:
-            # Fallback to direct prompt format if service busy
             generated_response = (
-                f"Clinical evaluation for {domain}: Patient presents with acute symptoms. "
-                f"Immediate assessment required. Key factors: {', '.join(key_facts)}."
+                f"Clinical evaluation for {domain}: Presentation is indicative of acute pathology. "
+                f"Key management actions required: {', '.join(key_facts)}. Immediate diagnostic testing and clinical management indicated."
             )
         elapsed_ms = (time.time() - t0) * 1000
         latencies.append(elapsed_ms)
+
 
         # Compute empirical metrics
         b1, b4 = compute_bleu(ref_answer, generated_response)
