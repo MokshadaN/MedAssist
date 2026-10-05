@@ -1,0 +1,42 @@
+% ==============================================================================
+% Final Clinical Evaluation Table: MedAssist + Groq (Qwen-3.8-27B)
+% Evaluated on AHRQ Emergency Severity Index (ESI v4/v5) Gold Standard (N=75)
+% ==============================================================================
+
+\begin{table*}[htbp]
+\centering
+\small
+\caption{Comprehensive Clinical Performance of MedAssist + Groq (Qwen-3.8-27B) on the AHRQ ESI Triage Benchmark ($N=75$)}
+\label{tab:groq_triage_final}
+\begin{tabular}{l | c | c | c}
+\hline
+\textbf{Metric Category} & \textbf{Metric Name} & \textbf{Value} & \textbf{95\% Wilson Confidence Interval} \\
+\hline
+\multirow{4}{*}{\textbf{Clinical Safety}} 
+ & Emergency Sensitivity (Recall) & \textbf{91.43\%} & [77.62\%, 97.04\%] \\
+ & Critical Under-Triage Rate ($FN / P$) & \textbf{8.57\%}  & [2.96\%, 22.38\%] \\
+ & Emergency Specificity          & \textbf{95.00\%} & [83.50\%, 98.62\%] \\
+ & Over-Triage Rate ($FP / N$)    & \textbf{5.00\%}  & [1.38\%, 16.50\%] \\
+\hline
+\multirow{4}{*}{\textbf{Predictive Efficacy}} 
+ & Positive Predictive Value (PPV / Precision) & \textbf{94.12\%} & [80.91\%, 98.37\%] \\
+ & Negative Predictive Value (NPV)            & \textbf{92.68\%} & [80.57\%, 97.48\%] \\
+ & Safety F1-Score                            & \textbf{0.928}   & -- \\
+ & Overall Classification Accuracy            & \textbf{93.33\%} & [85.32\%, 97.12\%] \\
+\hline
+\multirow{3}{*}{\textbf{Discriminative Power}}
+ & Balanced Accuracy                          & \textbf{93.21\%} & -- \\
+ & Matthews Correlation Coefficient (MCC)     & \textbf{0.866}   & -- \\
+ & Diagnostic Odds Ratio (DOR)                & \textbf{202.67}  & [36.21, 1134.42] \\
+\hline
+\multirow{4}{*}{\textbf{System Latency}}
+ & Median Latency ($P_{50}$)                   & \textbf{432 ms}  & (Fast-path rules: 0.2 ms) \\
+ & 90th Percentile Latency ($P_{90}$)         & \textbf{6.5 s}   & (Sequential batch execution) \\
+ & 95th Percentile Latency ($P_{95}$)         & \textbf{8.5 s}   & (Includes Groq rate pacing) \\
+ & Throughput Capability                      & \textbf{2.3 req/s}& (Single API worker) \\
+\hline
+\multicolumn{4}{l}{\footnotesize Ground truth: AHRQ ESI Levels 1--2 = Emergency ($n=35$), Levels 3--5 = Non-Emergency ($n=40$).} \\
+\multicolumn{4}{l}{\footnotesize Confusion Matrix: True Positives (TP) = 32, False Positives (FP) = 2, False Negatives (FN) = 3, True Negatives (TN) = 38.} \\
+\hline
+\end{tabular*}
+\end{table*}

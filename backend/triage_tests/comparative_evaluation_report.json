@@ -1,0 +1,2531 @@
+{
+  "rules_only": {
+    "provider": "rules_only",
+    "metrics": {
+      "sample_size": 75,
+      "emergency_cases": 35,
+      "non_emergency_cases": 40,
+      "network_errors": 0,
+      "confusion_matrix": {
+        "true_positives": 12,
+        "false_positives": 0,
+        "false_negatives": 23,
+        "true_negatives": 40
+      },
+      "safety_metrics": {
+        "sensitivity_pct": 34.29,
+        "sensitivity_ci95": [
+          20.83,
+          50.85
+        ],
+        "specificity_pct": 100.0,
+        "specificity_ci95": [
+          91.24,
+          100.0
+        ],
+        "under_triage_rate_pct": 65.71,
+        "under_triage_ci95": [
+          49.15,
+          79.17
+        ],
+        "over_triage_rate_pct": 0.0,
+        "precision_pct": 100.0,
+        "f1_score": 0.511,
+        "accuracy_pct": 69.33,
+        "accuracy_ci95": [
+          58.17,
+          78.61
+        ]
+      },
+      "latency_profile_ms": {
+        "p50": 0.2,
+        "p90": 0.4,
+        "p95": 0.4,
+        "p99": 1.0,
+        "mean": 0.2,
+        "std_dev": 0.1
+      }
+    },
+    "cases": [
+      {
+        "id": "AHRQ-ESI-001",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "gasping"
+        ],
+        "latency_ms": 1.0,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-002",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "cannot_breathe"
+        ],
+        "latency_ms": 0.3,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-003",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "unconscious",
+          "uncontrolled_bleeding"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-004",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "seizure"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-005",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-006",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-007",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-008",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-009",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-010",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-011",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-012",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "gasping"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-013",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-014",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-015",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-016",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "chest_pain",
+          "radiating_pain"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-017",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "slurred_speech"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-018",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "sudden_severe_symptom",
+          "stiff_neck"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-019",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-020",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-021",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-022",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-023",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "sudden_severe_symptom"
+        ],
+        "latency_ms": 0.1,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-024",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-025",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-026",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-027",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "high_fever"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-028",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "chest_pain",
+          "coughing_blood"
+        ],
+        "latency_ms": 0.4,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-029",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-030",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-031",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-032",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "uncontrolled_bleeding"
+        ],
+        "latency_ms": 0.1,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-033",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-034",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-035",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-036",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-037",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-038",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-039",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-040",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-041",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-042",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-043",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-044",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-045",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-046",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-047",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-048",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-049",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-050",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-051",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-052",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-053",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-054",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-055",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-056",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-057",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-058",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-059",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-060",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-061",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-062",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-063",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-064",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.7,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-065",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-066",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-067",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-068",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-069",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-070",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-071",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-072",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-073",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-074",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-075",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "rule_abstain",
+        "matched_rules": [],
+        "latency_ms": 0.4,
+        "status": "TN"
+      }
+    ]
+  },
+  "groq": {
+    "provider": "groq",
+    "metrics": {
+      "sample_size": 75,
+      "emergency_cases": 35,
+      "non_emergency_cases": 40,
+      "network_errors": 0,
+      "confusion_matrix": {
+        "true_positives": 29,
+        "false_positives": 1,
+        "false_negatives": 6,
+        "true_negatives": 39
+      },
+      "safety_metrics": {
+        "sensitivity_pct": 82.86,
+        "sensitivity_ci95": [
+          67.32,
+          91.9
+        ],
+        "specificity_pct": 97.5,
+        "specificity_ci95": [
+          87.12,
+          99.56
+        ],
+        "under_triage_rate_pct": 17.14,
+        "under_triage_ci95": [
+          8.1,
+          32.68
+        ],
+        "over_triage_rate_pct": 2.5,
+        "precision_pct": 96.67,
+        "f1_score": 0.892,
+        "accuracy_pct": 90.67,
+        "accuracy_ci95": [
+          81.97,
+          95.41
+        ]
+      },
+      "latency_profile_ms": {
+        "p50": 6465.5,
+        "p90": 8474.0,
+        "p95": 9499.2,
+        "p99": 10431.9,
+        "mean": 5308.2,
+        "std_dev": 3350.2
+      }
+    },
+    "cases": [
+      {
+        "id": "AHRQ-ESI-001",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "gasping"
+        ],
+        "latency_ms": 0.3,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-002",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "cannot_breathe"
+        ],
+        "latency_ms": 0.4,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-003",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "unconscious",
+          "uncontrolled_bleeding"
+        ],
+        "latency_ms": 0.5,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-004",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "seizure"
+        ],
+        "latency_ms": 0.5,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-005",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 398.1,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-006",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:severe_or_uncontrolled_bleeding"
+        ],
+        "latency_ms": 353.7,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-007",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:fainting_unconscious_or_collapse"
+        ],
+        "latency_ms": 361.6,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-008",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:breathing_difficulty"
+        ],
+        "latency_ms": 463.9,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-009",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:seizure",
+          "semantic:fainting_unconscious_or_collapse"
+        ],
+        "latency_ms": 536.5,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-010",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:breathing_difficulty"
+        ],
+        "latency_ms": 437.5,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-011",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:coughing_or_vomiting_blood",
+          "semantic:severe_or_uncontrolled_bleeding",
+          "semantic:fainting_unconscious_or_collapse"
+        ],
+        "latency_ms": 454.6,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-012",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "gasping"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-013",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:breathing_difficulty"
+        ],
+        "latency_ms": 495.8,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-014",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:fainting_unconscious_or_collapse",
+          "semantic:overdose_or_poisoning",
+          "semantic:breathing_difficulty"
+        ],
+        "latency_ms": 9539.4,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-015",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:fainting_unconscious_or_collapse",
+          "semantic:breathing_difficulty"
+        ],
+        "latency_ms": 9499.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-016",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "chest_pain",
+          "radiating_pain"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-017",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "slurred_speech"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-018",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "sudden_severe_symptom",
+          "stiff_neck"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-019",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:coughing_or_vomiting_blood",
+          "semantic:fainting_unconscious_or_collapse"
+        ],
+        "latency_ms": 8474.0,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-020",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:worst_or_extreme_pain"
+        ],
+        "latency_ms": 10431.9,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-021",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 7536.8,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-022",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:severe_head_injury",
+          "semantic:fainting_unconscious_or_collapse",
+          "semantic:confusion_or_slurred_speech"
+        ],
+        "latency_ms": 8545.7,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-023",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "sudden_severe_symptom"
+        ],
+        "latency_ms": 0.4,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-024",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:breathing_difficulty"
+        ],
+        "latency_ms": 10428.5,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-025",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:worst_or_extreme_pain"
+        ],
+        "latency_ms": 7595.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-026",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8433.5,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-027",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "high_fever"
+        ],
+        "latency_ms": 0.4,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-028",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "chest_pain",
+          "coughing_blood"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-029",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7370.5,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-030",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:confusion_or_slurred_speech"
+        ],
+        "latency_ms": 5422.9,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-031",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8440.8,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-032",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "uncontrolled_bleeding"
+        ],
+        "latency_ms": 0.6,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-033",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:suicidal_or_homicidal_intent"
+        ],
+        "latency_ms": 7403.9,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-034",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6412.7,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-035",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:choking"
+        ],
+        "latency_ms": 7600.3,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-036",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8519.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-037",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8422.7,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-038",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7411.9,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-039",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6683.5,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-040",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7487.7,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-041",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 6446.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-042",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8404.8,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-043",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6445.6,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-044",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": true,
+        "decision_source": "extracted_fact_rule",
+        "matched_rules": [
+          "semantic:chest_pain_or_tightness"
+        ],
+        "latency_ms": 7460.4,
+        "status": "FP"
+      },
+      {
+        "id": "AHRQ-ESI-045",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8724.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-046",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 7413.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-047",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6402.9,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-048",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8398.8,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-049",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6781.8,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-050",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7425.5,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-051",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8448.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-052",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 5584.9,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-053",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7488.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-054",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7405.8,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-055",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7487.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-056",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7529.7,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-057",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6504.9,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-058",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7366.6,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-059",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6465.5,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-060",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6427.6,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-061",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7418.5,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-062",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6469.5,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-063",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6432.8,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-064",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6311.7,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-065",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 4356.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-066",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 5638.6,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-067",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 7387.7,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-068",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 4552.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-069",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8421.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-070",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 5347.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-071",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6437.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-072",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 4378.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-073",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 6484.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-074",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 5319.7,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-075",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "groq_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 3385.4,
+        "status": "TN"
+      }
+    ]
+  },
+  "gemini": {
+    "provider": "gemini",
+    "metrics": {
+      "sample_size": 75,
+      "emergency_cases": 35,
+      "non_emergency_cases": 40,
+      "network_errors": 0,
+      "confusion_matrix": {
+        "true_positives": 12,
+        "false_positives": 0,
+        "false_negatives": 23,
+        "true_negatives": 40
+      },
+      "safety_metrics": {
+        "sensitivity_pct": 34.29,
+        "sensitivity_ci95": [
+          20.83,
+          50.85
+        ],
+        "specificity_pct": 100.0,
+        "specificity_ci95": [
+          91.24,
+          100.0
+        ],
+        "under_triage_rate_pct": 65.71,
+        "under_triage_ci95": [
+          49.15,
+          79.17
+        ],
+        "over_triage_rate_pct": 0.0,
+        "precision_pct": 100.0,
+        "f1_score": 0.511,
+        "accuracy_pct": 69.33,
+        "accuracy_ci95": [
+          58.17,
+          78.61
+        ]
+      },
+      "latency_profile_ms": {
+        "p50": 331.3,
+        "p90": 468.0,
+        "p95": 4149.5,
+        "p99": 8403.6,
+        "mean": 661.7,
+        "std_dev": 1434.2
+      }
+    },
+    "cases": [
+      {
+        "id": "AHRQ-ESI-001",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "gasping"
+        ],
+        "latency_ms": 0.1,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-002",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "cannot_breathe"
+        ],
+        "latency_ms": 0.1,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-003",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "unconscious",
+          "uncontrolled_bleeding"
+        ],
+        "latency_ms": 0.3,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-004",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "seizure"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-005",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 3326.9,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-006",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 5089.5,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-007",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 4149.5,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-008",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "gemini_extraction_only",
+        "matched_rules": [],
+        "latency_ms": 8403.6,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-009",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 1636.6,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-010",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 7090.8,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-011",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 357.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-012",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "gasping"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-013",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 311.5,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-014",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 390.5,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-015",
+        "esi_level": 1,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 377.8,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-016",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "chest_pain",
+          "radiating_pain"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-017",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "slurred_speech"
+        ],
+        "latency_ms": 0.1,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-018",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "sudden_severe_symptom",
+          "stiff_neck"
+        ],
+        "latency_ms": 0.1,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-019",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 379.9,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-020",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 364.9,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-021",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 367.4,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-022",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 361.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-023",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "sudden_severe_symptom"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-024",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 327.9,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-025",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 286.5,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-026",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 309.5,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-027",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "high_fever"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-028",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "chest_pain",
+          "coughing_blood"
+        ],
+        "latency_ms": 0.6,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-029",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 311.6,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-030",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 300.3,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-031",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 289.9,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-032",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": true,
+        "decision_source": "rule",
+        "matched_rules": [
+          "uncontrolled_bleeding"
+        ],
+        "latency_ms": 0.2,
+        "status": "TP"
+      },
+      {
+        "id": "AHRQ-ESI-033",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 324.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-034",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 285.9,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-035",
+        "esi_level": 2,
+        "expected_emergency": true,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 288.2,
+        "status": "FN"
+      },
+      {
+        "id": "AHRQ-ESI-036",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 312.8,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-037",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 375.0,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-038",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 354.6,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-039",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 340.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-040",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 374.0,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-041",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 362.5,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-042",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 342.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-043",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 292.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-044",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 311.5,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-045",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 395.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-046",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 367.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-047",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 305.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-048",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 310.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-049",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 468.0,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-050",
+        "esi_level": 3,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 267.7,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-051",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 292.7,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-052",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 315.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-053",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 359.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-054",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 278.2,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-055",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 347.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-056",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 359.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-057",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 807.0,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-058",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 279.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-059",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 399.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-060",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 262.0,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-061",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 327.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-062",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 387.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-063",
+        "esi_level": 4,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 330.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-064",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 404.4,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-065",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 334.0,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-066",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 390.9,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-067",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 350.5,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-068",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 400.9,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-069",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 365.8,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-070",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 331.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-071",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 332.1,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-072",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 399.0,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-073",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 282.9,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-074",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 326.3,
+        "status": "TN"
+      },
+      {
+        "id": "AHRQ-ESI-075",
+        "esi_level": 5,
+        "expected_emergency": false,
+        "predicted_urgent": false,
+        "decision_source": "fallback_error",
+        "matched_rules": [],
+        "latency_ms": 454.7,
+        "status": "TN"
+      }
+    ]
+  }
+}

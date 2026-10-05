@@ -1,0 +1,1934 @@
+{
+  "benchmark_metadata": {
+    "title": "Multi-Corpus Medical Report Extraction Public Benchmark",
+    "total_documents": 50,
+    "public_datasets": [
+      {
+        "name": "Noisy Medical Document Images (OCR)",
+        "source": "HuggingFace (hmnshudhmn24/noisy-medical-document-images-ocr)",
+        "count": 20,
+        "document_type": "Hospital Discharge Summaries"
+      },
+      {
+        "name": "ClinOCR-Bench",
+        "source": "arXiv:2607.03650 / HuggingFace (ianua/ClinOCR-Bench)",
+        "count": 15,
+        "document_type": "Clinical Scanned Forms & Tabular Reports"
+      },
+      {
+        "name": "Medical Prescription Dataset",
+        "source": "HuggingFace (chinmays18/medical-prescription-dataset)",
+        "count": 15,
+        "document_type": "Physician Clinical Prescriptions"
+      }
+    ]
+  },
+  "documents": [
+    {
+      "id": "DS-001",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200001_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200001_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Vikram Reddy",
+        "dob": "1982-09-30",
+        "mrn": "MRN-3920184",
+        "facility": "Christian Medical College (CMC)",
+        "diagnoses": [
+          {
+            "condition": "Osteoarthritis of Knee",
+            "icd_10": "M17.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Meloxicam 15mg PO Daily"
+          },
+          {
+            "raw_text": "Triamcinolone Acetonide Intra-articular Injection"
+          },
+          {
+            "raw_text": "Ibuprofen 800mg PO TID PRN"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "X-Ray Knee, 3 Views",
+            "code": "73562"
+          }
+        ],
+        "physician_notes": "Admitted for severe knee exacerbation. X-rays confirmed moderate to severe OA. Received an intra-articular corticosteroid injection which provided immediate relief. Discharged with outpatient PT referrals."
+      }
+    },
+    {
+      "id": "DS-002",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200002_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200002_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Karan Malhotra",
+        "dob": "1992-07-15",
+        "mrn": "MRN-3019284",
+        "facility": "Apollo Health City",
+        "diagnoses": [
+          {
+            "condition": "Type 2 Diabetes Mellitus",
+            "icd_10": "E11.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Sitagliptin 100mg PO Daily"
+          },
+          {
+            "raw_text": "Metformin 500mg PO BID"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          },
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "Office Visit, Est Patient",
+            "code": "99213"
+          },
+          {
+            "name": "Diabetic Retinal Exam",
+            "code": "92250"
+          },
+          {
+            "name": "Comprehensive Metabolic Panel (CMP)",
+            "code": "80053"
+          }
+        ],
+        "physician_notes": "Patient presented with elevated blood glucose levels. Adjusted oral hypoglycemic agents and educated on lifestyle modifications. Blood sugars stabilized during admission."
+      }
+    },
+    {
+      "id": "DS-003",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200003_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200003_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Karan Malhotra",
+        "dob": "1992-07-15",
+        "mrn": "MRN-3019284",
+        "facility": "Christian Medical College (CMC)",
+        "diagnoses": [
+          {
+            "condition": "Osteoarthritis of Knee",
+            "icd_10": "M17.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Meloxicam 15mg PO Daily"
+          },
+          {
+            "raw_text": "Ibuprofen 800mg PO TID PRN"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Physical Therapy Evaluation",
+            "code": "97161"
+          },
+          {
+            "name": "Therapeutic Exercise",
+            "code": "97110"
+          },
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          }
+        ],
+        "physician_notes": "Admitted for severe knee exacerbation. X-rays confirmed moderate to severe OA. Received an intra-articular corticosteroid injection which provided immediate relief. Discharged with outpatient PT referrals."
+      }
+    },
+    {
+      "id": "DS-004",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200004_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200004_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Rohan Sharma",
+        "dob": "1985-04-12",
+        "mrn": "MRN-8472910",
+        "facility": "Lilavati Hospital",
+        "diagnoses": [
+          {
+            "condition": "Acute Bronchitis",
+            "icd_10": "J20.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Azithromycin 250mg PO Daily x 5 Days"
+          },
+          {
+            "raw_text": "Albuterol Sulfate Inhaler 2 puffs Q4H PRN"
+          },
+          {
+            "raw_text": "Benzonatate 100mg PO TID PRN Cough"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Room and Board - Semi-Private",
+            "code": "0120"
+          },
+          {
+            "name": "Spirometry",
+            "code": "94010"
+          },
+          {
+            "name": "Medical/Surgical Supplies",
+            "code": "0270"
+          },
+          {
+            "name": "Complete Blood Count (CBC)",
+            "code": "85025"
+          },
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          }
+        ],
+        "physician_notes": "Patient presented with persistent cough and shortness of breath. Chest X-Ray confirmed no pneumonia. Treated with bronchodilators and a short course of oral steroids. Symptoms improved significantly."
+      }
+    },
+    {
+      "id": "DS-005",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200005_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200005_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Rahul Verma",
+        "dob": "1970-12-10",
+        "mrn": "MRN-4859201",
+        "facility": "Fortis Escorts Heart Institute",
+        "diagnoses": [
+          {
+            "condition": "Acute Bronchitis",
+            "icd_10": "J20.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Albuterol Sulfate Inhaler 2 puffs Q4H PRN"
+          },
+          {
+            "raw_text": "Azithromycin 250mg PO Daily x 5 Days"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Complete Blood Count (CBC)",
+            "code": "85025"
+          },
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          },
+          {
+            "name": "Spirometry",
+            "code": "94010"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          },
+          {
+            "name": "Room and Board - Semi-Private",
+            "code": "0120"
+          }
+        ],
+        "physician_notes": "Patient presented with persistent cough and shortness of breath. Chest X-Ray confirmed no pneumonia. Treated with bronchodilators and a short course of oral steroids. Symptoms improved significantly."
+      }
+    },
+    {
+      "id": "DS-006",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200006_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200006_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Rahul Verma",
+        "dob": "1970-12-10",
+        "mrn": "MRN-4859201",
+        "facility": "Christian Medical College (CMC)",
+        "diagnoses": [
+          {
+            "condition": "Type 2 Diabetes Mellitus",
+            "icd_10": "E11.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Glipizide 5mg PO Daily"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "Diabetic Retinal Exam",
+            "code": "92250"
+          },
+          {
+            "name": "Hemoglobin A1c (HbA1c)",
+            "code": "83036"
+          },
+          {
+            "name": "Medical/Surgical Supplies",
+            "code": "0270"
+          },
+          {
+            "name": "Office Visit, Est Patient",
+            "code": "99213"
+          }
+        ],
+        "physician_notes": "Patient presented with elevated blood glucose levels. Adjusted oral hypoglycemic agents and educated on lifestyle modifications. Blood sugars stabilized during admission."
+      }
+    },
+    {
+      "id": "DS-007",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200007_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200007_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Pooja Joshi",
+        "dob": "1980-01-22",
+        "mrn": "MRN-8492018",
+        "facility": "Christian Medical College (CMC)",
+        "diagnoses": [
+          {
+            "condition": "Acute Bronchitis",
+            "icd_10": "J20.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Benzonatate 100mg PO TID PRN Cough"
+          },
+          {
+            "raw_text": "Prednisone 20mg PO Daily"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          },
+          {
+            "name": "Room and Board - Semi-Private",
+            "code": "0120"
+          },
+          {
+            "name": "Complete Blood Count (CBC)",
+            "code": "85025"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "Chest X-Ray, 1 View",
+            "code": "71045"
+          },
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          }
+        ],
+        "physician_notes": "Patient presented with persistent cough and shortness of breath. Chest X-Ray confirmed no pneumonia. Treated with bronchodilators and a short course of oral steroids. Symptoms improved significantly."
+      }
+    },
+    {
+      "id": "DS-008",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200008_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200008_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Priya Patel",
+        "dob": "1990-08-25",
+        "mrn": "MRN-4920184",
+        "facility": "Apollo Health City",
+        "diagnoses": [
+          {
+            "condition": "Type 2 Diabetes Mellitus",
+            "icd_10": "E11.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Glipizide 5mg PO Daily"
+          },
+          {
+            "raw_text": "Sitagliptin 100mg PO Daily"
+          },
+          {
+            "raw_text": "Metformin 500mg PO BID"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          },
+          {
+            "name": "Hemoglobin A1c (HbA1c)",
+            "code": "83036"
+          },
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          },
+          {
+            "name": "Medical/Surgical Supplies",
+            "code": "0270"
+          }
+        ],
+        "physician_notes": "Patient presented with elevated blood glucose levels. Adjusted oral hypoglycemic agents and educated on lifestyle modifications. Blood sugars stabilized during admission."
+      }
+    },
+    {
+      "id": "DS-009",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200009_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200009_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Karan Malhotra",
+        "dob": "1992-07-15",
+        "mrn": "MRN-3019284",
+        "facility": "Lilavati Hospital",
+        "diagnoses": [
+          {
+            "condition": "Type 2 Diabetes Mellitus",
+            "icd_10": "E11.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Glipizide 5mg PO Daily"
+          },
+          {
+            "raw_text": "Insulin Glargine 10 units SubQ Nightly"
+          },
+          {
+            "raw_text": "Sitagliptin 100mg PO Daily"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          },
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          },
+          {
+            "name": "Medical/Surgical Supplies",
+            "code": "0270"
+          },
+          {
+            "name": "Office Visit, Est Patient",
+            "code": "99213"
+          },
+          {
+            "name": "Diabetic Retinal Exam",
+            "code": "92250"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          }
+        ],
+        "physician_notes": "Patient presented with elevated blood glucose levels. Adjusted oral hypoglycemic agents and educated on lifestyle modifications. Blood sugars stabilized during admission."
+      }
+    },
+    {
+      "id": "DS-010",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200010_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200010_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Vikram Reddy",
+        "dob": "1982-09-30",
+        "mrn": "MRN-3920184",
+        "facility": "Apollo Health City",
+        "diagnoses": [
+          {
+            "condition": "Acute Bronchitis",
+            "icd_10": "J20.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Albuterol Sulfate Inhaler 2 puffs Q4H PRN"
+          },
+          {
+            "raw_text": "Benzonatate 100mg PO TID PRN Cough"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "Spirometry",
+            "code": "94010"
+          },
+          {
+            "name": "Chest X-Ray, 1 View",
+            "code": "71045"
+          },
+          {
+            "name": "Complete Blood Count (CBC)",
+            "code": "85025"
+          }
+        ],
+        "physician_notes": "Patient presented with persistent cough and shortness of breath. Chest X-Ray confirmed no pneumonia. Treated with bronchodilators and a short course of oral steroids. Symptoms improved significantly."
+      }
+    },
+    {
+      "id": "DS-011",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200011_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200011_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Amit Singh",
+        "dob": "1978-11-03",
+        "mrn": "MRN-1039485",
+        "facility": "Manipal Hospital",
+        "diagnoses": [
+          {
+            "condition": "Hyperlipidemia",
+            "icd_10": "E78.5"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Rosuvastatin 10mg PO Daily"
+          },
+          {
+            "raw_text": "Ezetimibe 10mg PO Daily"
+          },
+          {
+            "raw_text": "Atorvastatin 20mg PO Daily"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Medical/Surgical Supplies",
+            "code": "0270"
+          },
+          {
+            "name": "Venipuncture",
+            "code": "36415"
+          },
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          },
+          {
+            "name": "Lipid Panel",
+            "code": "80061"
+          },
+          {
+            "name": "Room and Board - Semi-Private",
+            "code": "0120"
+          },
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          }
+        ],
+        "physician_notes": "Incidental finding of elevated cholesterol during routine screening. Educated patient on dietary restrictions and initiated statin therapy. Tolerated medication well."
+      }
+    },
+    {
+      "id": "DS-012",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200012_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200012_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Rahul Verma",
+        "dob": "1970-12-10",
+        "mrn": "MRN-4859201",
+        "facility": "Fortis Escorts Heart Institute",
+        "diagnoses": [
+          {
+            "condition": "Acute Bronchitis",
+            "icd_10": "J20.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Albuterol Sulfate Inhaler 2 puffs Q4H PRN"
+          },
+          {
+            "raw_text": "Benzonatate 100mg PO TID PRN Cough"
+          },
+          {
+            "raw_text": "Azithromycin 250mg PO Daily x 5 Days"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Spirometry",
+            "code": "94010"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          }
+        ],
+        "physician_notes": "Patient presented with persistent cough and shortness of breath. Chest X-Ray confirmed no pneumonia. Treated with bronchodilators and a short course of oral steroids. Symptoms improved significantly."
+      }
+    },
+    {
+      "id": "DS-013",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200013_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200013_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Vikram Reddy",
+        "dob": "1982-09-30",
+        "mrn": "MRN-3920184",
+        "facility": "Apollo Health City",
+        "diagnoses": [
+          {
+            "condition": "Hyperlipidemia",
+            "icd_10": "E78.5"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Ezetimibe 10mg PO Daily"
+          },
+          {
+            "raw_text": "Rosuvastatin 10mg PO Daily"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Lipid Panel",
+            "code": "80061"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          },
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          }
+        ],
+        "physician_notes": "Incidental finding of elevated cholesterol during routine screening. Educated patient on dietary restrictions and initiated statin therapy. Tolerated medication well."
+      }
+    },
+    {
+      "id": "DS-014",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200014_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200014_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Rohan Sharma",
+        "dob": "1985-04-12",
+        "mrn": "MRN-8472910",
+        "facility": "Apollo Health City",
+        "diagnoses": [
+          {
+            "condition": "Hyperlipidemia",
+            "icd_10": "E78.5"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Rosuvastatin 10mg PO Daily"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Medical/Surgical Supplies",
+            "code": "0270"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          },
+          {
+            "name": "Room and Board - Semi-Private",
+            "code": "0120"
+          },
+          {
+            "name": "Venipuncture",
+            "code": "36415"
+          },
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          }
+        ],
+        "physician_notes": "Incidental finding of elevated cholesterol during routine screening. Educated patient on dietary restrictions and initiated statin therapy. Tolerated medication well."
+      }
+    },
+    {
+      "id": "DS-015",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200015_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200015_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Sneha Iyer",
+        "dob": "1988-03-05",
+        "mrn": "MRN-5920183",
+        "facility": "Christian Medical College (CMC)",
+        "diagnoses": [
+          {
+            "condition": "Osteoarthritis of Knee",
+            "icd_10": "M17.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Ibuprofen 800mg PO TID PRN"
+          },
+          {
+            "raw_text": "Acetaminophen 500mg PO Q6H PRN"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Therapeutic Exercise",
+            "code": "97110"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          }
+        ],
+        "physician_notes": "Admitted for severe knee exacerbation. X-rays confirmed moderate to severe OA. Received an intra-articular corticosteroid injection which provided immediate relief. Discharged with outpatient PT referrals."
+      }
+    },
+    {
+      "id": "DS-016",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200016_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200016_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Rahul Verma",
+        "dob": "1970-12-10",
+        "mrn": "MRN-4859201",
+        "facility": "Fortis Escorts Heart Institute",
+        "diagnoses": [
+          {
+            "condition": "Type 2 Diabetes Mellitus",
+            "icd_10": "E11.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Insulin Glargine 10 units SubQ Nightly"
+          },
+          {
+            "raw_text": "Sitagliptin 100mg PO Daily"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          },
+          {
+            "name": "Medical/Surgical Supplies",
+            "code": "0270"
+          },
+          {
+            "name": "Office Visit, Est Patient",
+            "code": "99213"
+          },
+          {
+            "name": "Room and Board - Semi-Private",
+            "code": "0120"
+          },
+          {
+            "name": "Emergency Room Level 3",
+            "code": "99283"
+          }
+        ],
+        "physician_notes": "Patient presented with elevated blood glucose levels. Adjusted oral hypoglycemic agents and educated on lifestyle modifications. Blood sugars stabilized during admission."
+      }
+    },
+    {
+      "id": "DS-017",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200017_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200017_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Amit Singh",
+        "dob": "1978-11-03",
+        "mrn": "MRN-1039485",
+        "facility": "Christian Medical College (CMC)",
+        "diagnoses": [
+          {
+            "condition": "Type 2 Diabetes Mellitus",
+            "icd_10": "E11.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Metformin 500mg PO BID"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Office Visit, Est Patient",
+            "code": "99213"
+          },
+          {
+            "name": "Comprehensive Metabolic Panel (CMP)",
+            "code": "80053"
+          },
+          {
+            "name": "Room and Board - Semi-Private",
+            "code": "0120"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          }
+        ],
+        "physician_notes": "Patient presented with elevated blood glucose levels. Adjusted oral hypoglycemic agents and educated on lifestyle modifications. Blood sugars stabilized during admission."
+      }
+    },
+    {
+      "id": "DS-018",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200018_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200018_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Anjali Desai",
+        "dob": "1965-02-17",
+        "mrn": "MRN-5829103",
+        "facility": "Apollo Health City",
+        "diagnoses": [
+          {
+            "condition": "Acute Bronchitis",
+            "icd_10": "J20.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Azithromycin 250mg PO Daily x 5 Days"
+          },
+          {
+            "raw_text": "Benzonatate 100mg PO TID PRN Cough"
+          },
+          {
+            "raw_text": "Prednisone 20mg PO Daily"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Spirometry",
+            "code": "94010"
+          },
+          {
+            "name": "Rapid Strep Test",
+            "code": "87880"
+          },
+          {
+            "name": "Chest X-Ray, 1 View",
+            "code": "71045"
+          }
+        ],
+        "physician_notes": "Patient presented with persistent cough and shortness of breath. Chest X-Ray confirmed no pneumonia. Treated with bronchodilators and a short course of oral steroids. Symptoms improved significantly."
+      }
+    },
+    {
+      "id": "DS-019",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200019_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200019_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Sneha Iyer",
+        "dob": "1988-03-05",
+        "mrn": "MRN-5920183",
+        "facility": "Lilavati Hospital",
+        "diagnoses": [
+          {
+            "condition": "Osteoarthritis of Knee",
+            "icd_10": "M17.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Acetaminophen 500mg PO Q6H PRN"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "Room and Board - Semi-Private",
+            "code": "0120"
+          },
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "Therapeutic Exercise",
+            "code": "97110"
+          }
+        ],
+        "physician_notes": "Admitted for severe knee exacerbation. X-rays confirmed moderate to severe OA. Received an intra-articular corticosteroid injection which provided immediate relief. Discharged with outpatient PT referrals."
+      }
+    },
+    {
+      "id": "DS-020",
+      "source_dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "image_filename": "med_doc_discharge_summary_200020_noisy.jpg",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\med_doc_discharge_summary_200020_noisy.jpg",
+      "ground_truth": {
+        "patient_name": "Anjali Desai",
+        "dob": "1965-02-17",
+        "mrn": "MRN-5829103",
+        "facility": "Fortis Escorts Heart Institute",
+        "diagnoses": [
+          {
+            "condition": "Osteoarthritis of Knee",
+            "icd_10": "M17.9"
+          }
+        ],
+        "medications": [
+          {
+            "raw_text": "Ibuprofen 800mg PO TID PRN"
+          }
+        ],
+        "procedures": [
+          {
+            "name": "IV Therapy",
+            "code": "0260"
+          },
+          {
+            "name": "Pharmacy Services",
+            "code": "0250"
+          }
+        ],
+        "physician_notes": "Admitted for severe knee exacerbation. X-rays confirmed moderate to severe OA. Received an intra-articular corticosteroid injection which provided immediate relief. Discharged with outpatient PT referrals."
+      }
+    },
+    {
+      "id": "CLINOCR-001",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t10_s2.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t10_s2.png",
+      "ground_truth": {
+        "patient_name": "Maria C. Delgado",
+        "dob": "",
+        "mrn": "007-214-55",
+        "facility": "LAKEWOOD HOSPITAL",
+        "diagnoses": [
+          {
+            "condition": "Rheumatoid Arthritis",
+            "icd_10": "M06.9"
+          },
+          {
+            "condition": "Hypothyroidism",
+            "icd_10": "E03.9"
+          },
+          {
+            "condition": "Major Depressive Disorder",
+            "icd_10": "F32.1"
+          },
+          {
+            "condition": "Gastroesophageal Reflux Disease",
+            "icd_10": "K21.0"
+          },
+          {
+            "condition": "Osteoporosis",
+            "icd_10": "M81.0"
+          },
+          {
+            "condition": "Anemia, Iron Deficiency",
+            "icd_10": "D50.9"
+          },
+          {
+            "condition": "Fibromyalgia",
+            "icd_10": "M79.3"
+          }
+        ],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "LAKEWOOD HOSPITAL\n831676002937\nPatient: Maria C. Delgado  DOB: 03/28/1972  \nMRN: 007-214-55\nMarch 10, 2026\nSECTION A: Medical History\nYes\nNo\nRheumatoid Arthritis (ICD-10: M06.9)\nX\nHypothyroidism (ICD-10: E03.9)\nX\nMajor Depressive Disorder (ICD-10: F32.1)\nX\nGastroesophageal Reflux Disease (ICD-10: K2"
+      }
+    },
+    {
+      "id": "CLINOCR-002",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t10_s3.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t10_s3.png",
+      "ground_truth": {
+        "patient_name": "Robert T. Nakamura",
+        "dob": "",
+        "mrn": "012-501-88",
+        "facility": "LAKEWOOD HOSPITAL",
+        "diagnoses": [
+          {
+            "condition": "Congestive Heart Failure",
+            "icd_10": "I50.9"
+          },
+          {
+            "condition": "Atrial Fibrillation",
+            "icd_10": "I48.91"
+          },
+          {
+            "condition": "COPD, Moderate",
+            "icd_10": "J44.1"
+          },
+          {
+            "condition": "Diabetes Mellitus",
+            "icd_10": "E11.9"
+          },
+          {
+            "condition": "Benign Prostatic Hyperplasia",
+            "icd_10": "N40.0"
+          },
+          {
+            "condition": "Depression",
+            "icd_10": "F32.9"
+          },
+          {
+            "condition": "",
+            "icd_10": "N18.2"
+          }
+        ],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "LAKEWOOD HOSPITAL\n831676002937\nPatient: Robert T. Nakamura  \nDOB: 11/05/1945  \nMRN: 012-501-88\nApril 1, 2026\nSECTION A: Medical History\nYes\nNo\nCongestive Heart Failure (ICD-10: I50.9)\nX\nAtrial Fibrillation (ICD-10: I48.91)\nX\nCOPD, Moderate (ICD-10: J44.1)\nX\nType 2 Diabetes Mellitus (ICD-10: E11.9)\nX"
+      }
+    },
+    {
+      "id": "CLINOCR-003",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t10_s4.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t10_s4.png",
+      "ground_truth": {
+        "patient_name": "Sandra K. Okafor",
+        "dob": "",
+        "mrn": "019-883-12",
+        "facility": "LAKEWOOD HOSPITAL",
+        "diagnoses": [
+          {
+            "condition": "Systemic Lupus Erythematosus",
+            "icd_10": "M32.9"
+          },
+          {
+            "condition": "Hypertension",
+            "icd_10": "I10"
+          },
+          {
+            "condition": "Iron Deficiency Anemia",
+            "icd_10": "D50.9"
+          },
+          {
+            "condition": "Raynaud Syndrome",
+            "icd_10": "I73.00"
+          },
+          {
+            "condition": "Lupus Nephritis Class III",
+            "icd_10": "N08"
+          }
+        ],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "LAKEWOOD HOSPITAL\n831676002937\nPatient: Sandra K. Okafor  \nDOB: 08/19/1980  \nMRN: 019-883-12\nFebruary 14, 2026\nSECTION A: Medical History\nYes\nNo\nSystemic Lupus Erythematosus (ICD-10: M32.9)\nX\nHypertension (ICD-10: I10)\nX\nIron Deficiency Anemia (ICD-10: D50.9)\nX\nRaynaud Syndrome (ICD-10: I73.00)\nX\nLu"
+      }
+    },
+    {
+      "id": "CLINOCR-004",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t10_s5.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t10_s5.png",
+      "ground_truth": {
+        "patient_name": "David P. Kowalski",
+        "dob": "",
+        "mrn": "023-417-36",
+        "facility": "LAKEWOOD HOSPITAL",
+        "diagnoses": [
+          {
+            "condition": "Myocardial Infarction",
+            "icd_10": "I25.2"
+          },
+          {
+            "condition": "Hypertension",
+            "icd_10": "I10"
+          },
+          {
+            "condition": "Hyperlipidemia",
+            "icd_10": "E78.5"
+          },
+          {
+            "condition": "Diabetes Mellitus",
+            "icd_10": "E11.9"
+          },
+          {
+            "condition": "Generalized Anxiety Disorder",
+            "icd_10": "F41.1"
+          },
+          {
+            "condition": "Gout",
+            "icd_10": "M10.9"
+          },
+          {
+            "condition": "",
+            "icd_10": "N18.2"
+          }
+        ],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "LAKEWOOD HOSPITAL\n831676002937\nPatient: David P. Kowalski  DOB: 02/07/1962  \nMRN: 023-417-36\nMarch 25, 2026\nSECTION A: Medical History\nYes\nNo\nPost-Myocardial Infarction (ICD-10: I25.2)\nX\nHypertension (ICD-10: I10)\nX\nHyperlipidemia (ICD-10: E78.5)\nX\nType 2 Diabetes Mellitus (ICD-10: E11.9)\nX\nGenerali"
+      }
+    },
+    {
+      "id": "CLINOCR-005",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t10_s6.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t10_s6.png",
+      "ground_truth": {
+        "patient_name": "Helen F. Morrison",
+        "dob": "",
+        "mrn": "031-928-74",
+        "facility": "LAKEWOOD HOSPITAL",
+        "diagnoses": [
+          {
+            "condition": "",
+            "icd_10": "C50.912"
+          },
+          {
+            "condition": "Osteoporosis",
+            "icd_10": "M81.0"
+          },
+          {
+            "condition": "Hypertension",
+            "icd_10": "I10"
+          },
+          {
+            "condition": "Hypothyroidism",
+            "icd_10": "E03.9"
+          },
+          {
+            "condition": "Insomnia",
+            "icd_10": "G47.00"
+          }
+        ],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "LAKEWOOD HOSPITAL\n831676002937\nPatient: Helen F. Morrison  \nDOB: 05/30/1955  \nMRN: 031-928-74\nApril 8, 2026\nSECTION A: Medical History\nYes\nNo\nBreast Cancer Stage II ER+ (ICD-10: C50.912)\nX\nOsteoporosis (ICD-10: M81.0)\nX\nHypertension (ICD-10: I10)\nX\nHypothyroidism (ICD-10: E03.9)\nX\nInsomnia (ICD-10: "
+      }
+    },
+    {
+      "id": "CLINOCR-006",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t10_s7.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t10_s7.png",
+      "ground_truth": {
+        "patient_name": "Carlos M. Rivera",
+        "dob": "",
+        "mrn": "038-664-19",
+        "facility": "LAKEWOOD HOSPITAL",
+        "diagnoses": [
+          {
+            "condition": "Asthma, Moderate Persistent",
+            "icd_10": "J45.40"
+          },
+          {
+            "condition": "Allergic Rhinitis",
+            "icd_10": "J30.9"
+          },
+          {
+            "condition": "ADHD, Combined Type",
+            "icd_10": "F90.2"
+          },
+          {
+            "condition": "Migraine without Aura",
+            "icd_10": "G43.009"
+          },
+          {
+            "condition": "Atopic Dermatitis",
+            "icd_10": "L20.9"
+          }
+        ],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "LAKEWOOD HOSPITAL\n831676002937\nPatient: Carlos M. Rivera  \nDOB: 09/14/1990  \nMRN: 038-664-19\nJanuary 30, 2026\nSECTION A: Medical History\nYes\nNo\nAsthma, Moderate Persistent (ICD-10: J45.40)\nX\nAllergic Rhinitis (ICD-10: J30.9)\nX\nADHD, Combined Type (ICD-10: F90.2)\nX\nMigraine without Aura (ICD-10: G43."
+      }
+    },
+    {
+      "id": "CLINOCR-007",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t10_s8.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t10_s8.png",
+      "ground_truth": {
+        "patient_name": "Dorothy R. Ingram",
+        "dob": "",
+        "mrn": "045-772-03",
+        "facility": "LAKEWOOD HOSPITAL",
+        "diagnoses": [
+          {
+            "condition": "Alzheimer Disease, Early Stage",
+            "icd_10": "G30.0"
+          },
+          {
+            "condition": "Hypertension",
+            "icd_10": "I10"
+          },
+          {
+            "condition": "Diabetes Mellitus",
+            "icd_10": "E11.9"
+          },
+          {
+            "condition": "Osteoarthritis, Bilateral Knee",
+            "icd_10": "M17.11"
+          },
+          {
+            "condition": "Urinary Incontinence",
+            "icd_10": "R32"
+          },
+          {
+            "condition": "Depression",
+            "icd_10": "F32.9"
+          }
+        ],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "LAKEWOOD HOSPITAL\n831676002937\nPatient: Dorothy R. Ingram \nDOB: 01/17/1938  \nMRN: 045-772-03\nApril 20, 2026\nSECTION A: Medical History\nYes\nNo\nAlzheimer Disease, Early Stage (ICD-10: G30.0)\nX\nHypertension (ICD-10: I10)\nX\nType 2 Diabetes Mellitus (ICD-10: E11.9)\nX\nOsteoarthritis, Bilateral Knee (ICD-1"
+      }
+    },
+    {
+      "id": "CLINOCR-008",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t11_s2.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t11_s2.png",
+      "ground_truth": {
+        "patient_name": "",
+        "dob": "",
+        "mrn": "",
+        "facility": "Michael B. Torres",
+        "diagnoses": [],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "Michael B. Torres\nDOB: 11/03/1958   Age: 67   Sex: M\nAcct#: 44712-B     Physician: Dr. James R. Allen, MD\nPRECISION DIAGNOSTIC LAB\n03/15/2026  06:30\n03/15/2026  07:20\n03/15/2026  09:55\nCMP, HbA1c\nComp. Metabolic Panel \nTest\nResult\nPrevious Result\nDate\nUnits\nRef Interval\nGlucose\n142 H\n126\n03/01/2026\n"
+      }
+    },
+    {
+      "id": "CLINOCR-009",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t11_s3.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t11_s3.png",
+      "ground_truth": {
+        "patient_name": "",
+        "dob": "",
+        "mrn": "",
+        "facility": "Angela R. Fontaine",
+        "diagnoses": [],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "Angela R. Fontaine\nDOB: 05/17/1978   Age: 47   Sex: F\nAcct#: 31985-C     Physician: Dr. Sarah K. Bloom, MD\nPRECISION DIAGNOSTIC LAB\n04/10/2026  08:00\n04/10/2026  08:45\n04/10/2026  11:30\nCMP, HbA1c\nComp. Metabolic Panel \nTest\nResult\nPrevious Result\nDate\nUnits\nRef Interval\nGlucose\n88\n91\n01/15/2026\nmg/"
+      }
+    },
+    {
+      "id": "CLINOCR-010",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t11_s4.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t11_s4.png",
+      "ground_truth": {
+        "patient_name": "",
+        "dob": "",
+        "mrn": "",
+        "facility": "Kenneth J. Harrington",
+        "diagnoses": [],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "Kenneth J. Harrington\nDOB: 09/30/1950   Age: 75   Sex: M\nAcct#: 57230-D     Physician: Dr. Nadia Patel, MD\nPRECISION DIAGNOSTIC LAB\n02/28/2026  07:45\n02/28/2026  08:30\n02/28/2026  10:15\nCMP, HbA1c\nComp. Metabolic Panel \nTest\nResult\nPrevious Result\nDate\nUnits\nRef Interval\nGlucose\n104\n110\n12/10/2025\nm"
+      }
+    },
+    {
+      "id": "CLINOCR-011",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t11_s5.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t11_s5.png",
+      "ground_truth": {
+        "patient_name": "",
+        "dob": "",
+        "mrn": "",
+        "facility": "Olivia T. Brennan",
+        "diagnoses": [],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "Olivia T. Brennan\nDOB: 04/12/1995   Age: 31   Sex: F\nAcct#: 62441-E     Physician: Dr. Marcus J. Cohen, MD\nPRECISION DIAGNOSTIC LAB\n04/18/2026  09:00\n04/18/2026  09:50\n04/18/2026  11:00\nCMP, HbA1c\nComp. Metabolic Panel \nTest\nResult\nPrevious Result\nDate\nUnits\nRef Interval\nGlucose\n82\n80\n02/20/2026\nmg/"
+      }
+    },
+    {
+      "id": "CLINOCR-012",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t11_s6.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t11_s6.png",
+      "ground_truth": {
+        "patient_name": "",
+        "dob": "",
+        "mrn": "",
+        "facility": "George L. Washington",
+        "diagnoses": [],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "George L. Washington\nDOB: 12/08/1962   Age: 63   Sex: M\nAcct#: 73388-F     Physician: Dr. Priya N. Sharma, MD\nPRECISION DIAGNOSTIC LAB\n03/28/2026  07:00\n03/28/2026  07:55\n03/28/2026  10:00\nCMP, HbA1c\nComp. Metabolic Panel \nTest\nResult\nPrevious Result\nDate\nUnits\nRef Interval\nGlucose\n118 H\n130 H\n01/05"
+      }
+    },
+    {
+      "id": "CLINOCR-013",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t11_s7.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t11_s7.png",
+      "ground_truth": {
+        "patient_name": "",
+        "dob": "",
+        "mrn": "",
+        "facility": "Natalie G. Cruz",
+        "diagnoses": [],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "Natalie G. Cruz\nDOB: 06/25/1985   Age: 40   Sex: F\nAcct#: 81024-G     Physician: Dr. Alan T. Greenwood, MD\nPRECISION DIAGNOSTIC LAB\n04/05/2026  08:30\n04/05/2026  09:15\n04/05/2026  11:40\nCMP, HbA1c\nComp. Metabolic Panel \nTest\nResult\nPrevious Result\nDate\nUnits\nRef Interval\nGlucose\n90\n92\n02/10/2026\nmg/"
+      }
+    },
+    {
+      "id": "CLINOCR-014",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t11_s8.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t11_s8.png",
+      "ground_truth": {
+        "patient_name": "",
+        "dob": "",
+        "mrn": "",
+        "facility": "Harold S. Kim",
+        "diagnoses": [],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "Harold S. Kim\nDOB: 03/19/1970   Age: 56   Sex: M\nAcct#: 90173-H     Physician: Dr. Lucia M. Reyes, MD\nPRECISION DIAGNOSTIC LAB\n04/20/2026  07:30\n04/20/2026  08:20\n04/20/2026  10:50\nCMP, HbA1c\nComp. Metabolic Panel \nTest\nResult\nPrevious Result\nDate\nUnits\nRef Interval\nGlucose\n108 H\n100\n03/15/2026\nmg/d"
+      }
+    },
+    {
+      "id": "CLINOCR-015",
+      "source_dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "image_filename": "clinocr_table_tables_t12_s2.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\clinocr_table_tables_t12_s2.png",
+      "ground_truth": {
+        "patient_name": "",
+        "dob": "",
+        "mrn": "",
+        "facility": "Michael B. Torres",
+        "diagnoses": [],
+        "medications": [],
+        "procedures": [],
+        "physician_notes": "Michael B. Torres\nDOB: 11/03/1958   \nAge: 67   \nSex: M\nAcct#: 44712-B     Physician: Dr. James R. Allen, MD\nPRECISION DIAGNOSTIC LAB\n03/15/2026  06:30\n03/15/2026  07:20\n03/15/2026  09:55\nNMR LipoProfile\nNMR LipoProfile \nTest\nResult\nPrevious Result\nDate\nUnits\nRef Interval\nLDL Particle Number\n1820 H\n1"
+      }
+    },
+    {
+      "id": "RX-001",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00006.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00006.png",
+      "ground_truth": {
+        "patient_name": "Aisha Khan",
+        "dob": "",
+        "mrn": "",
+        "facility": "City Health Clinic",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Prednisone 25 mg"
+          },
+          {
+            "raw_text": "After meals"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. C. Rossi at City Health Clinic on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-002",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00025.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00025.png",
+      "ground_truth": {
+        "patient_name": "Wei Li",
+        "dob": "",
+        "mrn": "",
+        "facility": "Greenwood Medical Center",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Metformin 250 mg"
+          },
+          {
+            "raw_text": "After meals"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. F. Gomez at Greenwood Medical Center on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-003",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00027.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00027.png",
+      "ground_truth": {
+        "patient_name": "Hiro Tanaka",
+        "dob": "",
+        "mrn": "",
+        "facility": "City Health Clinic",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Acetaminophen 250 mg"
+          },
+          {
+            "raw_text": "Before meals"
+          },
+          {
+            "raw_text": "Losartan 250 mg"
+          },
+          {
+            "raw_text": "After meals"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. M. Lee at City Health Clinic on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-004",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00030.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00030.png",
+      "ground_truth": {
+        "patient_name": "Jane Smith",
+        "dob": "",
+        "mrn": "",
+        "facility": "Oakview Hospital",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Amoxicillin 50 mg"
+          },
+          {
+            "raw_text": "With food"
+          },
+          {
+            "raw_text": "Acetaminophen 500 mg"
+          },
+          {
+            "raw_text": "At bedtime"
+          },
+          {
+            "raw_text": "Gabapentin 25 mg"
+          },
+          {
+            "raw_text": "After meals"
+          },
+          {
+            "raw_text": "Simvastatin 20 mg"
+          },
+          {
+            "raw_text": "Every 12 hours"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. F. Gomez at Oakview Hospital on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-005",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00032.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00032.png",
+      "ground_truth": {
+        "patient_name": "Fatima Ali",
+        "dob": "",
+        "mrn": "",
+        "facility": "Oakview Hospital",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Metformin 250 mg"
+          },
+          {
+            "raw_text": "As directed"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. H. Johnson at Oakview Hospital on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-006",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00044.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00044.png",
+      "ground_truth": {
+        "patient_name": "Michael Brown",
+        "dob": "",
+        "mrn": "",
+        "facility": "City Health Clinic",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Levothyroxine 100 mg"
+          },
+          {
+            "raw_text": "Take once daily"
+          },
+          {
+            "raw_text": "Lisinopril 25 mg"
+          },
+          {
+            "raw_text": "Every 12 hours"
+          },
+          {
+            "raw_text": "Prednisone 10 mg"
+          },
+          {
+            "raw_text": "Every 8 hours"
+          },
+          {
+            "raw_text": "Amoxicillin 5 mg"
+          },
+          {
+            "raw_text": "At bedtime"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. H. Johnson at City Health Clinic on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-007",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00046.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00046.png",
+      "ground_truth": {
+        "patient_name": "Maria Garcia",
+        "dob": "",
+        "mrn": "",
+        "facility": "Greenwood Medical Center",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Ciprofloxacin 25 mg"
+          },
+          {
+            "raw_text": "With food"
+          },
+          {
+            "raw_text": "Hydrochlorothiazide 20 mg"
+          },
+          {
+            "raw_text": "As directed"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. M. Lee at Greenwood Medical Center on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-008",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00071.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00071.png",
+      "ground_truth": {
+        "patient_name": "John Doe",
+        "dob": "",
+        "mrn": "",
+        "facility": "Meadowview Health",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Acetaminophen 5 mg"
+          },
+          {
+            "raw_text": "At bedtime"
+          },
+          {
+            "raw_text": "Omeprazole 10 mg"
+          },
+          {
+            "raw_text": "Take twice daily"
+          },
+          {
+            "raw_text": "Ibuprofen 50 mg"
+          },
+          {
+            "raw_text": "Every 12 hours"
+          },
+          {
+            "raw_text": "Losartan 10 mg"
+          },
+          {
+            "raw_text": "As needed for pain"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. A. Smith at Meadowview Health on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-009",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00080.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00080.png",
+      "ground_truth": {
+        "patient_name": "Elena Petrova",
+        "dob": "",
+        "mrn": "",
+        "facility": "Riverside Clinic",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Lisinopril 10 mg"
+          },
+          {
+            "raw_text": "Take twice daily"
+          },
+          {
+            "raw_text": "Levothyroxine 100 mg"
+          },
+          {
+            "raw_text": "Take twice daily"
+          },
+          {
+            "raw_text": "Losartan 25 mg"
+          },
+          {
+            "raw_text": "Every 8 hours"
+          },
+          {
+            "raw_text": "Metformin 10 mg"
+          },
+          {
+            "raw_text": "At bedtime"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. M. Lee at Riverside Clinic on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-010",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00081.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00081.png",
+      "ground_truth": {
+        "patient_name": "John Doe",
+        "dob": "",
+        "mrn": "",
+        "facility": "Riverside Clinic",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Lisinopril 50 mg"
+          },
+          {
+            "raw_text": "At bedtime"
+          },
+          {
+            "raw_text": "Acetaminophen 100 mg"
+          },
+          {
+            "raw_text": "With food"
+          },
+          {
+            "raw_text": "Omeprazole 25 mg"
+          },
+          {
+            "raw_text": "At bedtime"
+          },
+          {
+            "raw_text": "Levothyroxine 5 mg"
+          },
+          {
+            "raw_text": "Before meals"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. R. Patel at Riverside Clinic on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-011",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00089.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00089.png",
+      "ground_truth": {
+        "patient_name": "Wei Li",
+        "dob": "",
+        "mrn": "",
+        "facility": "Riverside Clinic",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Prednisone 25 mg"
+          },
+          {
+            "raw_text": "As directed"
+          },
+          {
+            "raw_text": "Amlodipine 20 mg"
+          },
+          {
+            "raw_text": "With food"
+          },
+          {
+            "raw_text": "Omeprazole 5 mg"
+          },
+          {
+            "raw_text": "As directed"
+          },
+          {
+            "raw_text": "Lisinopril 5 mg"
+          },
+          {
+            "raw_text": "With food"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. R. Patel at Riverside Clinic on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-012",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00094.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00094.png",
+      "ground_truth": {
+        "patient_name": "Carlos Chavez",
+        "dob": "",
+        "mrn": "",
+        "facility": "Riverside Clinic",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Omeprazole 500 mg"
+          },
+          {
+            "raw_text": "Every 12 hours"
+          },
+          {
+            "raw_text": "Amoxicillin 5 mg"
+          },
+          {
+            "raw_text": "Every 8 hours"
+          },
+          {
+            "raw_text": "Metformin 10 mg"
+          },
+          {
+            "raw_text": "Before meals"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. F. Gomez at Riverside Clinic on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-013",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00095.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00095.png",
+      "ground_truth": {
+        "patient_name": "Hiro Tanaka",
+        "dob": "",
+        "mrn": "",
+        "facility": "City Health Clinic",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Levothyroxine 250 mg"
+          },
+          {
+            "raw_text": "After meals"
+          },
+          {
+            "raw_text": "Ciprofloxacin 250 mg"
+          },
+          {
+            "raw_text": "As needed for pain"
+          },
+          {
+            "raw_text": "Losartan 10 mg"
+          },
+          {
+            "raw_text": "As directed"
+          },
+          {
+            "raw_text": "Ibuprofen 500 mg"
+          },
+          {
+            "raw_text": "At bedtime"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. F. Gomez at City Health Clinic on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-014",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00099.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00099.png",
+      "ground_truth": {
+        "patient_name": "Michael Brown",
+        "dob": "",
+        "mrn": "",
+        "facility": "Greenwood Medical Center",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Lisinopril 50 mg"
+          },
+          {
+            "raw_text": "Every 8 hours"
+          },
+          {
+            "raw_text": "Amlodipine 250 mg"
+          },
+          {
+            "raw_text": "Every 8 hours"
+          },
+          {
+            "raw_text": "Atorvastatin 50 mg"
+          },
+          {
+            "raw_text": "At bedtime"
+          },
+          {
+            "raw_text": "Amoxicillin 500 mg"
+          },
+          {
+            "raw_text": "Take once daily"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. A. Smith at Greenwood Medical Center on 2024-12-16"
+      }
+    },
+    {
+      "id": "RX-015",
+      "source_dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "image_filename": "prescription_00103.png",
+      "local_image_path": "D:\\Projects\\MedAssist\\MedAssist\\backend\\report_evaluation\\benchmark_data\\images\\prescription_00103.png",
+      "ground_truth": {
+        "patient_name": "Wei Li",
+        "dob": "",
+        "mrn": "",
+        "facility": "Oakview Hospital",
+        "diagnoses": [],
+        "medications": [
+          {
+            "raw_text": "Metformin 100 mg"
+          },
+          {
+            "raw_text": "At bedtime"
+          },
+          {
+            "raw_text": "Acetaminophen 500 mg"
+          },
+          {
+            "raw_text": "After meals"
+          }
+        ],
+        "procedures": [],
+        "physician_notes": "Prescribed by Dr. R. Patel at Oakview Hospital on 2024-12-16"
+      }
+    }
+  ]
+}

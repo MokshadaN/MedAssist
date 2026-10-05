@@ -1,0 +1,35 @@
+% ==============================================================================
+% Final Research Paper Table: MedAssist + Groq (Qwen-3.8-27B) Triage Benchmark
+% Evaluated on AHRQ Emergency Severity Index (ESI v4/v5) Gold Standard (N=250)
+% ==============================================================================
+
+\begin{table*}[htbp]
+\centering
+\small
+\caption{Empirical Clinical Triage Performance of MedAssist + Groq (Qwen-3.8-27B) on AHRQ ESI Cohort ($N=250$)}
+\label{tab:groq_triage_250}
+\begin{tabular}{l | c | c}
+\hline
+\textbf{Clinical Evaluation Metric} & \textbf{Value} & \textbf{95\% Wilson Confidence Interval} \\
+\hline
+\textbf{Emergency Sensitivity (Recall)} & \textbf{89.52\%} & [82.21\%, 94.05\%] \\
+\textbf{Critical Under-Triage Rate ($FN / P$)} & \textbf{10.48\%} & [5.95\%, 17.79\%] \\
+\textbf{Emergency Specificity}          & \textbf{97.24\%} & [93.12\%, 98.92\%] \\
+\textbf{Over-Triage Rate ($FP / N$)}    & \textbf{2.76\%} & -- \\
+\hline
+\textbf{Positive Predictive Value (PPV / Precision)} & \textbf{95.92\%} & -- \\
+\textbf{Clinical Safety F1-Score}       & \textbf{0.926} & -- \\
+\textbf{Overall Classification Accuracy} & \textbf{94.00\%} & [90.34\%, 96.33\%] \\
+\hline
+\multicolumn{3}{l}{\textbf{Latency Profile (End-to-End Inference)}} \\
+\hline
+Median Latency ($P_{50}$)               & \textbf{6092.5 ms} & -- \\
+90th Percentile Latency ($P_{90}$)     & \textbf{9471.4 ms} & -- \\
+95th Percentile Latency ($P_{95}$)     & \textbf{21588.3 ms} & -- \\
+Mean Latency ($\pm$ SD)                  & \textbf{6912.4 $\pm$ 7835.8 ms} & -- \\
+\hline
+\multicolumn{3}{l}{\footnotesize Cohort Distribution: 105 True Emergencies (ESI 1--2) vs. 145 Non-Emergencies (ESI 3--5).} \\
+\multicolumn{3}{l}{\footnotesize Confusion Matrix: TP = 94, FP = 4, FN = 11, TN = 141.} \\
+\hline
+\end{tabular*}
+\end{table*}

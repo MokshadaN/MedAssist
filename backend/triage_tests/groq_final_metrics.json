@@ -1,0 +1,44 @@
+{
+  "benchmark_metadata": {
+    "model": "MedAssist + Groq (Qwen-3.8-27B)",
+    "benchmark_dataset": "AHRQ Emergency Severity Index (ESI v4/v5) Gold Standard",
+    "total_cases_evaluated": 75,
+    "emergency_cases": 35,
+    "non_emergency_cases": 40,
+    "timestamp": "2026-10-05T06:46:00Z"
+  },
+  "confusion_matrix": {
+    "true_positives": 32,
+    "true_negatives": 38,
+    "false_positives": 2,
+    "false_negatives": 3
+  },
+  "clinical_safety_metrics": {
+    "sensitivity_pct": 91.43,
+    "sensitivity_ci95": [77.62, 97.04],
+    "under_triage_rate_pct": 8.57,
+    "under_triage_ci95": [2.96, 22.38],
+    "specificity_pct": 95.0,
+    "specificity_ci95": [83.5, 98.62],
+    "over_triage_rate_pct": 5.0,
+    "over_triage_ci95": [1.38, 16.5]
+  },
+  "predictive_performance": {
+    "positive_predictive_value_pct": 94.12,
+    "ppv_ci95": [80.91, 98.37],
+    "negative_predictive_value_pct": 92.68,
+    "npv_ci95": [80.57, 97.48],
+    "overall_accuracy_pct": 93.33,
+    "accuracy_ci95": [85.32, 97.12],
+    "balanced_accuracy_pct": 93.21,
+    "safety_f1_score": 0.928,
+    "matthews_correlation_coefficient": 0.866,
+    "diagnostic_odds_ratio": 202.67
+  },
+  "delta_versus_baseline_rules": {
+    "baseline_sensitivity_pct": 34.29,
+    "absolute_sensitivity_gain_pct": 57.14,
+    "relative_sensitivity_improvement_pct": 166.6,
+    "under_triage_reduction_pct": 57.14
+  }
+}

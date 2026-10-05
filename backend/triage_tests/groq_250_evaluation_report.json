@@ -1,0 +1,2299 @@
+{
+  "metrics": {
+    "sample_size": 250,
+    "emergency_cases": 105,
+    "non_emergency_cases": 145,
+    "network_errors": 0,
+    "confusion_matrix": {
+      "true_positives": 94,
+      "false_positives": 4,
+      "false_negatives": 11,
+      "true_negatives": 141
+    },
+    "safety_metrics": {
+      "sensitivity_pct": 89.52,
+      "sensitivity_ci95": [
+        82.21,
+        94.05
+      ],
+      "specificity_pct": 97.24,
+      "specificity_ci95": [
+        93.12,
+        98.92
+      ],
+      "under_triage_rate_pct": 10.48,
+      "under_triage_ci95": [
+        5.95,
+        17.79
+      ],
+      "over_triage_rate_pct": 2.76,
+      "precision_pct": 95.92,
+      "f1_score": 0.926,
+      "accuracy_pct": 94.0,
+      "accuracy_ci95": [
+        90.34,
+        96.33
+      ]
+    },
+    "latency_profile_ms": {
+      "p50": 6092.5,
+      "p90": 9471.4,
+      "p95": 21588.3,
+      "p99": 57345.9,
+      "mean": 6912.4,
+      "std_dev": 7835.8
+    }
+  },
+  "cases": [
+    {
+      "id": "AHRQ-ESI-001",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.9,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-002",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.1,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-003",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.1,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-004",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-005",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 535.9,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-006",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 357.1,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-007",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 364.8,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-008",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 402.8,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-009",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 625.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-010",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 402.7,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-011",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 534.6,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-012",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.3,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-013",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 11446.1,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-014",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 5502.1,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-015",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 11548.9,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-016",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-017",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.1,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-018",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.3,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-019",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8511.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-020",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 9453.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-021",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 26496.6,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-022",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8052.8,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-023",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-024",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 7420.8,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-025",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 26957.3,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-026",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8576.6,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-027",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-028",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.6,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-029",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 9573.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-030",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 6420.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-031",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8532.8,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-032",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-033",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8486.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-034",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 22743.7,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-035",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 7456.8,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-036",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 9490.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-037",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8447.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-038",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8386.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-039",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6416.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-040",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7417.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-041",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 22850.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-042",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7421.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-043",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7399.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-044",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 7435.8,
+      "status": "FP"
+    },
+    {
+      "id": "AHRQ-ESI-045",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7433.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-046",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 16369.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-047",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7478.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-048",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6391.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-049",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8443.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-050",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 22814.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-051",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7439.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-052",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 21588.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-053",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 4393.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-054",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8455.2,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-055",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7415.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-056",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8469.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-057",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6446.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-058",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7388.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-059",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 5375.2,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-060",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 7444.4,
+      "status": "FP"
+    },
+    {
+      "id": "AHRQ-ESI-061",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8874.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-062",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6480.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-063",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6462.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-064",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7318.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-065",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 4293.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-066",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 5426.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-067",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6361.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-068",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 5435.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-069",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6395.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-070",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8355.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-071",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 5367.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-072",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 5358.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-073",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 5370.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-074",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6318.2,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-075",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 4661.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-076",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.3,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-077",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 3476.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-078",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 30557.7,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-079",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 10527.1,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-080",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 9360.3,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-081",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 6399.0,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-082",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8459.3,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-083",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8468.8,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-084",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8528.9,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-085",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8426.9,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-086",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8459.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-087",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 9434.7,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-088",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 7468.6,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-089",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 9471.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-090",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8458.0,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-091",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 9665.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-092",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-093",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 27917.2,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-094",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-095",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 9438.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-096",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8434.5,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-097",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8479.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-098",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 7466.9,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-099",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8462.1,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-100",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-101",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8470.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-102",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-103",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8465.9,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-104",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8464.7,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-105",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8438.0,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-106",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8417.0,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-107",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 6506.9,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-108",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 10454.9,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-109",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 24862.9,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-110",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 7468.6,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-111",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8509.3,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-112",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 10451.0,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-113",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.6,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-114",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 6637.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-115",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-116",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8502.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-117",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 9557.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-118",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 8483.0,
+      "status": "FP"
+    },
+    {
+      "id": "AHRQ-ESI-119",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8433.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-120",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": true,
+      "decision_source": "extracted_fact_rule",
+      "latency_ms": 7412.5,
+      "status": "FP"
+    },
+    {
+      "id": "AHRQ-ESI-121",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8411.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-122",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 5401.2,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-123",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 9393.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-124",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6427.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-125",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8399.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-126",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7536.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-127",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 5433.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-128",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8692.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-129",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 7443.2,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-130",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 21651.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-131",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 6403.2,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-132",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 5481.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-133",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 8409.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-134",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 11457.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-135",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6102.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-136",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6083.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-137",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6089.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-138",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6079.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-139",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6077.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-140",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6098.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-141",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6087.2,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-142",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6095.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-143",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6086.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-144",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6079.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-145",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6084.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-146",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6081.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-147",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6102.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-148",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6103.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-149",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6084.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-150",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6091.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-151",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6093.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-152",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6092.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-153",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6097.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-154",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6084.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-155",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6092.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-156",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6090.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-157",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6089.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-158",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6091.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-159",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6083.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-160",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6108.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-161",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6083.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-162",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6085.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-163",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6089.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-164",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6080.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-165",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6116.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-166",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6082.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-167",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 65433.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-168",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6082.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-169",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6074.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-170",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6074.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-171",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6078.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-172",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6076.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-173",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6094.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-174",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6069.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-175",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6085.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-176",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-177",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6084.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-178",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6101.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-179",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6077.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-180",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-181",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-182",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6077.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-183",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6077.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-184",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6084.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-185",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-186",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.1,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-187",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6334.2,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-188",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6078.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-189",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6071.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-190",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-191",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6107.2,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-192",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6086.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-193",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6075.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-194",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6080.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-195",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.3,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-196",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.2,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-197",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6069.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-198",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6077.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-199",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6078.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-200",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-201",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-202",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6085.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-203",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6094.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-204",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6080.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-205",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-206",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-207",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6140.3,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-208",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6146.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-209",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 62368.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-210",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-211",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6086.9,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-212",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6083.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-213",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6087.7,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-214",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6087.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-215",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-216",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-217",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6090.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-218",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6089.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-219",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6089.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-220",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-221",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-222",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6087.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-223",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6084.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-224",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6094.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-225",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-226",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-227",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6085.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-228",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6090.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-229",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6087.2,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-230",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-231",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6121.6,
+      "status": "FN"
+    },
+    {
+      "id": "AHRQ-ESI-232",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6106.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-233",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6108.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-234",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6103.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-235",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-236",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-237",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6096.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-238",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6094.1,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-239",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6096.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-240",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-241",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.5,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-242",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6100.8,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-243",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6126.4,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-244",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6087.5,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-245",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-246",
+      "esi_level": 2,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.4,
+      "status": "TP"
+    },
+    {
+      "id": "AHRQ-ESI-247",
+      "esi_level": 3,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6111.0,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-248",
+      "esi_level": 4,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "fallback_error",
+      "latency_ms": 6082.6,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-249",
+      "esi_level": 5,
+      "expected_emergency": false,
+      "predicted_urgent": false,
+      "decision_source": "groq_extraction_only",
+      "latency_ms": 57345.9,
+      "status": "TN"
+    },
+    {
+      "id": "AHRQ-ESI-250",
+      "esi_level": 1,
+      "expected_emergency": true,
+      "predicted_urgent": true,
+      "decision_source": "rule",
+      "latency_ms": 0.2,
+      "status": "TP"
+    }
+  ]
+}

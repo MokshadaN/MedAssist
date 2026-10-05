@@ -26,6 +26,9 @@ SafetyConcept = Literal[
     "choking",
     "overdose_or_poisoning",
     "suicidal_or_homicidal_intent",
+    "acute_airway_compromise_or_stridor",
+    "acute_ocular_emergency_or_chemical_burn",
+    "acute_severe_pelvic_or_testicular_torsion",
 ]
 
 
