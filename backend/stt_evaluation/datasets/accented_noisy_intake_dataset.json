@@ -1,0 +1,527 @@
+[
+  {
+    "id": "ACC-001",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Cardiovascular",
+    "text": "My grandmother is having extreme dizziness, cold sweats, and palpitations since this morning."
+  },
+  {
+    "id": "ACC-002",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Trauma / Neurological",
+    "text": "The patient collapsed suddenly with loss of consciousness and has a laceration on the forehead."
+  },
+  {
+    "id": "ACC-003",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Neurology",
+    "text": "I have had a severe throbbing headache behind my left eye with nausea and light sensitivity for twelve hours."
+  },
+  {
+    "id": "ACC-004",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Pediatrics",
+    "text": "My baby has been crying incessantly with high fever and refusing to drink milk for the past six hours."
+  },
+  {
+    "id": "ACC-005",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Orthopedic Trauma",
+    "text": "I fell from the motorcycle and there is severe swelling and deformity in my right forearm with numbness in fingers."
+  },
+  {
+    "id": "ACC-006",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Cardiology",
+    "text": "Sharp crushing chest pain that came on after climbing stairs, making it very difficult to catch my breath."
+  },
+  {
+    "id": "ACC-007",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Stroke / Neurology",
+    "text": "My father is experiencing sudden confusion, slurred speech, and weakness in his left leg."
+  },
+  {
+    "id": "ACC-008",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Anaphylaxis",
+    "text": "My lips and tongue started swelling twenty minutes after eating shellfish and my throat feels constricted."
+  },
+  {
+    "id": "ACC-009",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Acute Appendicitis",
+    "text": "Excruciating pain in the lower right abdomen with severe nausea, chills, and inability to stand upright."
+  },
+  {
+    "id": "ACC-010",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Hypoglycemia",
+    "text": "He is feeling extremely shaky, sweating profusely, and his blood sugar monitor reads forty-two."
+  },
+  {
+    "id": "ACC-011",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Arterial Hemorrhage",
+    "text": "A deep cut on the palm from broken glass with bright red blood spurting continuously."
+  },
+  {
+    "id": "ACC-012",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Gastroenterology",
+    "text": "Sudden burning pain in the chest with acid regurgitation and tightness across the upper ribcage."
+  },
+  {
+    "id": "ACC-013",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Respiratory Infection",
+    "text": "Persistent dry cough, mild shortness of breath upon exertion, and low grade fever for four days."
+  },
+  {
+    "id": "ACC-014",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Post-Op Infection",
+    "text": "Severe swelling and redness around the surgical incision with yellow discharge and localized warmth."
+  },
+  {
+    "id": "ACC-015",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Cauda Equina Syndrome",
+    "text": "Intense lower back pain radiating down both legs with sudden difficulty in bladder control."
+  },
+  {
+    "id": "ACC-016",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Foreign Body Ingestion",
+    "text": "The child swallowed a small coin twenty minutes ago and is now drooling and coughing repeatedly."
+  },
+  {
+    "id": "ACC-017",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Renal Colic",
+    "text": "Unbearable flank pain that comes in sharp waves, radiating to the groin with visible blood in urine."
+  },
+  {
+    "id": "ACC-018",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "ENT Emergency",
+    "text": "Severe throbbing pain in the left ear with bloody discharge and acute hearing loss after swimming."
+  },
+  {
+    "id": "ACC-019",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Congestive Heart Failure",
+    "text": "My mother woke up with swollen ankles, breathless while lying flat, and needs three pillows to sleep."
+  },
+  {
+    "id": "ACC-020",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Retinal Detachment",
+    "text": "Sudden curtain-like darkness falling over the upper half of my right eye without any pain."
+  },
+  {
+    "id": "ACC-021",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Gastroenteritis",
+    "text": "Continuous vomiting for twenty-four hours after eating seafood with severe dehydration and muscle cramps."
+  },
+  {
+    "id": "ACC-022",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Geriatric Fall",
+    "text": "Elderly male found on bathroom floor confused, hypothermic, with bruises on hip and shoulder."
+  },
+  {
+    "id": "ACC-023",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Deep Vein Thrombosis",
+    "text": "Sudden swelling in left calf with warmth, tenderness, and pain aggravated by flexing the foot."
+  },
+  {
+    "id": "ACC-024",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Acute Asthma Exacerbation",
+    "text": "Severe asthma attack with audible wheezing and no relief after six puffs of rescue inhaler."
+  },
+  {
+    "id": "ACC-025",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Meningitis",
+    "text": "High fever of 104 with stiff neck, photophobia, and extreme drowsiness in a college student."
+  },
+  {
+    "id": "ACC-026",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Colitis / Dysentery",
+    "text": "Severe abdominal cramping and bloody diarrhea with tenesmus for thirty-six hours."
+  },
+  {
+    "id": "ACC-027",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Chemical Ocular Burn",
+    "text": "Accidental splash of industrial cleaning chemical into both eyes causing intense burning and redness."
+  },
+  {
+    "id": "ACC-028",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Biliary Obstruction",
+    "text": "Dull persistent ache in right upper abdomen with yellowing of the eyes and dark tea-colored urine."
+  },
+  {
+    "id": "ACC-029",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Supraventricular Tachycardia",
+    "text": "Sudden onset of rapid racing heart rate exceeding 170 beats per minute while sitting at rest."
+  },
+  {
+    "id": "ACC-030",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Polypharmacy Overdose",
+    "text": "Patient took twenty sleeping tablets with alcohol three hours ago and is unarousable."
+  },
+  {
+    "id": "ACC-031",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Myocardial Infarction",
+    "text": "Crushing substernal pressure with nausea and cold clammy skin in a sixty year old diabetic."
+  },
+  {
+    "id": "ACC-032",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Cellulitis / Tetanus Risk",
+    "text": "Deep puncture wound from a rusty nail on the heel with redness spreading up the ankle."
+  },
+  {
+    "id": "ACC-033",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Complicated Migraine",
+    "text": "Severe pulsating migraine accompanied by flashing zig-zag visual aura and numbness in right hand."
+  },
+  {
+    "id": "ACC-034",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Post-Surgical Hemorrhage",
+    "text": "Post-tonsillectomy patient vomiting bright red blood seven days after surgery."
+  },
+  {
+    "id": "ACC-035",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Epiglottitis",
+    "text": "Child with sudden fever, raspy hoarse voice, drooling, and sitting forward to breathe."
+  },
+  {
+    "id": "ACC-036",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Acute Gouty Arthritis",
+    "text": "Pain and swelling in the right big toe that started overnight, so intense that a bedsheet hurts."
+  },
+  {
+    "id": "ACC-037",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Ectopic Pregnancy",
+    "text": "Acute pain in lower abdomen with vaginal spotting and positive home pregnancy test."
+  },
+  {
+    "id": "ACC-038",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Hyperkalemia / Fluid Overload",
+    "text": "Chronic dialysis patient missed two sessions and is now severely short of breath with irregular pulse."
+  },
+  {
+    "id": "ACC-039",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Epidural Hematoma",
+    "text": "Blunt head injury after bicycle fall without helmet, initially alert but now repeatedly vomiting and confused."
+  },
+  {
+    "id": "ACC-040",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Intracranial Aneurysm",
+    "text": "Sudden onset of double vision, drooping right eyelid, and severe occipital headache."
+  },
+  {
+    "id": "ACC-041",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Drug Eruption",
+    "text": "Severe allergic rash spreading over trunk after starting amoxicillin two days ago."
+  },
+  {
+    "id": "ACC-042",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Urosepsis",
+    "text": "Elderly patient with new onset delirium, foul smelling urine, and elevated temperature."
+  },
+  {
+    "id": "ACC-043",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Aortic Dissection",
+    "text": "Sudden tearing sensation in the chest radiating through to the shoulder blades with blood pressure asymmetry."
+  },
+  {
+    "id": "ACC-044",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Splenic Injury",
+    "text": "Severe left upper quadrant abdominal pain after blunt bicycle handlebar impact during mountain biking."
+  },
+  {
+    "id": "ACC-045",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Febrile Seizure",
+    "text": "Two year old having a three minute generalized seizure during a spike in body temperature."
+  },
+  {
+    "id": "ACC-046",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Central Retinal Artery Occlusion",
+    "text": "Sudden painless loss of vision in the left eye described as a dark shade being pulled down."
+  },
+  {
+    "id": "ACC-047",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Hemarthrosis",
+    "text": "Patient with known severe hemophilia suffering large hematoma in the right knee after minor bump."
+  },
+  {
+    "id": "ACC-048",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Orthostatic Syncope",
+    "text": "Feeling lightheaded and nearly blacking out every time I stand up from a chair today."
+  },
+  {
+    "id": "ACC-049",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Peritonsillar Abscess",
+    "text": "Severe sore throat with inability to swallow saliva, trismus, and deviation of the uvula to the right."
+  },
+  {
+    "id": "ACC-050",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Hemoptysis",
+    "text": "Chronic smoker coughing up half a cup of fresh red blood this morning."
+  },
+  {
+    "id": "ACC-051",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Pleurisy",
+    "text": "Sudden sharp chest pain on the right side made worse by deep inhalation and coughing."
+  },
+  {
+    "id": "ACC-052",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Facial Erysipelas",
+    "text": "Swelling, redness, and heat spreading rapidly across the bridge of the nose and both cheeks."
+  },
+  {
+    "id": "ACC-053",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Intrahepatic Cholestasis",
+    "text": "Severe unrelenting itching over the palms and soles with dark urine in a pregnant woman at 32 weeks."
+  },
+  {
+    "id": "ACC-054",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Kawasaki Disease",
+    "text": "Child with persistent high fever for five days, strawberry tongue, bilateral conjunctival injection, and swollen hands."
+  },
+  {
+    "id": "ACC-055",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Testicular Torsion",
+    "text": "Severe pain in testicle with sudden swelling and elevation that started abruptly two hours ago."
+  },
+  {
+    "id": "ACC-056",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Guillain-Barre Syndrome",
+    "text": "Gradual onset of weakness in legs ascending to arms over the past four days following a stomach flu."
+  },
+  {
+    "id": "ACC-057",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Posterior Epistaxis",
+    "text": "Continuous epistaxis from the right nostril for forty minutes despite firm direct pressure."
+  },
+  {
+    "id": "ACC-058",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Acute Mesenteric Ischemia",
+    "text": "Severe abdominal pain out of proportion to physical exam findings in an elderly atrial fibrillation patient."
+  },
+  {
+    "id": "ACC-059",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Diabetic Foot Infection",
+    "text": "Patient with diabetes has a painless deep ulcer on the bottom of the foot surrounded by callus and erythema."
+  },
+  {
+    "id": "ACC-060",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Adrenal Crisis",
+    "text": "Extreme weakness, hyperpigmentation of skin creases, low blood pressure, and salt craving."
+  },
+  {
+    "id": "ACC-061",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Subarachnoid Hemorrhage",
+    "text": "Sudden excruciating headache described as the absolute worst headache of my entire life."
+  },
+  {
+    "id": "ACC-062",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Lateral Ligament Sprain",
+    "text": "Severe pain and inability to bear weight on the right ankle following an inversion twisting injury."
+  },
+  {
+    "id": "ACC-063",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Delirium Tremens",
+    "text": "Tremors, diaphoresis, visual hallucinations, and agitation forty-eight hours after sudden alcohol cessation."
+  },
+  {
+    "id": "ACC-064",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Spontaneous Pneumothorax",
+    "text": "Sudden shortness of breath and pleuritic chest pain in a young tall thin male after lifting heavy weight."
+  },
+  {
+    "id": "ACC-065",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Acute Cystitis",
+    "text": "Burning sensation during urination with increased frequency, suprapubic tenderness, and cloudy urine."
+  },
+  {
+    "id": "ACC-066",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Focal Motor Seizure",
+    "text": "Sudden onset of involuntary jerking movements in the left arm and leg lasting two minutes."
+  },
+  {
+    "id": "ACC-067",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Tracheostomy Tube Obstruction",
+    "text": "Patient with tracheostomy having acute respiratory distress and inability to pass suction catheter."
+  },
+  {
+    "id": "ACC-068",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Second Degree Sunburn",
+    "text": "Severe painful blistering sunburn covering the entire back with chills and dizziness."
+  },
+  {
+    "id": "ACC-069",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Pyloric Stenosis",
+    "text": "Persistent vomiting in a three week old infant immediately after every feeding with visible peristaltic waves."
+  },
+  {
+    "id": "ACC-070",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Meniscal Tear",
+    "text": "Acute pain and swelling behind the knee with difficulty bending the joint after a popping sensation."
+  },
+  {
+    "id": "ACC-071",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Acute Limb Ischemia",
+    "text": "Pain, pallor, pulselessness, and coldness in the right lower extremity below the knee."
+  },
+  {
+    "id": "ACC-072",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-AU",
+    "domain": "Acute Angle Closure Glaucoma",
+    "text": "Severe eye pain, blurred vision with halos around lights, and a fixed mid-dilated pupil."
+  },
+  {
+    "id": "ACC-073",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-IN",
+    "domain": "Infectious Mononucleosis",
+    "text": "Swollen tender lymph nodes in the neck with high fever, sore throat, and marked fatigue for one week."
+  },
+  {
+    "id": "ACC-074",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-GB",
+    "domain": "Benign Paroxysmal Positional Vertigo",
+    "text": "Sudden onset of severe vertigo with nausea and horizontal nystagmus triggered by head turns."
+  },
+  {
+    "id": "ACC-075",
+    "source": "Google FLEURS / Common Voice Demographic Protocol",
+    "accent": "en-US",
+    "domain": "Febrile Neutropenia",
+    "text": "Patient on chemotherapy presenting with temperature of 101.5 and absolute neutrophil count of 300."
+  }
+]

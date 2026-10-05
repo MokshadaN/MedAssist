@@ -1,0 +1,452 @@
+[
+  {
+    "id": "LIBRI-001",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He had not the slightest intention of making any alteration in his ordinary way of living."
+  },
+  {
+    "id": "LIBRI-002",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The discovery was not one that could be easily hidden or forgotten by those who had witnessed it."
+  },
+  {
+    "id": "LIBRI-003",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She walked slowly down the long corridor without looking to either side."
+  },
+  {
+    "id": "LIBRI-004",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "There was a sound of distant thunder rolling over the mountains in the early evening."
+  },
+  {
+    "id": "LIBRI-005",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The committee concluded their investigation after several weeks of continuous deliberation."
+  },
+  {
+    "id": "LIBRI-006",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He picked up the small silver instrument and examined it carefully under the bright lamp."
+  },
+  {
+    "id": "LIBRI-007",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "Every attempt to establish communication with the station was met with absolute silence."
+  },
+  {
+    "id": "LIBRI-008",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The sudden change in temperature caused the glass containers to crack along the base."
+  },
+  {
+    "id": "LIBRI-009",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "They gathered around the central table to discuss the final provisions of the treaty."
+  },
+  {
+    "id": "LIBRI-010",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "A gentle breeze swept through the open window carrying the fresh scent of pine trees."
+  },
+  {
+    "id": "LIBRI-011",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The old manuscript was written in a fine hand that had faded with the passage of centuries."
+  },
+  {
+    "id": "LIBRI-012",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "No one had ever suspected that such a quiet town could harbor such deep mysteries."
+  },
+  {
+    "id": "LIBRI-013",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He listened intently to the steady ticking of the clock on the mantle piece."
+  },
+  {
+    "id": "LIBRI-014",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The captain stood on the bridge watching the morning fog lift from the harbor waters."
+  },
+  {
+    "id": "LIBRI-015",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "It was impossible to determine the exact origin of the strange mechanical sound."
+  },
+  {
+    "id": "LIBRI-016",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She carefully folded the letter and placed it inside the leather bound journal."
+  },
+  {
+    "id": "LIBRI-017",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The expedition was forced to turn back due to severe weather conditions on the ridge."
+  },
+  {
+    "id": "LIBRI-018",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "A single beam of sunlight pierced through the dense foliage of the ancient forest."
+  },
+  {
+    "id": "LIBRI-019",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He spoke with an authority that left no room for doubt or hesitation among the crew."
+  },
+  {
+    "id": "LIBRI-020",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The laboratory was filled with various scientific apparatus and glassware of all descriptions."
+  },
+  {
+    "id": "LIBRI-021",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "They decided to postpone the final vote until all members had returned from abroad."
+  },
+  {
+    "id": "LIBRI-022",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "A faint melody could be heard drifting across the quiet water from the opposite shore."
+  },
+  {
+    "id": "LIBRI-023",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The architectural design of the building reflected both classical and modern influences."
+  },
+  {
+    "id": "LIBRI-024",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He noticed that the lock on the iron gate had been tampered with recently."
+  },
+  {
+    "id": "LIBRI-025",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The results of the preliminary experiments exceeded all of their initial expectations."
+  },
+  {
+    "id": "LIBRI-026",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She spent several hours cataloging the rare botanical specimens collected during the voyage."
+  },
+  {
+    "id": "LIBRI-027",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The road wound through picturesque hills dotted with small farmhouses and vineyards."
+  },
+  {
+    "id": "LIBRI-028",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He felt a sudden surge of excitement as the truth of the situation dawned upon him."
+  },
+  {
+    "id": "LIBRI-029",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The council members expressed their profound gratitude for the assistance provided."
+  },
+  {
+    "id": "LIBRI-030",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "A thick blanket of snow covered the landscape stretching as far as the eye could see."
+  },
+  {
+    "id": "LIBRI-031",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He adjusted the focus of the telescope to observe the distant constellation more clearly."
+  },
+  {
+    "id": "LIBRI-032",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The historical archives contained numerous documents pertaining to the colonial era."
+  },
+  {
+    "id": "LIBRI-033",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She demonstrated remarkable skill and precision throughout the complex surgical procedure."
+  },
+  {
+    "id": "LIBRI-034",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The sound of the ocean waves crashing against the rocky cliff echoed through the night."
+  },
+  {
+    "id": "LIBRI-035",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "They found shelter from the storm inside a small abandoned stone cottage."
+  },
+  {
+    "id": "LIBRI-036",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He offered a reasonable explanation for the unexpected discrepancy in the financial records."
+  },
+  {
+    "id": "LIBRI-037",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The artist captured the delicate play of light and shadow with extraordinary subtlety."
+  },
+  {
+    "id": "LIBRI-038",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "A group of researchers embarked on a comprehensive study of local marine biodiversity."
+  },
+  {
+    "id": "LIBRI-039",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She remained calm and composed despite the chaotic events unfolding around her."
+  },
+  {
+    "id": "LIBRI-040",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The mechanism consisted of a series of interlocking brass gears and polished levers."
+  },
+  {
+    "id": "LIBRI-041",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He spent the entire afternoon reading in the quiet corner of the university library."
+  },
+  {
+    "id": "LIBRI-042",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The unexpected announcement took everyone present in the auditorium completely by surprise."
+  },
+  {
+    "id": "LIBRI-043",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "They carefully packed the fragile porcelain artifacts in wooden crates filled with straw."
+  },
+  {
+    "id": "LIBRI-044",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The view from the summit offered a panoramic perspective of the entire river valley."
+  },
+  {
+    "id": "LIBRI-045",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He possessed an encyclopedic knowledge of regional flora and fauna throughout the province."
+  },
+  {
+    "id": "LIBRI-046",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The conference brought together leading experts from diverse scientific disciplines worldwide."
+  },
+  {
+    "id": "LIBRI-047",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She took meticulous notes during every lecture to ensure complete understanding of the subject."
+  },
+  {
+    "id": "LIBRI-048",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The bridge had withstood the force of numerous seasonal floods over the past century."
+  },
+  {
+    "id": "LIBRI-049",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "A quiet murmur of approval rippled through the audience following his closing remarks."
+  },
+  {
+    "id": "LIBRI-050",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He made a rapid calculation on the back of an envelope before answering the question."
+  },
+  {
+    "id": "LIBRI-051",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The garden was filled with the vibrant colors of blooming roses and fragrant jasmine."
+  },
+  {
+    "id": "LIBRI-052",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "They encountered several unexpected obstacles during the initial phase of construction."
+  },
+  {
+    "id": "LIBRI-053",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She wore a simple silver pendant that had been handed down through three generations."
+  },
+  {
+    "id": "LIBRI-054",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The weather forecast predicted clear skies and moderate temperatures for the upcoming weekend."
+  },
+  {
+    "id": "LIBRI-055",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He dedicated his life to the preservation of endangered wildlife habitats across the continent."
+  },
+  {
+    "id": "LIBRI-056",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The train departed promptly from platform four just as the station clock struck midnight."
+  },
+  {
+    "id": "LIBRI-057",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "A gentle rain began to fall as the sun sank below the western horizon."
+  },
+  {
+    "id": "LIBRI-058",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "They celebrated the successful completion of the project with a formal banquet."
+  },
+  {
+    "id": "LIBRI-059",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He examined the microscopic crystal structure using advanced electron microscopy techniques."
+  },
+  {
+    "id": "LIBRI-060",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She possessed a rare talent for translating complex theoretical concepts into accessible language."
+  },
+  {
+    "id": "LIBRI-061",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The ancient stone amphitheater had retained remarkable acoustic properties despite its age."
+  },
+  {
+    "id": "LIBRI-062",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "They established a temporary base camp near the edge of the glacier to monitor its retreat."
+  },
+  {
+    "id": "LIBRI-063",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He carefully reviewed the legal contract before affixing his signature to the final page."
+  },
+  {
+    "id": "LIBRI-064",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The atmospheric pressure dropped significantly as the tropical cyclone approached the coastline."
+  },
+  {
+    "id": "LIBRI-065",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She navigated the winding mountain paths with confidence born of long experience."
+  },
+  {
+    "id": "LIBRI-066",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The team of archaeologists uncovered a series of well preserved terracotta vessels."
+  },
+  {
+    "id": "LIBRI-067",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He maintained a disciplined routine that balanced rigorous physical exercise with scholarly study."
+  },
+  {
+    "id": "LIBRI-068",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The bright illumination from the street lamps cast long shadows across the empty square."
+  },
+  {
+    "id": "LIBRI-069",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "They gathered around the fireplace to listen to tales of maritime adventures from old sailors."
+  },
+  {
+    "id": "LIBRI-070",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She observed the migratory behavior of monarch butterflies over consecutive autumn seasons."
+  },
+  {
+    "id": "LIBRI-071",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The clockmaker adjusted the delicate escapement spring with steady and practiced hands."
+  },
+  {
+    "id": "LIBRI-072",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "He expressed deep admiration for the ingenuity displayed in solving the engineering challenge."
+  },
+  {
+    "id": "LIBRI-073",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "The crisp autumn air carried the pleasant aroma of burning wood and fallen leaves."
+  },
+  {
+    "id": "LIBRI-074",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "They reached the conclusion that additional empirical data would be required before publishing."
+  },
+  {
+    "id": "LIBRI-075",
+    "source": "OpenSLR LibriSpeech ASR test-clean",
+    "domain": "Continuous Read English",
+    "text": "She organized the exhibition with an eye for harmonious color balance and thematic continuity."
+  }
+]

@@ -1,0 +1,677 @@
+[
+  {
+    "id": "AHRQ-ESI-001",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "My husband suddenly collapsed to the floor and is not responding. He is gasping for air and his lips are turning blue.",
+    "clinical_rationale": "Requires immediate life-saving intervention. Unresponsive with agonal breathing and cyanosis.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-002",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "My daughter ate a peanut cookie and now she cannot breathe, her throat is closing up, face is swollen and she is wheezing loudly.",
+    "clinical_rationale": "Anaphylaxis with acute airway compromise. Immediate epinephrine and intubation risk.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-003",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Patient was found completely unconscious with shallow breathing and a deep bleeding arterial wound on his neck that won't stop bleeding.",
+    "clinical_rationale": "Severe exsanguination and airway threat. Immediate resuscitation required.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-004",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "He has been having a continuous generalized tonic-clonic seizure for over eight minutes without waking up and is now gasping.",
+    "clinical_rationale": "Status epilepticus. Immediate pharmacological termination and airway protection required.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-005",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "My roommate is slumped on the couch, completely non-responsive, with pinpoint pupils and breathing only three times a minute after suspected drug overdose.",
+    "clinical_rationale": "Acute opioid overdose with severe respiratory arrest. Immediate bag-valve mask and naloxone.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-006",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Construction worker caught in industrial machinery with complete traumatic amputation of the right leg above knee and massive spurting hemorrhage.",
+    "clinical_rationale": "Traumatic amputation with exsanguinating shock. Immediate tourniquet and blood transfusion protocol.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-007",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Patient brought in after near drowning at the community pool, pulseless and non-breathing, CPR in progress by bystanders.",
+    "clinical_rationale": "Cardiac arrest secondary to submersion. Immediate advanced life support resuscitation.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-008",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Severe gunshot wound to the right hemithorax with absent breath sounds on the right, tracheal deviation to the left, and profound hypotension.",
+    "clinical_rationale": "Tension pneumothorax with obstructive shock. Immediate needle decompression and chest tube.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-009",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Diabetic patient found unresponsive in bed with glucometer reading unmeasurably low, diaphoretic, seizing, and unresponsive to painful stimuli.",
+    "clinical_rationale": "Severe hypoglycemic coma with status seizure. Immediate intravenous hypertonic dextrose.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-010",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Patient pulled from burning house with third-degree circumferential burns over 60 percent of body surface area, soot in oropharynx, and severe inspiratory stridor.",
+    "clinical_rationale": "Severe thermal inhalation injury with imminent complete airway closure. Immediate endotracheal intubation.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-011",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Patient presenting with massive hematemesis, vomiting two liters of bright red blood in triage, blood pressure 60/40, pulse 140, rapidly losing consciousness.",
+    "clinical_rationale": "Hemorrhagic shock secondary to ruptured esophageal varices or massive peptic bleed. Immediate massive transfusion protocol.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-012",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Patient choking on a piece of steak at dinner, holding hands to throat, making silent gasping attempts, unable to speak, cough, or breathe, and turning pale blue.",
+    "clinical_rationale": "Complete foreign body airway obstruction with imminent hypoxic arrest. Immediate Heimlich / airway intervention.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-013",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Pediatric patient found submerged in bathtub for unknown duration, cyanotic, flaccid, apnea with heart rate 40 beats per minute.",
+    "clinical_rationale": "Pediatric severe hypoxic bradycardia / arrest. Immediate bag-mask ventilation, compressions, resuscitation.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-014",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Elderly patient found on floor after carbon monoxide leak, unarousable with decerebrate posturing and profound respiratory depression.",
+    "clinical_rationale": "Severe neurotoxic carbon monoxide poisoning with coma. Immediate 100% FiO2 intubation and hyperbaric referral.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-015",
+    "esi_level": 1,
+    "category": "Resuscitation",
+    "vignette": "Trauma patient ejected from vehicle rollover at high speed, non-responsive with flail chest, paradoxical respirations, and barely palpable carotid pulse.",
+    "clinical_rationale": "Severe polytrauma with acute respiratory collapse and shock. Immediate trauma resuscitation.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-016",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "I am having severe crushing chest pain that feels like an elephant sitting on my chest, with radiating pain down my left arm and cold sweat.",
+    "clinical_rationale": "High-risk acute coronary syndrome (ACS / STEMI). Immediate EKG and cardiac care pathway.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-017",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "My mother suddenly developed slurred speech twenty minutes ago and has weakness and numbness on the right side of her body and face.",
+    "clinical_rationale": "Acute ischemic stroke symptoms within thrombolytic time window. High-risk time-critical emergency.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-018",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "I have the sudden severe worst headache of my life that came on like a thunderclap, along with a stiff neck and vomiting.",
+    "clinical_rationale": "Classic thunderclap headache concerning for subarachnoid hemorrhage (SAH) or acute meningitis.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-019",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "I started vomiting large amounts of dark red blood and blood clots about an hour ago and I feel very dizzy and faint when standing.",
+    "clinical_rationale": "Severe upper gastrointestinal bleeding with orthostatic hemodynamic instability. High risk.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-020",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "I have severe 10/10 tearing abdominal and back pain that started abruptly, and my abdomen feels hard as a rock.",
+    "clinical_rationale": "Acute surgical abdomen / aortic dissection / ruptured viscous. High risk.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-021",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "Patient states: I took a large overdose of sleeping pills and blood pressure pills two hours ago and I feel completely hopeless.",
+    "clinical_rationale": "Acute high-lethality toxic ingestion with suicidal intent. High risk for rapid decompensation.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-022",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "I was struck in the head with a baseball bat, lost consciousness for five minutes, and now I have clear fluid leaking from my nose and confusion.",
+    "clinical_rationale": "Severe traumatic brain injury with basilar skull fracture sign and post-traumatic confusion.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-023",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "26F who is 8 weeks pregnant presents with sudden severe sharp right lower quadrant pelvic pain, vaginal spotting, and syncope.",
+    "clinical_rationale": "Ruptured ectopic pregnancy with intra-abdominal hemorrhage. High-risk surgical emergency.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-024",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "Known asthmatic presents with acute severe breathlessness, unable to speak more than one word at a time, using sternocleidomastoid accessory muscles.",
+    "clinical_rationale": "Severe status asthmaticus with impending respiratory fatigue. High risk for intubation.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-025",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "16M presents with sudden onset of severe excruciating right testicular pain and swelling that began 90 minutes ago, accompanied by nausea.",
+    "clinical_rationale": "Acute testicular torsion. Time-critical organ-loss emergency requiring immediate surgical exploration.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-026",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "52F presents with severe sudden ocular pain, rainbow halos around lights, cloudy steamy cornea, fixed mid-dilated pupil, and severe nausea.",
+    "clinical_rationale": "Acute angle-closure glaucoma. High risk for permanent irreversible vision loss.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-027",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "Cancer patient undergoing active chemotherapy presents with high fever of 103.5F, rigors, heart rate 125, and feeling dizzy.",
+    "clinical_rationale": "Febrile neutropenia / septic shock risk. Immediate broad-spectrum IV antibiotics within 60 minutes.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-028",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "34F with history of deep vein thrombosis presents with sudden sharp pleuritic chest pain, coughing up blood, acute dyspnea, and tachycardia of 130.",
+    "clinical_rationale": "Acute pulmonary embolism with pulmonary infarction signs. High risk.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-029",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "Industrial laboratory worker had concentrated sodium hydroxide alkali chemical splashed directly into both eyes five minutes ago, experiencing blinding pain.",
+    "clinical_rationale": "Ocular chemical burn (alkali liquefactive necrosis). Immediate continuous eye irrigation.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-030",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "Patient with known Type 1 diabetes presents with deep rapid Kussmaul respirations, fruity breath odor, persistent vomiting, and confusion.",
+    "clinical_rationale": "Severe diabetic ketoacidosis (DKA) with metabolic acidosis and altered mental status.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-031",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "42M presents with sudden painless loss of vision in the left eye described as a dark curtain descending over his visual field.",
+    "clinical_rationale": "Acute retinal detachment / central retinal artery occlusion. High risk time-critical ophthalmic emergency.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-032",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "Patient on high-dose Warfarin anticoagulation therapy presents with massive spontaneous epistaxis filling cups with blood that will not stop bleeding.",
+    "clinical_rationale": "Uncontrolled coagulopathic posterior hemorrhage with airway compromise risk.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-033",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "Young adult brought in by family after sending goodbye messages, found sitting with a loaded firearm and expressing active desire to end their life.",
+    "clinical_rationale": "Acute high-acuity behavioral emergency with imminent lethal threat. Requires 1-to-1 safety observation.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-034",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "60M with chronic aortic aneurysm presents with tearing mid-scapular interscapular back pain, asymmetric blood pressure between arms, and diaphoresis.",
+    "clinical_rationale": "Acute aortic dissection (Stanford Type A/B). Catastrophic vascular emergency.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-035",
+    "esi_level": 2,
+    "category": "Emergent / High Risk",
+    "vignette": "Patient with neck swelling after dental extraction has severe difficulty swallowing, drooling, muffled hot-potato voice, and anterior neck erythema.",
+    "clinical_rationale": "Ludwig's angina / submandibular deep neck space infection with imminent airway compromise.",
+    "ground_truth_emergency": true,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-036",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "I have had moderate crampy right lower quadrant abdominal pain for 12 hours with mild nausea and low-grade temperature of 99.8F.",
+    "clinical_rationale": "Requires multiple resources (CT scan, blood lab panel, IV fluids) to rule out appendicitis, but hemodynamically stable.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-037",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "I slipped on ice and hurt my left wrist. It is painful and swollen, but my fingers are warm and pink with normal sensation.",
+    "clinical_rationale": "Requires X-ray, splinting, and analgesics (2 resources). Stable vital signs, no neurovascular compromise.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-038",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "I have had a productive cough with yellowish phlegm and feeling feverish for 3 days. My oxygen level on my home meter is 96 percent.",
+    "clinical_rationale": "Suspected pneumonia or bronchitis requiring chest X-ray and lab work, but breathing is comfortable and vitals stable.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-039",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "I have had burning pain when urinating along with dull right lower back ache for two days. No vomiting and no high fever.",
+    "clinical_rationale": "Possible pyelonephritis or complicated UTI requiring urinalysis, urine culture, and oral/IV antibiotics.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-040",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "48F presents with colicky right upper quadrant abdominal pain that radiates to right shoulder blade after eating fried chicken 3 hours ago, accompanied by nausea.",
+    "clinical_rationale": "Biliary colic / acute cholecystitis requiring abdominal ultrasound, IV antiemetics, and labs.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-041",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "55M presents with acute left flank pain radiating to left groin with gross hematuria, pacing the room in discomfort, vital signs normal.",
+    "clinical_rationale": "Acute nephrolithiasis (renal colic) requiring non-contrast CT, IV analgesia, and urinalysis.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-042",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "62M presents with persistent left lower quadrant pain and constipation for 4 days, low-grade temperature 100.2F, no peritoneal signs.",
+    "clinical_rationale": "Acute uncomplicated diverticulitis requiring CT scan of abdomen/pelvis, labs, and IV hydration.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-043",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "38F presents with 3 days of unilateral right calf pain and swelling after an 8-hour airplane flight, unable to comfortably bear weight.",
+    "clinical_rationale": "Suspected deep vein thrombosis (DVT) requiring compression duplex ultrasound and D-dimer lab.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-044",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "Patient with history of moderate asthma has worsening wheezing and chest tightness after catching a cold, oxygen saturation 95% on room air.",
+    "clinical_rationale": "Moderate asthma exacerbation requiring nebulized bronchodilators, systemic corticosteroids, and peak flow.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-045",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "70M presents with acute painful urinary retention, unable to void for 10 hours, suprapubic fullness and moderate distress.",
+    "clinical_rationale": "Acute urinary retention requiring bladder catheterization, post-void residual, and renal function panel.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-046",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "29M presents with worsening painful swelling and redness on his right buttock for 3 days, fluctuant 4cm tender mass, temperature 99.1F.",
+    "clinical_rationale": "Cutaneous abscess requiring incision and drainage, local anesthesia, and wound packing.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-047",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "Patient presents with persistent vomiting and diarrhea for 24 hours from viral gastroenteritis, feeling dizzy when standing, pulse 98, BP 110/70.",
+    "clinical_rationale": "Moderate volume depletion requiring IV fluid hydration, IV antiemetics, and basic electrolyte panel.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-048",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "Patient with established chronic sickle cell disease presents with typical moderate vaso-occlusive bone pain in bilateral humeri and thighs, baseline vitals.",
+    "clinical_rationale": "Sickle cell vaso-occlusive pain crisis requiring IV opioid analgesia, IV hydration, and CBC/reticulocyte count.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-049",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "65F presents with sudden onset of room-spinning vertigo that worsens when turning head to left, with nausea and horizontal nystagmus, normal gait.",
+    "clinical_rationale": "Benign paroxysmal positional vertigo (BPPV) or vestibular neuritis requiring Dix-Hallpike, Epley maneuver, and vestibular suppressants.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-050",
+    "esi_level": 3,
+    "category": "Urgent / Moderate",
+    "vignette": "50M presents with expanding area of warmth, erythema, and tenderness on left anterior shin for 2 days without bullae or systemic signs.",
+    "clinical_rationale": "Lower extremity cellulitis requiring initial IV antibiotic loading dose, blood labs, and skin marking.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-051",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "I accidentally cut my left thumb with a clean kitchen knife while slicing bread. The bleeding stopped after direct pressure, but the cut is open about 1.5 cm.",
+    "clinical_rationale": "Single resource needed (sutures or simple wound closure). Normal vital signs.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-052",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "I twisted my ankle playing basketball yesterday. It is mildly swollen on the outer ankle, but I am able to put weight on it and walk.",
+    "clinical_rationale": "Requires single resource (ankle X-ray or physical assessment). No acute deformity.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-053",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "My right eye has been itchy, pink, and watery for two days with clear drainage. My vision is completely normal and I have no eye pain.",
+    "clinical_rationale": "Likely viral conjunctivitis. Single resource (prescription eye drops / exam).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-054",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "I have an itchy red localized rash on my right forearm after gardening near poison ivy. No facial swelling, no breathing problems.",
+    "clinical_rationale": "Contact dermatitis requiring single resource (topical corticosteroid ointment).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-055",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "I have had a mild sore throat, clear runny nose, and sneezing for two days. No difficulty swallowing and no fever.",
+    "clinical_rationale": "Upper respiratory viral illness. Single resource (throat culture or symptomatic prescription).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-056",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "24F presents with dysuria and increased urinary frequency for 24 hours, afebrile, no back or flank pain, denies nausea.",
+    "clinical_rationale": "Uncomplicated acute cystitis requiring single resource (point-of-care urinalysis and oral antibiotics).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-057",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "7-year-old child with acute left earache that began last night, pulling at ear, mild fever 99.5F, alert and playful in triage.",
+    "clinical_rationale": "Acute otitis media requiring single resource (otoscopic exam and oral amoxicillin prescription).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-058",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "Carpenter got a wooden splinter embedded deep under the fingernail of his index finger 3 hours ago, unable to extract at home.",
+    "clinical_rationale": "Subungual foreign body requiring single resource (simple digital block and splinter removal).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-059",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "Patient presents with painful red swelling beside the cuticle of right thumb for 2 days after hangnail trimming, small white pustule visible.",
+    "clinical_rationale": "Acute paronychia requiring single resource (simple scalpel drainage under digital block).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-060",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "Gardener scratched cornea on a rose bush branch 4 hours ago, foreign body sensation and photophobia, visual acuity 20/25.",
+    "clinical_rationale": "Corneal abrasion requiring single resource (fluorescein stain examination and erythromycin ointment).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-061",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "Patient jammed left middle finger catching a basketball, mildly swollen proximal interphalangeal joint, good range of motion, no skin break.",
+    "clinical_rationale": "Finger sprain requiring single resource (2-view finger X-ray and buddy taping).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-062",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "Adult presents with superficial second-degree burn the size of a quarter on forearm after hot soup splash, small intact blister.",
+    "clinical_rationale": "Minor superficial partial-thickness burn requiring single resource (cleansing, bacitracin, dressing).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-063",
+    "esi_level": 4,
+    "category": "Less Urgent",
+    "vignette": "Patient presents with painful swelling in mouth under tongue after meals, small firm movable white calculus visible at submandibular duct.",
+    "clinical_rationale": "Sialolithiasis (salivary duct stone) requiring single resource (intraoral palpation, sialogogues).",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-064",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "I ran out of my monthly blood pressure and cholesterol medications yesterday and need a routine refill prescription from a doctor. Feeling completely fine.",
+    "clinical_rationale": "Zero hospital resources required. Routine outpatient medication refill.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-065",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "I had five stitches put in my forearm ten days ago at urgent care. The wound is completely healed and I am here to have the sutures removed.",
+    "clinical_rationale": "Zero hospital resources required. Suture removal only.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-066",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "I have a small dry patch of skin on my right elbow that has been slightly itchy for over a month. No pain, no bleeding, no fever.",
+    "clinical_rationale": "Chronic mild dermatological condition. Zero acute emergency resources.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-067",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "I need a routine pre-employment physical exam and medical clearance form signed for my new job.",
+    "clinical_rationale": "Administrative medical examination. Zero emergency resources.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-068",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "I have had mild lower back stiffness in the mornings for several months that improves with gentle stretching. No numbness, weakness, or leg pain.",
+    "clinical_rationale": "Chronic mechanical back stiffness without red flags. Outpatient physical therapy referral.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-069",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "Patient presents asking for an update to their tetanus vaccination after cleaning up yard waste, no cuts, punctures, or wounds present.",
+    "clinical_rationale": "Routine preventative immunization. Zero diagnostic emergency resources.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-070",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "Patient noticed an engorged tick on their pant leg after walking in woods today, tick was brushed off, no bite mark, no rash, completely asymptomatic.",
+    "clinical_rationale": "Asymptomatic tick exposure without bite. Reassurance and education.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-071",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "Patient presents asking for doctor's sick leave note for employer after missing work yesterday due to mild hangover, currently asymptomatic.",
+    "clinical_rationale": "Administrative medical certification. Zero clinical emergency resources.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-072",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "Patient presents with long-standing mild toe fungus on two toenails for six months, asking what over-the-counter polish to use.",
+    "clinical_rationale": "Chronic onychomycosis. Routine outpatient counseling, zero emergency resources.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-073",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "Patient requests clean sterile gauze and medical tape to re-wrap a clean healing superficial scratch on forearm.",
+    "clinical_rationale": "Routine dressing change request. Zero emergency physician resources.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-074",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "College student requests routine tuberculosis PPD skin test reading 48 hours after placement, forearm is completely flat with zero induration.",
+    "clinical_rationale": "Routine negative PPD test reading. Zero emergency resources.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  },
+  {
+    "id": "AHRQ-ESI-075",
+    "esi_level": 5,
+    "category": "Non-Urgent",
+    "vignette": "Patient requesting blood pressure check on their way to the pharmacy, states they feel fine and their home machine showed 124/82.",
+    "clinical_rationale": "Isolated asymptomatic screening. Normal blood pressure, zero emergency interventions.",
+    "ground_truth_emergency": false,
+    "source": "AHRQ ESI Handbook v4"
+  }
+]

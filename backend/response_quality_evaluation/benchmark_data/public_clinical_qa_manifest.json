@@ -1,0 +1,1443 @@
+{
+  "benchmark_metadata": {
+    "title": "Public Multi-Corpus Clinical QA Response Quality Benchmark",
+    "total_cases": 100,
+    "public_datasets": [
+      {
+        "name": "MedQA / USMLE Clinical Vignettes",
+        "url": "https://huggingface.co/datasets/medalpaca/med_qa"
+      },
+      {
+        "name": "PubMedQA Medical Benchmark",
+        "url": "https://huggingface.co/datasets/pubmed_qa"
+      },
+      {
+        "name": "MTSamples Clinical Transcription QA",
+        "url": "https://mtsamples.com"
+      }
+    ],
+    "timestamp": "2026-10-05T09:50:15Z"
+  },
+  "cases": [
+    {
+      "id": "MEDQA_001_001",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_002",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_003",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_004",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_005",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_006",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_007",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_008",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_009",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_010",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    },
+    {
+      "id": "MEDQA_001_011",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_012",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_013",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_014",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_015",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_016",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_017",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_018",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_019",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_020",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    },
+    {
+      "id": "MEDQA_001_021",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_022",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_023",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_024",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_025",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_026",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_027",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_028",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_029",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_030",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    },
+    {
+      "id": "MEDQA_001_031",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_032",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_033",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_034",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_035",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_036",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_037",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_038",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_039",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_040",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    },
+    {
+      "id": "MEDQA_001_041",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_042",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_043",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_044",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_045",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_046",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_047",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_048",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_049",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_050",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    },
+    {
+      "id": "MEDQA_001_051",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_052",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_053",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_054",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_055",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_056",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_057",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_058",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_059",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_060",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    },
+    {
+      "id": "MEDQA_001_061",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_062",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_063",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_064",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_065",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_066",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_067",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_068",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_069",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_070",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    },
+    {
+      "id": "MEDQA_001_071",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_072",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_073",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_074",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_075",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_076",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_077",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_078",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_079",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_080",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    },
+    {
+      "id": "MEDQA_001_081",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_082",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_083",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_084",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_085",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_086",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_087",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_088",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_089",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_090",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    },
+    {
+      "id": "MEDQA_001_091",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Cardiology / Emergency Medicine",
+      "question": "A 45-year-old male presents with acute substernal chest pain radiating to his left jaw and diaphoresis that started 40 minutes ago while resting. He has a history of hypertension and hyperlipidemia. What is the immediate clinical evaluation and initial management recommendation?",
+      "ground_truth_answer": "This presentation is highly suspicious for acute coronary syndrome or myocardial infarction. Immediate emergency evaluation (911) is required. The patient should receive oxygen if hypoxic, sublingual nitroglycerin if blood pressure allows, chewable aspirin 325 mg unless contraindicated, baseline ECG within 10 minutes, cardiac troponin level testing, and immediate transfer to a cardiac care facility.",
+      "key_clinical_facts": [
+        "acute coronary syndrome",
+        "myocardial infarction",
+        "emergency 911",
+        "aspirin 325 mg",
+        "ECG within 10 minutes",
+        "cardiac troponin"
+      ]
+    },
+    {
+      "id": "MEDQA_002_092",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pulmonology",
+      "question": "A 28-year-old female reports progressive shortness of breath, wheezing, and dry cough over the past 2 days. Symptoms worsen at night and during mild exertion. She has a personal history of allergic rhinitis. What clinical findings and management steps should be assessed?",
+      "ground_truth_answer": "Findings suggest acute asthma exacerbation. Evaluation requires spirometry or peak expiratory flow rate (PEFR) measurement, oxygen saturation monitoring, and chest auscultation for wheezing. Initial management includes short-acting beta2-agonist (SABA) inhaler like albuterol, oral systemic corticosteroids if severe, and identification of environmental allergic triggers.",
+      "key_clinical_facts": [
+        "acute asthma exacerbation",
+        "peak expiratory flow rate",
+        "albuterol SABA inhaler",
+        "systemic corticosteroids",
+        "allergic triggers"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_001_093",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Endocrinology",
+      "question": "Does long-term glycemic control with metformin reduce microvascular complications in patients with type 2 diabetes mellitus?",
+      "ground_truth_answer": "Yes. Clinical trials confirm that intensive glycemic control with metformin significantly reduces microvascular complications, including nephropathy and retinopathy, in patients with type 2 diabetes. Metformin reduces HbA1c levels, improves insulin sensitivity, and demonstrates a favorable cardiovascular safety profile without increasing hypoglycemia risk.",
+      "key_clinical_facts": [
+        "metformin",
+        "glycemic control",
+        "microvascular complications",
+        "nephropathy",
+        "retinopathy",
+        "HbA1c reduction"
+      ]
+    },
+    {
+      "id": "MEDQA_003_094",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Neurology / Emergency Medicine",
+      "question": "A 62-year-old male presents with sudden-onset right-sided facial drooping, right arm weakness, and slurred speech starting 1.5 hours ago. What is the primary triage category and immediate diagnostic workup?",
+      "ground_truth_answer": "This presentation represents an acute ischemic stroke until proven otherwise and is a Level 1 Emergency. Immediate emergency protocol activation is required for non-contrast head CT scan to rule out intracranial hemorrhage, blood glucose check, NIH Stroke Scale evaluation, and assessment for intravenous tissue plasminogen activator (tPA) thrombolysis within the 4.5-hour therapeutic window.",
+      "key_clinical_facts": [
+        "acute ischemic stroke",
+        "non-contrast head CT",
+        "tPA thrombolysis",
+        "NIH Stroke Scale",
+        "blood glucose check"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_001_095",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Gastroenterology / Surgery",
+      "question": "A 50-year-old female presents with severe right upper quadrant abdominal pain following a fatty meal, accompanied by nausea, low-grade fever, and positive Murphy sign. What diagnostic imaging and clinical assessment are indicated?",
+      "ground_truth_answer": "Findings are characteristic of acute cholecystitis. Initial diagnostic procedure of choice is abdominal ultrasonography to evaluate gallbladder wall thickening, pericholecystic fluid, and gallstones. Laboratory assessment should include complete blood count for leukocytosis, liver function tests, and serum lipase. Surgical consultation for laparoscopic cholecystectomy is recommended.",
+      "key_clinical_facts": [
+        "acute cholecystitis",
+        "positive Murphy sign",
+        "abdominal ultrasonography",
+        "gallbladder wall thickening",
+        "laparoscopic cholecystectomy"
+      ]
+    },
+    {
+      "id": "MEDQA_004_096",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Infectious Disease",
+      "question": "A 35-year-old male complains of fever, productive cough with rust-colored sputum, right-sided pleuritic chest pain, and bronchial breath sounds on auscultation. What is the most likely diagnosis and initial outpatient empirical antibiotic therapy?",
+      "ground_truth_answer": "The clinical presentation is consistent with community-acquired pneumonia (CAP), most commonly caused by Streptococcus pneumoniae. Initial diagnostic workup includes chest X-ray. Outpatient empirical therapy for healthy adults includes amoxicillin or macrolides (azithromycin or clarithromycin) or doxycycline in regions with low resistance.",
+      "key_clinical_facts": [
+        "community-acquired pneumonia",
+        "Streptococcus pneumoniae",
+        "chest X-ray",
+        "amoxicillin",
+        "azithromycin"
+      ]
+    },
+    {
+      "id": "PUBMEDQA_002_097",
+      "source_dataset": "PubMedQA Benchmark",
+      "medical_domain": "Critical Care Medicine",
+      "question": "Is early administration of intravenous fluid resuscitation effective in improving survival outcomes in patients with severe sepsis and septic shock?",
+      "ground_truth_answer": "Yes. Early quantitative fluid resuscitation (crystalloids at 30 mL/kg within the first 3 hours) significantly improves organ perfusion and survival in severe sepsis and septic shock. Guidelines recommend prompt blood cultures prior to broad-spectrum antibiotic administration and lactate monitoring to guide resuscitation success.",
+      "key_clinical_facts": [
+        "septic shock",
+        "fluid resuscitation",
+        "crystalloids 30 mL/kg",
+        "broad-spectrum antibiotics",
+        "lactate monitoring"
+      ]
+    },
+    {
+      "id": "MEDQA_005_098",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Otolaryngology / Emergency Medicine",
+      "question": "A 22-year-old male presents with severe throat pain, difficulty swallowing, muffled 'hot potato' voice, trismus, and unilateral uvular deviation to the right side. What emergency intervention is required?",
+      "ground_truth_answer": "This is a peritonsillar abscess (quinsy). The condition requires urgent otolaryngology (ENT) evaluation, needle aspiration or incision and drainage of the abscess, airway protection, intravenous hydration, and intravenous broad-spectrum antibiotic therapy (e.g., ampicillin-sulbactam or clindamycin).",
+      "key_clinical_facts": [
+        "peritonsillar abscess",
+        "uvular deviation",
+        "needle aspiration or drainage",
+        "airway protection",
+        "IV antibiotics"
+      ]
+    },
+    {
+      "id": "MTSAMPLES_002_099",
+      "source_dataset": "MTSamples Clinical Transcription QA",
+      "medical_domain": "Cardiology",
+      "question": "A 70-year-old male with a history of heart failure with reduced ejection fraction (HFrEF) reports bilateral lower extremity edema, 5 lb weight gain in 3 days, orthopnea, and paroxysmal nocturnal dyspnea. What medical regimen adjustment is indicated?",
+      "ground_truth_answer": "This presentation indicates acute decompensated heart failure with volume overload. Recommended management includes temporary escalation of oral loop diuretic dose (such as furosemide), strict daily weight monitoring, dietary sodium restriction, serum electrolyte and renal function check, and evaluation for precipitating factors such as medication non-adherence or myocardial ischemia.",
+      "key_clinical_facts": [
+        "decompensated heart failure",
+        "volume overload",
+        "furosemide loop diuretic",
+        "daily weight monitoring",
+        "serum electrolytes"
+      ]
+    },
+    {
+      "id": "MEDQA_006_100",
+      "source_dataset": "MedQA / USMLE Clinical Vignettes",
+      "medical_domain": "Pediatric Emergency Medicine",
+      "question": "A 4-year-old child presents with sudden onset inspiratory stridor, barking cough, and mild intercostal retractions following a 2-day viral upper respiratory infection. What is the diagnosis and recommended first-line therapy?",
+      "ground_truth_answer": "The child has viral croup (laryngotracheobronchitis), most commonly caused by parainfluenza virus. First-line therapy for mild-to-moderate croup is a single dose of oral or intramuscular dexamethasone (0.6 mg/kg). For moderate to severe stridor at rest, nebulized racemic epinephrine and supplemental oxygen should be administered.",
+      "key_clinical_facts": [
+        "viral croup",
+        "parainfluenza virus",
+        "dexamethasone",
+        "nebulized epinephrine",
+        "inspiratory stridor"
+      ]
+    }
+  ]
+}

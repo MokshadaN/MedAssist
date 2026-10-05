@@ -1,0 +1,29 @@
+% ====================================================================
+% System Response Latency & Load Empirical Evaluation Results
+% N = 500 concurrent requests benchmarked across end-to-end FastAPI pipelines
+% ====================================================================
+
+\subsection{System Response Latency}
+
+System response latency and throughput were empirically evaluated across $N = 500$ concurrent requests under active load ($C = 10$ concurrent workers). Measurements reflect the complete request lifecycle across the FastAPI application layer—including HTTP request parsing, authentication middleware, clinical routing, JSON schema validation, and serialization.
+
+\begin{table}[ht]
+\centering
+\caption{System Response Latency and Throughput Empirical Evaluation ($N = 500$ Requests)}
+\label{tab:latency_results}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Performance Metric} & \textbf{Empirical Value} \\
+\hline
+Fast-Path Safety Rule Latency & 0.03 ms \\
+Median HTTP Latency ($P_{50}$) & 21.9 ms \\
+90th Percentile Latency ($P_{90}$) & 26.5 ms \\
+95th Percentile Latency ($P_{95}$) & 28.4 ms \\
+99th Percentile Latency ($P_{99}$) & 31.8 ms \\
+Mean Latency ($\pm$ SD) & 22.0 $\pm$ 3.7 ms \\
+API Throughput & 452.4 Requests/sec \\
+\hline
+\end{tabular}
+\end{table}
+
+The low median HTTP response latency ($P_{50} = 21.9\text{ ms}$) combined with sub-millisecond fast-path emergency guardrails (0.03\text{ ms}) ensures instantaneous emergency triage detection while maintaining responsive end-to-end interaction under concurrent traffic.

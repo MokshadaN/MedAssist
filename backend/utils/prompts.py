@@ -46,15 +46,15 @@ TRIAGE_SYSTEM_PROMPT = (
 
 def triage_prompt(transcript: str) -> str:
     return f"""
-Extract only facts explicitly stated by the patient text below.
+Extract only facts explicitly stated by the text below.
 
 Do not return an urgency level, diagnosis, possible condition, treatment,
 recommendation, or medical reasoning. Do not infer missing facts.
 Map different wording with the same explicit meaning to the allowed safety
-concepts below. Include a concept as present only when it describes the
-patient's current symptom. Put explicit denials in negated_safety_concepts.
-Do not treat past symptoms, hypothetical statements, or another person's
-symptoms as present.
+concepts below. Include a concept as present when it describes the
+acute symptoms of the patient or individual being reported (including reports
+made by family members, caregivers, or witnesses). Put explicit denials in negated_safety_concepts.
+Do not treat past resolved symptoms or hypothetical statements as present.
 
 Allowed safety concepts:
 - chest_pain_or_tightness
@@ -71,6 +71,9 @@ Allowed safety concepts:
 - choking
 - overdose_or_poisoning
 - suicidal_or_homicidal_intent
+- acute_airway_compromise_or_stridor
+- acute_ocular_emergency_or_chemical_burn
+- acute_severe_pelvic_or_testicular_torsion
 
 Return STRICT JSON in exactly this format:
 {{

@@ -1,0 +1,2480 @@
+{
+  "benchmark_metadata": {
+    "title": "Public Multi-Corpus Medical Report Extraction Empirical Evaluation",
+    "model_evaluated": "Gemini 2.5 Flash Multimodal Document Engine",
+    "total_documents_evaluated": 50,
+    "public_datasets": [
+      {
+        "name": "Noisy Medical Document Images (OCR)",
+        "source": "HuggingFace (hmnshudhmn24/noisy-medical-document-images-ocr)",
+        "count": 20,
+        "document_type": "Hospital Discharge Summaries"
+      },
+      {
+        "name": "ClinOCR-Bench",
+        "source": "arXiv:2607.03650 / HuggingFace (ianua/ClinOCR-Bench)",
+        "count": 15,
+        "document_type": "Clinical Scanned Forms & Tabular Reports"
+      },
+      {
+        "name": "Medical Prescription Dataset",
+        "source": "HuggingFace (chinmays18/medical-prescription-dataset)",
+        "count": 15,
+        "document_type": "Physician Clinical Prescriptions"
+      }
+    ],
+    "timestamp": "2026-10-05T09:36:23Z"
+  },
+  "latency_metrics": {
+    "p50_ms": 28207.6,
+    "p90_ms": 53737.8,
+    "p95_ms": 60290.6,
+    "mean_ms": 35274.7
+  },
+  "aggregate_results": {
+    "counts": {
+      "total_documents": 50,
+      "total_tp": 234,
+      "total_fp": 50,
+      "total_fn": 211
+    },
+    "overall_metrics": {
+      "precision": 82.39,
+      "precision_ci": [
+        77.54,
+        86.38
+      ],
+      "recall": 52.58,
+      "recall_ci": [
+        47.94,
+        57.18
+      ],
+      "f1_score": 64.2,
+      "field_extraction_accuracy": 47.27,
+      "field_extraction_accuracy_ci": [
+        42.91,
+        51.67
+      ]
+    },
+    "category_metrics": {
+      "metadata": {
+        "tp": 81,
+        "fp": 2,
+        "fn": 38,
+        "precision": 97.59,
+        "recall": 68.07,
+        "f1_score": 80.2,
+        "field_accuracy": 66.94
+      },
+      "diagnoses": {
+        "tp": 60,
+        "fp": 0,
+        "fn": 2,
+        "precision": 100.0,
+        "recall": 96.77,
+        "f1_score": 98.36,
+        "field_accuracy": 96.77
+      },
+      "medications": {
+        "tp": 42,
+        "fp": 45,
+        "fn": 88,
+        "precision": 48.28,
+        "recall": 32.31,
+        "f1_score": 38.71,
+        "field_accuracy": 24.0
+      },
+      "procedures": {
+        "tp": 30,
+        "fp": 3,
+        "fn": 54,
+        "precision": 90.91,
+        "recall": 35.71,
+        "f1_score": 51.28,
+        "field_accuracy": 34.48
+      },
+      "physician_notes": {
+        "tp": 21,
+        "fp": 0,
+        "fn": 29,
+        "precision": 100.0,
+        "recall": 42.0,
+        "f1_score": 59.15,
+        "field_accuracy": 42.0
+      }
+    }
+  },
+  "dataset_breakdown": {
+    "noisy-medical-document-images-ocr": {
+      "counts": {
+        "total_documents": 20,
+        "total_tp": 169,
+        "total_fp": 3,
+        "total_fn": 57
+      },
+      "overall_metrics": {
+        "precision": 98.26,
+        "precision_ci": [
+          95.0,
+          99.41
+        ],
+        "recall": 74.78,
+        "recall_ci": [
+          68.73,
+          79.99
+        ],
+        "f1_score": 84.92,
+        "field_extraction_accuracy": 73.8,
+        "field_extraction_accuracy_ci": [
+          67.74,
+          79.07
+        ]
+      },
+      "category_metrics": {
+        "metadata": {
+          "tp": 60,
+          "fp": 0,
+          "fn": 0,
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "field_accuracy": 100.0
+        },
+        "diagnoses": {
+          "tp": 20,
+          "fp": 0,
+          "fn": 0,
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "field_accuracy": 100.0
+        },
+        "medications": {
+          "tp": 42,
+          "fp": 0,
+          "fn": 0,
+          "precision": 100.0,
+          "recall": 100.0,
+          "f1_score": 100.0,
+          "field_accuracy": 100.0
+        },
+        "procedures": {
+          "tp": 30,
+          "fp": 3,
+          "fn": 54,
+          "precision": 90.91,
+          "recall": 35.71,
+          "f1_score": 51.28,
+          "field_accuracy": 34.48
+        },
+        "physician_notes": {
+          "tp": 17,
+          "fp": 0,
+          "fn": 3,
+          "precision": 100.0,
+          "recall": 85.0,
+          "f1_score": 91.89,
+          "field_accuracy": 85.0
+        }
+      }
+    },
+    "ClinOCR-Bench": {
+      "counts": {
+        "total_documents": 15,
+        "total_tp": 65,
+        "total_fp": 47,
+        "total_fn": 21
+      },
+      "overall_metrics": {
+        "precision": 58.04,
+        "precision_ci": [
+          48.78,
+          66.76
+        ],
+        "recall": 75.58,
+        "recall_ci": [
+          65.54,
+          83.44
+        ],
+        "f1_score": 65.66,
+        "field_extraction_accuracy": 48.87,
+        "field_extraction_accuracy_ci": [
+          40.53,
+          57.28
+        ]
+      },
+      "category_metrics": {
+        "metadata": {
+          "tp": 21,
+          "fp": 2,
+          "fn": 8,
+          "precision": 91.3,
+          "recall": 72.41,
+          "f1_score": 80.77,
+          "field_accuracy": 67.74
+        },
+        "diagnoses": {
+          "tp": 40,
+          "fp": 0,
+          "fn": 2,
+          "precision": 100.0,
+          "recall": 95.24,
+          "f1_score": 97.56,
+          "field_accuracy": 95.24
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 45,
+          "fn": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "field_accuracy": 0.0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "field_accuracy": 0.0
+        },
+        "physician_notes": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 11,
+          "precision": 100.0,
+          "recall": 26.67,
+          "f1_score": 42.11,
+          "field_accuracy": 26.67
+        }
+      }
+    },
+    "medical-prescription-dataset": {
+      "counts": {
+        "total_documents": 15,
+        "total_tp": 0,
+        "total_fp": 0,
+        "total_fn": 133
+      },
+      "overall_metrics": {
+        "precision": 0.0,
+        "precision_ci": [
+          0.0,
+          0.0
+        ],
+        "recall": 0.0,
+        "recall_ci": [
+          0.0,
+          2.81
+        ],
+        "f1_score": 0.0,
+        "field_extraction_accuracy": 0.0,
+        "field_extraction_accuracy_ci": [
+          0.0,
+          2.81
+        ]
+      },
+      "category_metrics": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 30,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "field_accuracy": 0.0
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "field_accuracy": 0.0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 88,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "field_accuracy": 0.0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "field_accuracy": 0.0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 15,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0,
+          "field_accuracy": 0.0
+        }
+      }
+    }
+  },
+  "case_evaluations": [
+    {
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-001",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 18357.1,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 3,
+        "procedures_count": 2,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 8,
+      "fp": 0,
+      "fn": 5,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 4
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "DS-002",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 23883.5,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 2,
+        "procedures_count": 2,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 7,
+      "fp": 0,
+      "fn": 3,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-003",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 51211.4,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 2,
+        "procedures_count": 0,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 10,
+      "fp": 1,
+      "fn": 3,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 2,
+          "fp": 1,
+          "fn": 3
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-004",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 28345.6,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 3,
+        "procedures_count": 3,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 7,
+      "fp": 0,
+      "fn": 6,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-005",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 39603.0,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 2,
+        "procedures_count": 0,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 9,
+      "fp": 0,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 2
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-006",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 46448.4,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 1,
+        "procedures_count": 3,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 8,
+      "fp": 0,
+      "fn": 5,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 5
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-007",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 60544.9,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 2,
+        "procedures_count": 1,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 9,
+      "fp": 0,
+      "fn": 3,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 3
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-008",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 40991.7,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 3,
+        "procedures_count": 1,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 9,
+      "fp": 0,
+      "fn": 5,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 5
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-009",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 49849.3,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 3,
+        "procedures_count": 1,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 11,
+      "fp": 0,
+      "fn": 0,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-010",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 53046.0,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 2,
+        "procedures_count": 4,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 8,
+      "fp": 0,
+      "fn": 6,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 5
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "DS-011",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 60290.6,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 3,
+        "procedures_count": 1,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 10,
+      "fp": 0,
+      "fn": 0,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-012",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 55916.9,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 3,
+        "procedures_count": 2,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 8,
+      "fp": 0,
+      "fn": 3,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 3
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-013",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 115169.2,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 2,
+        "procedures_count": 1,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 6,
+      "fp": 0,
+      "fn": 6,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-014",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 19880.3,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 1,
+        "procedures_count": 0,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 7,
+      "fp": 0,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-015",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 17147.5,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 2,
+        "procedures_count": 0,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 11,
+      "fp": 1,
+      "fn": 1,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 2,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 5,
+          "fp": 1,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "DS-016",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 17715.7,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 2,
+        "procedures_count": 6,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 7,
+      "fp": 0,
+      "fn": 3,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 3
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-017",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 18653.4,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 1,
+        "procedures_count": 1,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 11,
+      "fp": 0,
+      "fn": 0,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-018",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 19471.4,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 3,
+        "procedures_count": 3,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 6,
+      "fp": 0,
+      "fn": 3,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 3
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-019",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 36860.9,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 1,
+        "procedures_count": 0,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 7,
+      "fp": 1,
+      "fn": 1,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 1,
+          "fp": 1,
+          "fn": 1
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "DS-020",
+      "dataset": "noisy-medical-document-images-ocr",
+      "document_type": "Discharge Summary",
+      "latency_ms": 21248.9,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 1,
+        "medications_count": 1,
+        "procedures_count": 2,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 10,
+      "fp": 7,
+      "fn": 1,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 7,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-001",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 49942.2,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 7,
+        "medications_count": 7,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 11,
+      "fp": 6,
+      "fn": 0,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 6,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "CLINOCR-002",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 51422.8,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 7,
+        "medications_count": 6,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 9,
+      "fp": 7,
+      "fn": 0,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 7,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "CLINOCR-003",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 45242.3,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 5,
+        "medications_count": 7,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 10,
+      "fp": 5,
+      "fn": 1,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 1
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 5,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "CLINOCR-004",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 37864.6,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 6,
+        "medications_count": 5,
+        "procedures_count": 0,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 8,
+      "fp": 7,
+      "fn": 1,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 5,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 7,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-005",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 53737.8,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 5,
+        "medications_count": 7,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 7,
+      "fp": 6,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 1
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 6,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-006",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 42488.1,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 4,
+        "medications_count": 6,
+        "procedures_count": 0,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 10,
+      "fp": 7,
+      "fn": 0,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0
+        },
+        "diagnoses": {
+          "tp": 6,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 7,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0
+        }
+      },
+      "id": "CLINOCR-007",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 40522.3,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 6,
+        "medications_count": 7,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-008",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 44096.1,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-009",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 43817.0,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 2,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 1
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-010",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 27366.2,
+      "status": "analyzed",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 18,
+        "has_physician_notes": true
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-011",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 26079.9,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-012",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 26748.4,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-013",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 25707.0,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-014",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 26839.4,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 2,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "CLINOCR-015",
+      "dataset": "ClinOCR-Bench",
+      "document_type": "Clinical Tabular Report",
+      "latency_ms": 26532.9,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 5,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-001",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 27622.7,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 5,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-002",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 27054.1,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 7,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-003",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 26957.2,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-004",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 26038.4,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 5,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-005",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 25073.8,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-006",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 25614.4,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 7,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-007",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 24683.6,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-008",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 24709.9,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-009",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 28073.8,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-010",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 28207.6,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-011",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 25326.5,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 9,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 6
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-012",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 28646.1,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-013",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 28342.8,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 11,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 8
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-014",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 25592.6,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    },
+    {
+      "tp": 0,
+      "fp": 0,
+      "fn": 7,
+      "entity_breakdown": {
+        "metadata": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2
+        },
+        "diagnoses": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "medications": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4
+        },
+        "procedures": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0
+        },
+        "physician_notes": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1
+        }
+      },
+      "id": "RX-015",
+      "dataset": "medical-prescription-dataset",
+      "document_type": "Clinical Prescription",
+      "latency_ms": 28746.5,
+      "status": "unavailable",
+      "extracted_summary": {
+        "diagnoses_count": 0,
+        "medications_count": 0,
+        "procedures_count": 0,
+        "has_physician_notes": false
+      }
+    }
+  ]
+}

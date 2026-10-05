@@ -204,7 +204,7 @@ def _get_triage_models() -> list[str]:
         candidates = configured.split(",")
     else:
         candidates = [
-            os.getenv("GROQ_MODEL", "openai/gpt-oss-20b"),
+            os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b"),
             os.getenv("GROQ_FALLBACK_MODEL", "openai/gpt-oss-120b"),
         ]
 
