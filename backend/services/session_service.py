@@ -13,6 +13,7 @@ from services.ai_service import (
 )
 from services.message_service import create_message
 from services.triage_service import detect_urgent_red_flags
+from services import soap_classifier
 
 
 INTAKE_QUESTIONS = [
@@ -147,6 +148,22 @@ def save_ai_summary(db, session_id: str, clinical_summary: str) -> AISummary:
     return summary
 
 
+def _classify_and_store(db, message_obj: ChatMessage) -> dict:
+    """Run PubMedBERT classifier on a patient message and persist the label.
+
+    Always returns a classification dict — errors are caught so intake is
+    never interrupted by a classifier failure.
+    """
+    try:
+        result = soap_classifier.classify_soap(message_obj.message)
+        message_obj.soap_label = result["label"]
+        message_obj.soap_confidence = result["confidence"]
+        db.commit()
+        return result
+    except Exception:  # noqa: BLE001
+        return {"label": "Unavailable", "label_id": -1, "confidence": 0.0, "available": False}
+
+
 def process_intake_answer(
     db,
     session: ChatSession,
@@ -154,7 +171,8 @@ def process_intake_answer(
     input_mode: str,
     previous_structured: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    create_message(db, session.id, message, "patient")
+    patient_msg = create_message(db, session.id, message, "patient")
+    soap_result = _classify_and_store(db, patient_msg)
     messages = get_session_messages(db, session.id)
     transcript = build_transcript(messages)
     patient_triage_text = build_patient_triage_text(messages)
@@ -180,6 +198,7 @@ def process_intake_answer(
             "emergency_message": triage_result.get("emergency_message"),
             "triage_level": "emergency",
             "review_required": False,
+            "soap_classification": soap_result,
         }
 
     # 24-hour tier: not life-threatening, but worth telling the patient to
@@ -216,6 +235,7 @@ def process_intake_answer(
             "advisory": advisory,
             "triage_level": triage_result.get("level"),
             "review_required": bool(triage_result.get("review_required")),
+            "soap_classification": soap_result,
         }
 
     result = extract_and_summarize(transcript)
@@ -236,6 +256,7 @@ def process_intake_answer(
             "advisory": advisory,
             "triage_level": triage_result.get("level"),
             "review_required": bool(triage_result.get("review_required")),
+            "soap_classification": soap_result,
         }
 
     structured_data = data.model_dump()
@@ -263,4 +284,5 @@ def process_intake_answer(
         "advisory": advisory,
         "triage_level": triage_result.get("level"),
         "review_required": bool(triage_result.get("review_required")),
+        "soap_classification": soap_result,
     }

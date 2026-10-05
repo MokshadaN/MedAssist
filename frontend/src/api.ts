@@ -142,6 +142,15 @@ export type EmergencyHospital = {
   is_open?: boolean | null;
 };
 
+export type SOAPClassification = {
+  label: 'Subjective' | 'Objective' | 'Assessment' | 'Plan' | 'Unclear' | 'Unavailable';
+  label_id: number;
+  confidence: number;
+  valid?: boolean | null;
+  feedback?: string;
+  available: boolean;
+};
+
 export type IntakeResponse = {
   session_id: string;
   status: string;
@@ -159,6 +168,7 @@ export type IntakeResponse = {
   triage_level?: 'emergency' | 'urgent_care' | 'routine' | 'abstain' | null;
   review_required?: boolean;
   advisory?: string | null;
+  soap_classification?: SOAPClassification | null;
 };
 
 export type AISummary = {
@@ -194,6 +204,8 @@ export type SessionState = {
     sender: string;
     message: string;
     timestamp: string;
+    soap_label?: string | null;
+    soap_confidence?: number | null;
   }>;
 };
 
@@ -454,6 +466,17 @@ export const api = {
       method: 'POST',
       token,
       body: JSON.stringify({ transcript }),
+    });
+  },
+  classifySOAP(
+    text: string,
+    token: string,
+    expectedSection?: 'Subjective' | 'Objective' | 'Assessment' | 'Plan',
+  ) {
+    return request<SOAPClassification>(`/soap/classify`, {
+      method: 'POST',
+      token,
+      body: JSON.stringify({ text, expected_section: expectedSection ?? null }),
     });
   },
   getSummary(sessionId: string, token: string) {

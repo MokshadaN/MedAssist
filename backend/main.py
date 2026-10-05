@@ -51,6 +51,7 @@ from schemas import ai, auth, feedback, message, patient, prescription, reminder
 
 from api.v1.router import api_router
 from services import ai_service
+from services.soap_classifier import warmup as soap_warmup, get_model_status as soap_status
 
 # ── Logging ───────────────────────────────────────────────────────────────────
 configure_logging(environment=settings.environment, log_level=settings.log_level)
@@ -165,6 +166,17 @@ def health_detailed():
     hf_token = os.getenv("HF_TOKEN", "")
     checks["huggingface"] = {"status": "configured" if hf_token else "not_configured"}
 
+    # ── SOAP PubMedBERT Classifier ────────────────────────────────────────────
+    soap = soap_status()
+    checks["soap_classifier"] = {
+        "status": "loaded" if soap["loaded"] else ("error" if soap["error"] else "not_loaded"),
+        "model_exists": soap["model_exists"],
+        "device": soap["device"],
+        "error": soap["error"],
+    }
+    if not soap["loaded"]:
+        overall = "degraded"
+
     return {
         "status": overall,
         "environment": settings.environment,
@@ -186,6 +198,13 @@ def startup_event():
         logger.info("Development mode: database tables verified/created (production uses Alembic only).")
     else:
         logger.info("Production mode: skipping create_all — schema is managed by Alembic.")
+
+    # Pre-warm the PubMedBERT SOAP classifier so the first patient request
+    # does not pay the model-load latency cost.
+    try:
+        soap_warmup()
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("SOAP classifier warmup failed (non-fatal): %s", exc)
 
     # Initialize Cache (Redis if available, else InMemory)
     redis_password = os.getenv("REDIS_PASSWORD", "")

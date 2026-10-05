@@ -52,7 +52,7 @@ interface PatientDashboardViewProps {
   setIntakeOpen: (open: boolean) => void;
   intakeText: string;
   setIntakeText: (text: string) => void;
-  intakeMessages: Array<{ role: 'assistant' | 'user'; text: string }>;
+  intakeMessages: Array<{ role: 'assistant' | 'user'; text: string; soapLabel?: string; soapConfidence?: number }>;
   isRecording: boolean;
   isTranscribing: boolean;
   isSendingIntake: boolean;
@@ -61,6 +61,7 @@ interface PatientDashboardViewProps {
   emergencyMessage: string;
   emergencyHospitals: EmergencyHospital[];
   lastSummary: AISummary | null;
+  authToken: string | null;
   medicineDb: MedicineInfo[];
   showMedicineBox: boolean;
   setShowMedicineBox: (show: boolean) => void;
@@ -116,6 +117,7 @@ export const PatientDashboardView: React.FC<PatientDashboardViewProps> = ({
   emergencyMessage,
   emergencyHospitals,
   lastSummary,
+  authToken,
   medicineDb,
   showMedicineBox,
   setShowMedicineBox,
@@ -352,6 +354,7 @@ export const PatientDashboardView: React.FC<PatientDashboardViewProps> = ({
               emergencyMessage={emergencyMessage}
               emergencyHospitals={emergencyHospitals}
               lastSummary={lastSummary}
+              authToken={authToken}
               onStartIntake={onStartIntake}
               onSendIntakeMessage={onSendIntakeMessage}
               onToggleRecording={onToggleRecording}
