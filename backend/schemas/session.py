@@ -26,8 +26,6 @@ class SessionMessageOut(BaseModel):
     sender: str
     message: str
     timestamp: datetime
-    soap_label: str | None = None
-    soap_confidence: float | None = None
 
 
 class SessionDetailOut(BaseModel):
@@ -74,5 +72,3 @@ class IntakeResponse(BaseModel):
     review_required: bool = False
     # Non-emergency advisory; intake continues.
     advisory: str | None = None
-    # Real-time SOAP classification for the patient message just processed.
-    soap_classification: dict | None = None

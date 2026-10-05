@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   Stethoscope,
   ArrowRight,
@@ -11,181 +11,13 @@ import {
   Bot,
   User,
   CheckCircle2,
-  Brain,
+  Phone
 } from 'lucide-react';
-import { DoctorDirectoryItem, AISummary, EmergencyHospital, SOAPClassification, api } from '../../api';
+import { DoctorDirectoryItem, AISummary, EmergencyHospital } from '../../api';
+import { Dialog } from '../ui/dialog';
 
-type ChatMessage = { role: 'assistant' | 'user'; text: string; soapLabel?: string; soapConfidence?: number };
+type ChatMessage = { role: 'assistant' | 'user'; text: string };
 
-// ─── SOAP badge config ────────────────────────────────────────────────────────
-const SOAP_CONFIG: Record<
-  string,
-  { color: string; bg: string; border: string; dot: string; short: string }
-> = {
-  Subjective:  { color: '#065F46', bg: '#ECFDF5', border: '#A7F3D0', dot: '#10B981', short: 'S' },
-  Objective:   { color: '#1E3A8A', bg: '#EFF6FF', border: '#BFDBFE', dot: '#3B82F6', short: 'O' },
-  Assessment:  { color: '#713F12', bg: '#FFFBEB', border: '#FDE68A', dot: '#F59E0B', short: 'A' },
-  Plan:        { color: '#4C1D95', bg: '#F5F3FF', border: '#DDD6FE', dot: '#8B5CF6', short: 'P' },
-  Unclear:     { color: '#374151', bg: '#F9FAFB', border: '#E5E7EB', dot: '#9CA3AF', short: '?' },
-};
-
-function SOAPBadge({
-  result,
-  isLoading,
-}: {
-  result: SOAPClassification | null;
-  isLoading: boolean;
-}) {
-  if (isLoading) {
-    return (
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.35rem',
-          padding: '0.2rem 0.65rem',
-          borderRadius: 999,
-          backgroundColor: '#F3F4F6',
-          border: '1px solid #E5E7EB',
-          fontSize: '0.68rem',
-          color: '#6B7280',
-          fontWeight: 500,
-          animation: 'pulse 1.5s ease-in-out infinite',
-        }}
-      >
-        <Brain size={11} />
-        <span>Classifying…</span>
-      </div>
-    );
-  }
-
-  if (!result || !result.available || result.label === 'Unavailable') return null;
-
-  const cfg = SOAP_CONFIG[result.label] ?? SOAP_CONFIG['Unclear'];
-  const pct = Math.round(result.confidence * 100);
-
-  return (
-    <div
-      title={`PubMedBERT classified this as "${result.label}" (${pct}% confidence)`}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '0.35rem',
-        padding: '0.2rem 0.65rem',
-        borderRadius: 999,
-        backgroundColor: cfg.bg,
-        border: `1px solid ${cfg.border}`,
-        fontSize: '0.68rem',
-        color: cfg.color,
-        fontWeight: 600,
-        transition: 'all 0.2s ease',
-        cursor: 'default',
-        userSelect: 'none',
-      }}
-    >
-      <span
-        style={{
-          width: 7,
-          height: 7,
-          borderRadius: '50%',
-          backgroundColor: cfg.dot,
-          flexShrink: 0,
-        }}
-      />
-      <span>{result.label === 'Unclear' ? 'Keep describing…' : result.label}</span>
-      {result.label !== 'Unclear' && (
-        <span style={{ opacity: 0.7 }}>{pct}%</span>
-      )}
-    </div>
-  );
-}
-
-// Small inline SOAP tag shown on each user message bubble
-function MessageSOAPTag({ label, confidence }: { label: string; confidence: number }) {
-  const cfg = SOAP_CONFIG[label];
-  if (!cfg) return null;
-  return (
-    <span
-      title={`${label} — ${Math.round(confidence * 100)}% confidence`}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '0.25rem',
-        padding: '0.1rem 0.45rem',
-        borderRadius: 999,
-        backgroundColor: cfg.bg,
-        border: `1px solid ${cfg.border}`,
-        fontSize: '0.62rem',
-        color: cfg.color,
-        fontWeight: 700,
-        marginTop: '0.3rem',
-        letterSpacing: '0.04em',
-      }}
-    >
-      <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: cfg.dot, flexShrink: 0 }} />
-      {cfg.short}
-    </span>
-  );
-}
-
-// Coverage strip: which SOAP sections have been captured
-function SOAPCoverageStrip({ messages }: { messages: ChatMessage[] }) {
-  const covered = new Set(messages.filter((m) => m.soapLabel && m.soapLabel !== 'Unclear').map((m) => m.soapLabel));
-  const sections = [
-    { key: 'Subjective',  label: 'S', title: 'Subjective'  },
-    { key: 'Objective',   label: 'O', title: 'Objective'   },
-    { key: 'Assessment',  label: 'A', title: 'Assessment'  },
-    { key: 'Plan',        label: 'P', title: 'Plan'        },
-  ];
-  const hasSome = messages.some((m) => m.role === 'user');
-  if (!hasSome) return null;
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.35rem',
-        padding: '0.45rem 1.25rem',
-        backgroundColor: '#F8FAF7',
-        borderBottom: '1px solid #E8ECE7',
-        flexShrink: 0,
-      }}
-    >
-      <span style={{ fontSize: '0.6rem', fontWeight: 700, color: '#63806F', textTransform: 'uppercase', letterSpacing: '0.07em', marginRight: '0.25rem' }}>
-        SOAP
-      </span>
-      {sections.map(({ key, label, title }) => {
-        const ok = covered.has(key);
-        const cfg = SOAP_CONFIG[key];
-        return (
-          <span
-            key={key}
-            title={`${title}: ${ok ? 'captured' : 'not yet covered'}`}
-            style={{
-              width: 22,
-              height: 22,
-              borderRadius: 6,
-              border: `1px solid ${ok ? cfg.border : '#E5E7EB'}`,
-              backgroundColor: ok ? cfg.bg : '#F9FAFB',
-              color: ok ? cfg.color : '#9CA3AF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '0.65rem',
-              fontWeight: 700,
-              transition: 'all 0.2s',
-            }}
-          >
-            {label}
-          </span>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── Props ────────────────────────────────────────────────────────────────────
 interface PatientIntakeCardProps {
   doctors: DoctorDirectoryItem[];
   selectedDoctorId: string;
@@ -203,14 +35,12 @@ interface PatientIntakeCardProps {
   emergencyMessage: string;
   emergencyHospitals: EmergencyHospital[];
   lastSummary: AISummary | null;
-  authToken: string | null;
   onStartIntake: () => Promise<void>;
   onSendIntakeMessage: () => Promise<void>;
   onToggleRecording: () => void;
   onFinishIntake: () => Promise<void>;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
 export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
   doctors,
   selectedDoctorId,
@@ -228,67 +58,11 @@ export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
   emergencyMessage,
   emergencyHospitals,
   lastSummary,
-  authToken,
   onStartIntake,
   onSendIntakeMessage,
   onToggleRecording,
   onFinishIntake,
 }) => {
-  // ── SOAP real-time classification state ──────────────────────────────────────
-  const [soapResult, setSoapResult] = useState<SOAPClassification | null>(null);
-  const [soapLoading, setSoapLoading] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
-
-  const runClassify = useCallback(
-    async (text: string) => {
-      if (!authToken || !text.trim() || text.trim().length < 8) {
-        setSoapResult(null);
-        setSoapLoading(false);
-        return;
-      }
-      // Cancel any previous in-flight request
-      abortRef.current?.abort();
-      abortRef.current = new AbortController();
-      setSoapLoading(true);
-      try {
-        const result = await api.classifySOAP(text.trim(), authToken);
-        setSoapResult(result);
-      } catch {
-        // Silent fail — never disrupt the patient typing flow
-        setSoapResult(null);
-      } finally {
-        setSoapLoading(false);
-      }
-    },
-    [authToken],
-  );
-
-  // Debounce: classify 400ms after the user stops typing
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!intakeText.trim() || intakeText.trim().length < 8) {
-      setSoapResult(null);
-      setSoapLoading(false);
-      return;
-    }
-    setSoapLoading(true);
-    debounceRef.current = setTimeout(() => {
-      runClassify(intakeText);
-    }, 400);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [intakeText, runClassify]);
-
-  // Clear badge after message is sent
-  useEffect(() => {
-    if (!isSendingIntake) {
-      setSoapResult(null);
-      setSoapLoading(false);
-    }
-  }, [isSendingIntake]);
-
   return (
     <>
       {/* Start Visit Card on Dashboard */}
@@ -483,7 +257,7 @@ export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
                     AI Clinical Intake Assistant
                   </h3>
                   <p style={{ fontSize: '0.7rem', color: '#63806F', margin: '2px 0 0 0' }}>
-                    Conversational triage & symptom evaluation · PubMedBERT SOAP classification
+                    Conversational triage & symptom evaluation
                   </p>
                 </div>
               </div>
@@ -577,9 +351,6 @@ export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
               </div>
             )}
 
-            {/* SOAP Coverage Strip */}
-            <SOAPCoverageStrip messages={intakeMessages} />
-
             {/* Message Thread */}
             <div
               style={{
@@ -623,25 +394,20 @@ export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
                         <Bot size={15} color="#86EFAC" />
                       </div>
                     )}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: isAssistant ? 'flex-start' : 'flex-end', maxWidth: '82%' }}>
-                      <div
-                        style={{
-                          borderRadius: 14,
-                          padding: '0.65rem 0.95rem',
-                          fontSize: '0.8rem',
-                          lineHeight: 1.5,
-                          backgroundColor: isAssistant ? '#FFFFFF' : '#142A1F',
-                          color: isAssistant ? '#142A1F' : '#FFFFFF',
-                          border: isAssistant ? '1px solid #E3E8E3' : 'none',
-                          boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
-                        }}
-                      >
-                        {msg.text}
-                      </div>
-                      {/* SOAP mini tag on user messages */}
-                      {!isAssistant && msg.soapLabel && msg.soapLabel !== 'Unclear' && msg.soapConfidence !== undefined && (
-                        <MessageSOAPTag label={msg.soapLabel} confidence={msg.soapConfidence} />
-                      )}
+                    <div
+                      style={{
+                        maxWidth: '82%',
+                        borderRadius: 14,
+                        padding: '0.65rem 0.95rem',
+                        fontSize: '0.8rem',
+                        lineHeight: 1.5,
+                        backgroundColor: isAssistant ? '#FFFFFF' : '#142A1F',
+                        color: isAssistant ? '#142A1F' : '#FFFFFF',
+                        border: isAssistant ? '1px solid #E3E8E3' : 'none',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+                      }}
+                    >
+                      {msg.text}
                     </div>
                     {!isAssistant && (
                       <div
@@ -689,28 +455,11 @@ export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
                 borderTop: '1px solid #E8ECE7',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.5rem',
+                gap: '0.65rem',
                 flexShrink: 0,
                 boxSizing: 'border-box',
               }}
             >
-              {/* Real-time SOAP badge — shown above the input */}
-              <div style={{ minHeight: 26, display: 'flex', alignItems: 'center' }}>
-                <SOAPBadge result={soapResult} isLoading={soapLoading && intakeText.trim().length >= 8} />
-                {soapResult?.feedback && (
-                  <span
-                    style={{
-                      marginLeft: '0.6rem',
-                      fontSize: '0.67rem',
-                      color: '#92400E',
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    {soapResult.feedback}
-                  </span>
-                )}
-              </div>
-
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -739,9 +488,8 @@ export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
                   }}
                 >
                   <input
-                    id="intake-message-input"
                     type="text"
-                    placeholder={isRecording ? 'Listening to voice...' : 'Type your symptoms or how you feel…'}
+                    placeholder={isRecording ? 'Listening to voice...' : 'Type your symptoms or how you feel...'}
                     value={intakeText}
                     onChange={(e) => setIntakeText(e.target.value)}
                     style={{
@@ -783,7 +531,6 @@ export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
 
                 {/* Send Button */}
                 <button
-                  id="intake-send-btn"
                   type="submit"
                   disabled={!intakeText.trim() || isSendingIntake}
                   style={{
@@ -847,7 +594,6 @@ export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
                 </span>
 
                 <button
-                  id="finish-intake-btn"
                   type="button"
                   onClick={() => onFinishIntake()}
                   style={{
@@ -887,3 +633,4 @@ export const PatientIntakeCard: React.FC<PatientIntakeCardProps> = ({
 };
 
 export default PatientIntakeCard;
+

@@ -1,0 +1,52 @@
+services:
+  # ── Backend Web Service (FastAPI) ──────────────────────────────────────────
+  - type: web
+    name: medassist-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    region: oregon # or frankfurt / singapore
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: medassist-postgres
+          property: connectionString
+      - key: ALLOWED_ORIGINS
+        # Update this with your frontend URL once generated, or comma-separated origins
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+
+  # ── Frontend Static Site (React + Vite) ───────────────────────────────────
+  - type: web
+    name: medassist-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        # Set to https://<your-backend-name>.onrender.com/api/v1
+        sync: false
+
+# ── Managed PostgreSQL Database ──────────────────────────────────────────────
+databases:
+  - name: medassist-postgres
+    databaseName: medassist
+    user: medassist
+    plan: free
+    region: oregon

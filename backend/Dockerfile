@@ -42,6 +42,6 @@ USER appuser
 
 EXPOSE 8000
 
-# Default: run migrations then start Uvicorn
+# Default: run migrations then start Uvicorn (uses $PORT provided by Render or defaults to 8000)
 # Override this in docker-compose or Kubernetes for the Celery worker
-CMD ["sh", "-c", "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4 --no-access-log"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 2 --no-access-log"]

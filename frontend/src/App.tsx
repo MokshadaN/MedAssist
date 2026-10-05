@@ -34,7 +34,7 @@ import {
 } from './api';
 import { FrequencyOption } from './components/doctor/DoctorPrescriptionStudio';
 
-type ChatMessage = { role: 'assistant' | 'user'; text: string; soapLabel?: string; soapConfidence?: number };
+type ChatMessage = { role: 'assistant' | 'user'; text: string };
 
 function App() {
   const isPublicRoute = window.location.pathname.startsWith('/public-profile/');
@@ -642,12 +642,7 @@ function App() {
       );
       setIntakeMessages((current) => [
         ...current,
-        {
-          role: 'user',
-          text: answer,
-          soapLabel: response.soap_classification?.label,
-          soapConfidence: response.soap_classification?.confidence,
-        },
+        { role: 'user', text: answer },
         { role: 'assistant', text: response.next_question || response.clinical_summary || response.message },
       ]);
       setIntakeText('');
@@ -999,7 +994,6 @@ function App() {
         emergencyMessage={emergencyMessage}
         emergencyHospitals={emergencyHospitals}
         lastSummary={lastSummary}
-        authToken={authToken}
         medicineDb={MEDICINE_DB}
         showMedicineBox={showMedicineBox}
         setShowMedicineBox={setShowMedicineBox}

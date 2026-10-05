@@ -33,14 +33,17 @@ class PendingDoctorOut(BaseModel):
     user_id: str
     name: str | None = None
     email: str | None = None
+    phone: str | None = None
     specialization: str | None = None
     license_number: str | None = None
     state_council: str | None = None
+    qualification: str | None = None
     registration_year: int | None = None
     experience_years: int | None = None
     hospital_affiliation: str | None = None
     verification_status: str = "pending"
     submitted_at: datetime | None = None
+    created_at: datetime | None = None
 
 
 def _get_doctor_or_404(db: Session, user_id: str) -> tuple[User, DoctorProfile]:
@@ -75,14 +78,17 @@ def list_pending_doctors(
             user_id=user.id,
             name=user.name,
             email=user.email,
+            phone=user.phone,
             specialization=profile.specialization,
             license_number=profile.license_number,
             state_council=profile.state_council,
+            qualification=profile.qualification,
             registration_year=profile.registration_year,
             experience_years=profile.experience_years,
             hospital_affiliation=profile.hospital_affiliation,
             verification_status=profile.verification_status,
             submitted_at=profile.submitted_at,
+            created_at=user.created_at,
         )
         for profile, user in pending
     ]

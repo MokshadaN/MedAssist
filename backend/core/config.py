@@ -98,6 +98,13 @@ class Settings(BaseSettings):
                 raise ValueError("SECRET_KEY must be at least 32 characters in production.")
         return v
 
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def validate_database_url(cls, v: str) -> str:
+        if v and v.startswith("postgres://"):
+            return v.replace("postgres://", "postgresql://", 1)
+        return v
+
     def get_allowed_origins(self) -> List[str]:
         """Parse the comma-separated allowed_origins string into a list."""
         return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]

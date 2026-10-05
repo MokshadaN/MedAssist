@@ -12,8 +12,6 @@ __pycache__/
 medassist.db
 frontend/dist/
 frontend/node_modules/
+*.tsbuildinfo
 uploads/
 vite-app
-
-# Fine-tuned PubMedBERT model
-backend/pubmedbert/
